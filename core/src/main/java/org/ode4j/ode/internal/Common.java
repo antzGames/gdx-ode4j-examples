@@ -24,14 +24,12 @@
  *************************************************************************/
 package org.ode4j.ode.internal;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
-
 import org.ode4j.math.DVector3;
 import org.ode4j.ode.DGeom.DNearCallback;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.OdeConstants;
-import org.ode4j.ode.internal.joints.DxJoint;
+
 
 import static org.ode4j.ode.internal.ErrorHandler.*;
 

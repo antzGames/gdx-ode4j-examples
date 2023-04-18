@@ -31,7 +31,7 @@ import org.ode4j.math.DVector3C;
 
 /**
  *  object, body, and world structs.
- *  
+ *
  *  @author Tilmann Zaeschke
  */
 public class Objects_H {
@@ -47,21 +47,21 @@ public class Objects_H {
 //	#endif
 
 	/** auto disable parameters. */
-	public static class dxAutoDisable implements Cloneable {
+	public static class dxAutoDisable {
 		public double idle_time;		// time the body needs to be idle to auto-disable it
 		public int idle_steps;		// steps the body needs to be idle to auto-disable it
 		public double linear_average_threshold;   // linear (squared) average velocity threshold
 		public double angular_average_threshold;  // angular (squared) average velocity threshold
-		//TODO? unsigned 
+		//TODO? unsigned
 		public int average_samples;     // size of the average_lvel and average_avel buffers
-		@Override
-		protected dxAutoDisable clone() {
-			try {
-				return (dxAutoDisable) super.clone();
-			} catch (CloneNotSupportedException e) {
-				throw new RuntimeException(e);
-			}
-		}
+//		@Override
+//		protected dxAutoDisable clone() {
+//			try {
+//				return (dxAutoDisable) super.clone();
+//			} catch (CloneNotSupportedException e) {
+//				throw new RuntimeException(e);
+//			}
+//		}
 
 		//TZ: 'explicit' not required in Java
 	    dxAutoDisable() {
@@ -75,19 +75,19 @@ public class Objects_H {
 
 
 	/** damping parameters. */
-	public static class dxDampingParameters implements Cloneable {
+	public static class dxDampingParameters{
 		public double linear_scale;  // multiply the linear velocity by (1 - scale)
 		public double angular_scale; // multiply the angular velocity by (1 - scale)
 		public double linear_threshold;   // linear (squared) average speed threshold
 		public double angular_threshold;  // angular (squared) average speed threshold
-		@Override
-		protected dxDampingParameters clone() {
-			try {
-				return (dxDampingParameters) super.clone();
-			} catch (CloneNotSupportedException e) {
-				throw new RuntimeException(e);
-			}
-		}
+//		@Override
+//		protected dxDampingParameters clone() {
+//			try {
+//				return (dxDampingParameters) super.clone();
+//			} catch (CloneNotSupportedException e) {
+//				throw new RuntimeException(e);
+//			}
+//		}
 
 		//TZ: 'explicit' not required in Java
 	    dxDampingParameters() {
@@ -100,13 +100,13 @@ public class Objects_H {
 
 
 	/** quick-step parameters. */
-	public static class dxQuickStepParameters extends CloneableParameter {
+	public static class dxQuickStepParameters {
 		public int num_iterations;		// number of SOR iterations to perform
 		public double w;			// the SOR over-relaxation parameter
-		@Override
-		protected dxQuickStepParameters clone() {
-			return cloneThis();
-		}
+//		@Override
+//		protected dxQuickStepParameters clone() {
+//			return cloneThis();
+//		}
 
 		//TZ: 'explicit' not required in Java
 	    dxQuickStepParameters() {
@@ -117,13 +117,13 @@ public class Objects_H {
 
 
 	/** contact generation parameters. */
-	public static class dxContactParameters extends CloneableParameter {
+	public static class dxContactParameters {
 		public double max_vel;		// maximum correcting velocity
 		public double min_depth;		// thickness of 'surface layer'
-		@Override
-		protected dxContactParameters clone() {
-			return cloneThis();
-		}
+//		@Override
+//		protected dxContactParameters clone() {
+//			return cloneThis();
+//		}
 
 		//TZ: 'explicit' not required in Java
 	    dxContactParameters() {
@@ -134,7 +134,7 @@ public class Objects_H {
 
 
 
-	/** 
+	/**
 	 * position vector and rotation matrix for geometry objects that are not
 	 * connected to bodies.
 	 */
@@ -146,7 +146,7 @@ public class Objects_H {
 			return R;
 		}
 		/**
-		 * 
+		 *
 		 * @return Writable R.
 		 */
 		public DMatrix3 Rw() {
@@ -168,21 +168,21 @@ public class Objects_H {
 			}
 		}
 	}
-	
+
 	public interface DxPosRC {
 		DMatrix3C R();
 		DVector3C pos();
 	}
-	
-	private static class CloneableParameter implements Cloneable {
+
+	private static class CloneableParameter  {
 		//@Override
-		@SuppressWarnings("unchecked")
-		public <T> T cloneThis() {
-			try {
-				return (T) super.clone();
-			} catch (CloneNotSupportedException e) {
-				throw new RuntimeException(e);
-			}
-		}
+//		@SuppressWarnings("unchecked")
+//		public <T> T cloneThis() {
+//			try {
+//				return (T) super.clone();
+//			} catch (CloneNotSupportedException e) {
+//				throw new RuntimeException(e);
+//			}
+//		}
 	}
 }

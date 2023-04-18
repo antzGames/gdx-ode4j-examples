@@ -294,7 +294,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 		 dOrthogonalizeR(_posr.Rw());
 		 dQfromR (_q, R);
 		 dNormalize4 (_q);
-		  
+
 		// notify all attached geoms that this body has moved
 		for (DxGeom geom2 = geom; geom2 != null; geom2 = geom2.dGeomGetBodyNext ()) {
 			geom2.dGeomMoved ();
@@ -382,7 +382,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 		//			R.v[9] = src[9];
 		//			R.v[10] = src[10];
 		//			R.v[11] = src[11];
-		//TODO clean up commented code and other TODO below (add(f), e.t.c) 
+		//TODO clean up commented code and other TODO below (add(f), e.t.c)
 		R.set(b._posr.R());
 	}
 
@@ -421,12 +421,12 @@ public class DxBody extends DObject implements DBody, Cloneable {
 		dIASSERT(mass2.check());
 
 		// The centre of mass must be at the origin.
-		// Use dMassTranslate( mass, -mass->c[0], -mass->c[1], -mass->c[2] ) 
+		// Use dMassTranslate( mass, -mass->c[0], -mass->c[1], -mass->c[2] )
 		// to correct it.
 		DVector3C mass2c = mass2.getC();
 		dUASSERT( Math.abs( mass2c.get0() ) <= DBL_EPSILON &&
 				Math.abs( mass2c.get1() ) <= DBL_EPSILON &&
-				Math.abs( mass2c.get2() ) <= DBL_EPSILON, 
+				Math.abs( mass2c.get2() ) <= DBL_EPSILON,
 		"The centre of mass must be at the origin." );
 
 		//memcpy (b.mass,mass,sizeof(dMass));
@@ -708,7 +708,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	{
 		//dSetZero (b->invI,4*3);
 		invI.setZero();
-		invMass = 0; 
+		invMass = 0;
 	}
 
 	boolean dBodyIsKinematic ()
@@ -873,7 +873,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 			adis.idle_steps = world.getAutoDisableSteps();
 			adis.idle_time = world.getAutoDisableTime();
 			// resetting the average calculations too
-			dBodySetAutoDisableAverageSamplesCount( 
+			dBodySetAutoDisableAverageSamplesCount(
 					world.getAutoDisableAverageSamplesCount() );
 		}
 		else
@@ -886,7 +886,13 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	void dBodySetAutoDisableDefaults ()
 	{
 		DxWorld w = world;
-		adis = w.adis.clone();
+		adis = new dxAutoDisable();
+        adis.average_samples = w.adis.average_samples;
+        adis.angular_average_threshold = w.adis.angular_average_threshold;
+        adis.idle_steps = w.adis.idle_steps;
+        adis.linear_average_threshold = w.adis.linear_average_threshold;
+        adis.idle_time = w.adis.idle_time;
+
 		dBodySetAutoDisableFlag ( (w.body_flags & dxBodyAutoDisable)!=0);
 	}
 
@@ -951,7 +957,13 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	void dBodySetDampingDefaults()
 	{
 		DxWorld w = world;
-		dampingp = w.dampingp.clone();
+		dampingp = new dxDampingParameters();
+
+        dampingp.angular_scale = w.dampingp.angular_scale;
+        dampingp.linear_scale = w.dampingp.linear_scale;
+        dampingp.angular_threshold = w.dampingp.angular_threshold;
+        dampingp.linear_threshold = w.dampingp.linear_threshold;
+
 		//unsigned
 		final int mask = dxBodyLinearDamping | dxBodyAngularDamping;
 		flags &= ~mask; // zero them
@@ -1114,7 +1126,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 
 
 		// notify all attached geoms that this body has moved
-	    DxWorldProcessContext world_process_context = world.UnsafeGetWorldProcessingContext(); 
+	    DxWorldProcessContext world_process_context = world.UnsafeGetWorldProcessingContext();
 	    for (DxGeom geom2 = geom; geom2 != null; geom2 = geom2.dGeomGetBodyNext ()) {
 	        world_process_context.LockForStepbodySerialization();
 	        geom2.dGeomMoved ();
@@ -1157,14 +1169,14 @@ public class DxBody extends DObject implements DBody, Cloneable {
 
 	@Override
 	public String toString() {
-		return super.toString();  
+		return super.toString();
 	}
 
 	public DxPosRC posr() {
 		return _posr;
 	}
-	
-	
+
+
 	// ******************************************************
 	// dBody API
 	// ******************************************************
@@ -1179,9 +1191,9 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	@Override
 	public void setData (Object data)
 	{ dBodySetData (data); }
-	//void *getData() 
+	//void *getData()
 	@Override
-	public Object getData() 
+	public Object getData()
 	{ return dBodyGetData (); }
 
 	@Override
@@ -1218,7 +1230,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	{ dBodySetAngularVel (v); }
 
 	@Override
-	public DVector3C getPosition() 
+	public DVector3C getPosition()
 	{ return dBodyGetPosition (); }
 	@Override
 	public DMatrix3C getRotation() //const
@@ -1418,14 +1430,14 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	{ dBodySetGravityMode (mode); }
 	/** @see DxBody#dBodyGetGravityMode() */
 	@Override
-	public boolean getGravityMode() 
+	public boolean getGravityMode()
 	{ return dBodyGetGravityMode (); }
 
 	@Override
 	public void setGyroscopicMode (boolean mode)
 	{ dBodySetGyroscopicMode(mode); }
 	@Override
-	public boolean getGyroscopicMode() 
+	public boolean getGyroscopicMode()
 	{ return dBodyGetGyroscopicMode (); }
 
 	@Override
@@ -1448,19 +1460,19 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	public void setAutoDisableSteps (int steps)
 	{ dBodySetAutoDisableSteps (steps); }
 	@Override
-	public int getAutoDisableSteps() 
+	public int getAutoDisableSteps()
 	{ return dBodyGetAutoDisableSteps (); }
 	@Override
 	public void setAutoDisableTime (double time)
 	{ dBodySetAutoDisableTime (time); }
 	@Override
-	public double getAutoDisableTime() 
+	public double getAutoDisableTime()
 	{ return dBodyGetAutoDisableTime (); }
 	@Override
 	public void setAutoDisableFlag (boolean do_auto_disable)
 	{ dBodySetAutoDisableFlag ( do_auto_disable); }
 	@Override
-	public boolean getAutoDisableFlag() 
+	public boolean getAutoDisableFlag()
 	{ return dBodyGetAutoDisableFlag (); }
 
 	@Override
