@@ -24,11 +24,13 @@
  *************************************************************************/
 package org.ode4j.ode;
 
+import com.badlogic.gdx.utils.TimeUtils;
+
 public class DStopwatch {
 
 	private double _time;			/* total clock count */
 	private long _cc;   /* clock count since last `start' */
-	
+
 	//****************************************************************************
 	// stop watches
 
@@ -39,12 +41,12 @@ public class DStopwatch {
 
 
 	public void start () {
-		_cc = System.nanoTime();
+		_cc =  TimeUtils.nanoTime();
 	}
 
 
 	public void stop () {
-		_time += System.nanoTime() - _cc;
+		_time +=  TimeUtils.nanoTime() - _cc;
 	}
 
 

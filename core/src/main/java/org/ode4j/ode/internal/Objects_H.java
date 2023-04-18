@@ -156,17 +156,15 @@ public class Objects_H {
 		public DVector3C pos() {
 			return pos;
 		}
-		@Override
-		protected DxPosR clone() {
-			try {
-				DxPosR p = (DxPosR) super.clone();
-				p.pos.set( pos );// = pos.clone();
-				p.R.set( R );// = R.clone();
-				return p;
-			} catch (CloneNotSupportedException e) {
-				throw new RuntimeException(e);
-			}
-		}
+
+//		protected DxPosR copy() {
+//				DxPosR p = new DxPosR();
+//                p.pos = pos.
+//				p.pos.set( pos );// = pos.clone();
+//				p.R.set( R );// = R.clone();
+//				return p;
+//			}
+//		}
 	}
 
 	public interface DxPosRC {

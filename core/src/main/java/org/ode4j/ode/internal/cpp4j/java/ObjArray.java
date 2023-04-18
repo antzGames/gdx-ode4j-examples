@@ -30,10 +30,10 @@ import java.util.Arrays;
  * @param <T> type
  */
 public class ObjArray<T> {
-    
+
     private final T[] _data;
     private int _ofs;
-    
+
     /**
      * Create a new Array referencing the given array.
      * @param array array
@@ -42,7 +42,7 @@ public class ObjArray<T> {
         _data = array;
         _ofs = 0;
     }
-    
+
     /**
      * Create a new Array referencing the given array.
      * @param array array
@@ -52,7 +52,7 @@ public class ObjArray<T> {
         _data = array;
         _ofs = ofs;
     }
-    
+
     /**
      * Create a new Array referencing the same Array referenced by
      * the argument.
@@ -62,7 +62,7 @@ public class ObjArray<T> {
         _data = array._data;
         _ofs = array._ofs;
     }
-    
+
     /**
      * Create a new Array referencing the same Array referenced by
      * the argument, starting at the given offset.
@@ -73,18 +73,18 @@ public class ObjArray<T> {
         _data = array._data;
         _ofs = array._ofs + ofs;
         if (_ofs >= _data.length) {
-            throw new IndexOutOfBoundsException(array._ofs + " + " + ofs + 
+            throw new IndexOutOfBoundsException(array._ofs + " + " + ofs +
                     " = " + _ofs + " >= " + _data.length);
         }
     }
-    
+
     /**
      * @return value at position 0;
      */
     public T at0() {
         return _data[_ofs];
     }
-    
+
     /**
      * @param ofs offset
      * @return value at position ofs;
@@ -92,7 +92,7 @@ public class ObjArray<T> {
     public T at(int ofs) {
         return _data[_ofs + ofs];
     }
-    
+
     /**
      * Set value at position 0;
      * @param d d
@@ -100,7 +100,7 @@ public class ObjArray<T> {
     public void setAt0(T d) {
         _data[_ofs] = d;
     }
-    
+
     /**
      * Set value at position ofs;
      * @param ofs offset
@@ -109,18 +109,18 @@ public class ObjArray<T> {
     public void setAt(int ofs, T d) {
         _data[_ofs + ofs] = d;
     }
-    
+
     /**
      * @param data data
      */
     public void setData(T[] data) {
         if (data.length + _ofs >= _data.length) {
-            throw new IndexOutOfBoundsException(data.length + " + " + 
+            throw new IndexOutOfBoundsException(data.length + " + " +
                     _ofs + " = " + (data.length + _ofs) + " >= " + _data.length);
         }
         System.arraycopy(data, 0, _data, _ofs, data.length);
     }
-    
+
     /**
      * @param array array
      */
@@ -134,7 +134,7 @@ public class ObjArray<T> {
         }
         System.arraycopy(data, 0, _data, _ofs, data.length);
     }
-    
+
     /**
      * @return cloned double[].
      */
@@ -143,25 +143,25 @@ public class ObjArray<T> {
 //        System.arraycopy(_data, _ofs, ret, 0, _data.length - _ofs);
         return ret;
     }
-    
+
     /**
      * @param ofs offset
      * @param len length
      * @return cloned []
      */
-    public T[] cloneData(int ofs, int len) {
-        T[] ret = _data.clone();
-//        System.arraycopy(_data, _ofs + ofs, ret, 0, len);
-        return ret;
-    }
-    
+//    public T[] cloneData(int ofs, int len) {
+//        T[] ret = _data.clone();
+////        System.arraycopy(_data, _ofs + ofs, ret, 0, len);
+//        return ret;
+//    }
+
     /**
      * Decrement offset by 1.
      */
     public void dec() {
         _ofs--;
     }
-    
+
     /**
      * Decrement offset by n.
      * @param n n
@@ -169,14 +169,14 @@ public class ObjArray<T> {
     public void dec(int n) {
         _ofs -= n;
     }
-    
+
     /**
      * Increment offset by 1.
      */
     public void inc() {
         _ofs++;
     }
-    
+
     /**
      * Increment offset by n.
      * @param n n

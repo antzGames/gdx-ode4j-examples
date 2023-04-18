@@ -378,7 +378,21 @@ public class Common extends OdeConstants {
 
     //#define dNextAfter(x, y) nextafterf(x, y) /* next value after */
     public static final double dNextAfter(double start, double direction) {
-        return Math.nextAfter(start, direction);
+
+        long transducer;
+        if (start > direction) {
+            if (start != 0.0D) {
+                transducer = Double.doubleToLongBits(start);
+                return Double.longBitsToDouble(transducer + (transducer > 0L ? -1L : 1L));
+            } else {
+                return -4.9E-324D;
+            }
+        } else if (start < direction) {
+            transducer = Double.doubleToLongBits(start + 0.0D);
+            return Double.longBitsToDouble(transducer + (transducer >= 0L ? 1L : -1L));
+        } else {
+            return start == direction ? direction : start + direction;
+        }
     }
 
 

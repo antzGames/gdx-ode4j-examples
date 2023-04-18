@@ -27,14 +27,14 @@ package org.ode4j.math;
  * @author Tilmann Zaeschke
  */
 public class DVectorN {
-	
+
 	private final double[] v;
 	public static final int CURRENT_LENGTH = 4;
 
-	public DVectorN(int len) { 
+	public DVectorN(int len) {
 		v = new double[len];
 	}
-	
+
 	public DVectorN(DVectorN v2) {
 		this(v2.v.length);
 		set(v2.v);
@@ -45,12 +45,12 @@ public class DVectorN {
 		System.arraycopy(data, 0, v, 0, v.length);
 	}
 
-	@Override
+
 	public DVectorN clone() {
 		return new DVectorN(this);
 	}
-	
-	
+
+
 	@Override
 	public String toString() {
 		StringBuffer b = new StringBuffer();
@@ -66,33 +66,33 @@ public class DVectorN {
 //	public void assertLen(int n) {
 //		if (n!=v.length) {
 //			throw new IllegalStateException("LEN is " + v.length + ", not " + n);
-//		}		
+//		}
 //	}
-	
+
 	public void set0(double d) {
 		v[0] = d;
 	}
-	
+
 	public void set1(double d) {
 		v[1] = d;
 	}
-	
+
 	public void set2(double d) {
 		v[2] = d;
 	}
-	
+
 	public double get0() {
 		return v[0];
 	}
-	
+
 	public double get1() {
 		return v[1];
 	}
-	
+
 	public double get2() {
 		return v[2];
 	}
-	
+
 	public final double get(int i) {
 		return v[i];
 	}
@@ -116,21 +116,21 @@ public class DVectorN {
 				d = Math.abs(v[i]);
 			}
 		}
-		
+
 		if (d <= Double.MIN_NORMAL) {
 			setIdentity();
 			return false;
 		}
-		
+
 		for (int i = 0; i < v.length; i++) {
 			v[i] /= d;
 		}
-		
+
 		double sum = 0;
 		for (double d2: v) {
 			sum += d2*d2;
 		}
-		
+
 		double l = 1./Math.sqrt(sum);
 		for (int i = 0; i < v.length; i++) {
 			v[i] *= l;
@@ -165,7 +165,7 @@ public class DVectorN {
 		System.arraycopy(a, 0, v, 0, v.length);
 		//return (T) this;
 	}
-	
+
 	public void setIdentity() {
 		v[0] = 1;
 		for (int i = 1; i < v.length-1; i++) {

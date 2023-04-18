@@ -2,15 +2,15 @@
  * ----------------------------------------------------------------------------
  * This source file is part of the ODE4J library (ported to
  * Java from the GIMPACT Library).
- * 
+ *
  * For the latest info on ODE4J, see http://www.ode4j.org/
  * For the latest info on GIMPACT, see http://gimpact.sourceforge.net/
- * 
+ *
  * Copyright of GIMPACT (c) 2006 Francisco Leon. C.C. 80087371.
  * email: projectileman@yahoo.com
  * Copyright of ODE4J (c) 2009-2014 Tilmann Zäschke.
  * email: ode4j.gmx.de
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of EITHER:
  *   (1) The GNU Lesser General Public License as published by the Free
@@ -20,16 +20,18 @@
  *       file GIMPACT-LICENSE-LGPL.TXT and LICENSE.TXT.
  *   (2) The BSD-style license that is included with this library in
  *       the file GIMPACT-LICENSE-BSD.TXT and ODE4J-LICENSE-BSD.TXT.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the files
- * GIMPACT-LICENSE-LGPL.TXT, GIMPACT-LICENSE-BSD.TXT, LICENSE.TXT and 
+ * GIMPACT-LICENSE-LGPL.TXT, GIMPACT-LICENSE-BSD.TXT, LICENSE.TXT and
  * ODE4J-LICENSE-BSD.TXT for more details.
- * 
+ *
  * ----------------------------------------------------------------------------
  */
 package org.ode4j.ode.internal.gimpact;
+
+import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.Random;
 
@@ -142,7 +144,7 @@ public class GimMath {
 
 	///returns a clamped number
 	//#define CLAMP(number,minval,maxval) ((number)<(minval)?(minval):((number)>(maxval)?(maxval):(number)))
-	protected static float CLAMP(float number, float minval, float maxval) { 
+	protected static float CLAMP(float number, float minval, float maxval) {
 		return number<minval ? minval : (number>maxval ? maxval : number ); }
 
 
@@ -152,10 +154,10 @@ public class GimMath {
 //	    (b) = (a)-(b); \
 //	    (a) = (a)-(b); \
 //	}\
-//	private static final void SWAP_NUMBERS(final RefFloat a, final RefFloat b){ 
-//		a.d = a.d+b.d; 
-//		b.d = a.d-b.d; 
-//		a.d = a.d-b.d; 
+//	private static final void SWAP_NUMBERS(final RefFloat a, final RefFloat b){
+//		a.d = a.d+b.d;
+//		b.d = a.d-b.d;
+//		a.d = a.d-b.d;
 //	}
 
 	//#define GIM_INV_SQRT(va,isva)\
@@ -204,12 +206,12 @@ public class GimMath {
 	    return GIM_SQRT(f);
 	}
 
-	private static final Random random = new Random(System.nanoTime());
-	
+	private static final Random random = new Random( TimeUtils.nanoTime());
+
 	//!Initializes mathematical functions
 	static void gim_init_math()
 	{
-		//new Random( System.nanoTime() );
+		//new Random(  TimeUtils.nanoTime() );
 	    //srand( static_cast< unsigned int >( time( 0 ) ) );
 	}
 

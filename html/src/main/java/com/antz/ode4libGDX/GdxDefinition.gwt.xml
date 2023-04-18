@@ -14,14 +14,6 @@
 
   <entry-point class="com.antz.ode4libGDX.gwt.GwtLauncher" />
 
-    <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch" />
-    <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.gdx.graphics.g3d.particles.ParticleShader" />
-    <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.gdx.utils.IntArray"/>
-    <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.gdx.graphics.g2d.TextureAtlas"/>
-
-    <set-configuration-property name="gdx.assetpath" value="../assets" />
-    <set-configuration-property name="gdx.assetfilterclass" value="com.antz.jam.gwt.GameDefaultAssetFilter"/>
-
   <set-configuration-property name="gdx.assetpath" value="../assets" />
   <set-configuration-property name="xsiframe.failIfScriptTag" value="FALSE"/>
   <!-- These two lines reduce the work GWT has to do during compilation and also shrink output size. -->

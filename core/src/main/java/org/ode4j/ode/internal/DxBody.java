@@ -71,7 +71,7 @@ import org.ode4j.ode.internal.processmem.DxWorldProcessContext;
 /**
  * rigid body (dynamics object).
  */
-public class DxBody extends DObject implements DBody, Cloneable {
+public class DxBody extends DObject implements DBody {
 
 	// some body flags
 
@@ -1157,14 +1157,14 @@ public class DxBody extends DObject implements DBody, Cloneable {
 		}
 	}
 
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
-	}
+//	@Override
+//	public Object clone() {
+//		try {
+//			return super.clone();
+//		} catch (CloneNotSupportedException e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 
 
 	@Override

@@ -24,6 +24,8 @@
  *************************************************************************/
 package org.ode4j.ode.internal;
 
+import com.badlogic.gdx.utils.TimeUtils;
+
 import org.ode4j.ode.DStopwatch;
 
 import text.formic.Stringf;
@@ -43,13 +45,13 @@ public class Timer {
 
 	//	private static void getClockCount (long[] cc)
 	//	{
-	//		long ms = System.nanoTime();//TimeMillis();
+	//		long ms =  TimeUtils.nanoTime();//TimeMillis();
 	//		//  cc[1] = ms.lo / 1000000;
 	//		//  cc[0] = ms.lo - ( cc[1] * 1000000 );
 	//	}
 	private static long getClockCount ()
 	{
-		return System.nanoTime();//TimeMillis();
+		return  TimeUtils.nanoTime();//TimeMillis();
 	}
 
 
@@ -84,12 +86,12 @@ public class Timer {
 		//		double t1 = loadClockCount (cc1);
 		//		double t2 = loadClockCount (cc2);
 		long cc2;
-		long cc1 = System.nanoTime();
+		long cc1 =  TimeUtils.nanoTime();
 		do {
-			cc2 = System.nanoTime();
+			cc2 =  TimeUtils.nanoTime();
 		} while (cc1 == cc2);
 		do {
-			cc1 = System.nanoTime();
+			cc1 =  TimeUtils.nanoTime();
 		} while (cc1 == cc2);
 
 		return (cc1-cc2) / dTimerTicksPerSecond();
