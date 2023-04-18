@@ -1,7 +1,27 @@
 package com.antz.ode4libGDX.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
+import com.mbrlabs.mundus.commons.Scene;
+import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
+import com.mbrlabs.mundus.runtime.Mundus;
+
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DVector3;
@@ -22,10 +42,37 @@ import org.ode4j.ode.DMass;
 import org.ode4j.ode.DSpace;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.DGeom.DNearCallback;
+
+import java.util.ArrayList;
+
 import static org.ode4j.ode.OdeMath.*;
 
 /** First screen of the application. Displayed after the application is created. */
 public class CrashTest implements Screen, InputProcessor {
+
+    private Mundus mundus;
+    private Scene scene;
+    enum GameState {
+        LOADING,
+        PLAYING
+    }
+    private GameState gameState = GameState.LOADING;
+
+    public ModelBatch modelBatch;
+    public ModelBuilder modelBuilder;
+    public Model model;
+    public ArrayList<ModelInstance> wallBoxModelInstances = new ArrayList<>();
+
+    private FirstPersonCameraController controller;
+    private OrthographicCamera guiCamera;
+    private ShapeRenderer shapeRenderer;
+    private Color mundusTeal = new Color(0x00b695ff);
+
+    private final float camFlySpeed = 20f;
+    private Array<Vector3> cameraDestinations;
+    private int currentCameraDestIndex = 0;
+    private final Vector3 lookAtPos = new Vector3(800,0,800);
+    private Color color = new Color();
 
     // some constants
     private static final float LENGTH = 3.5f;		// chassis length
@@ -95,6 +142,520 @@ public class CrashTest implements Screen, InputProcessor {
     // things that the user controls
     private static float turn = 0, speed = 0;	// user commands
     private static float cannon_angle=0,cannon_elevation=-1.2f;
+
+    @Override
+    public void show() {
+        // Prepare your screen here.
+
+        modelBatch = new ModelBatch();
+        modelBuilder = new ModelBuilder();
+        doFast = true;
+
+        OdeHelper.initODE2(0);
+
+        bodies = 0;
+        joints = 0;
+        boxes = 0;
+        spheres = 0;
+
+        setupSimulation();
+
+        // Mundus
+        Mundus.Config config = new Mundus.Config();
+        config.autoLoad = false; // Do not autoload, we want to queue custom assets
+        config.asyncLoad = true; // Do asynchronous loading
+
+        // Start asynchronous loading
+        mundus = new Mundus(Gdx.files.internal("mundus"), config);
+        try {
+            mundus.getAssetManager().queueAssetsForLoading(true);
+        } catch (MetaFileParseException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Press:\t'+' to increase speed.\n" +
+            "\t'-' to decrease speed.\n" +
+            "\t',' to steer left.\n" +
+            "\t'.' to steer right.\n" +
+            "\t' ' to reset speed and steering.\n" +
+            "\t'[' to turn the cannon left.\n" +
+            "\t']' to turn the cannon right.\n" +
+            "\t'1' to raise the cannon.\n" +
+            "\t'2' to lower the cannon.\n" +
+            "\t'x' to shoot from the cannon.\n" +
+            "\t'f' to toggle fast step mode.\n" +
+            "\t'r' to reset simulation.\n");
+    }
+
+    @Override
+    public void render(float delta) {
+        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+        switch (gameState) {
+            case LOADING:
+                continueLoading();
+                break;
+            case PLAYING:
+                draw();
+                break;
+        }
+
+    }
+
+    private void draw() {
+        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+        controller.update();
+        scene.sceneGraph.update();
+        scene.render();
+        simLoop(false);
+
+        modelBatch.begin(scene.cam);
+        for (ModelInstance m: wallBoxModelInstances){
+            modelBatch.render(m);
+        }
+        modelBatch.end();
+
+    }
+
+    // simulation loop
+    private void simLoop (boolean pause)  {
+        int i, j;
+
+        //dsSetTexture (DS_TEXTURE_NUMBER.DS_WOOD);
+
+        if (!pause) {
+            if (BOX) {
+                //dBodyAddForce(body[bodies-1],lspeed,0,0);
+                body[bodies-1].addForce(speed,0,0);
+            }
+
+            for (j = 0; j < joints; j++)  {
+                DHinge2Joint j2 = joint[j];
+                double curturn = j2.getAngle1 ();
+                //dMessage (0,"curturn %e, turn %e, vel %e", curturn, turn, (turn-curturn)*1.0);
+                j2.setParamVel((turn-curturn)*1.0);
+                j2.setParamFMax(dInfinity);
+                j2.setParamVel2(speed);
+                j2.setParamFMax2(FMAX);
+                j2.getBody(0).enable();
+                j2.getBody(1).enable();
+            }
+            if (doFast) {
+                space.collide (null,nearCallback);
+                world.quickStep (0.05);
+                contactgroup.empty ();
+            } else {
+                space.collide (null,nearCallback);
+                world.step (0.05);
+                contactgroup.empty ();
+            }
+
+            for (i = 0; i < wb; i++) {
+                b = wall_boxes[i].getBody();
+                if (b.isEnabled()) {
+                    boolean disable = true;
+                    DVector3C lvel = b.getLinearVel();
+                    double lspeed = lvel.lengthSquared();
+                    if (lspeed > DISABLE_THRESHOLD)
+                        disable = false;
+                    DVector3C avel = b.getAngularVel();
+                    double aspeed = avel.lengthSquared();
+                    if (aspeed > DISABLE_THRESHOLD)
+                        disable = false;
+
+                    if (disable)
+                        wb_stepsdis[i]++;
+                    else
+                        wb_stepsdis[i] = 0;
+
+                    if (wb_stepsdis[i] > DISABLE_STEPS) {
+                        b.disable();
+                        color.set(0.5f,0.5f,1,1);
+                    }
+                    else              ;
+                        color.set(1,1,1,1);
+
+                } else                 ;
+                    color.set(0.4f,0.4f,0.4f,1);
+
+                DVector3 ss = new DVector3();
+                wall_boxes[i].getLengths (ss);
+                //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);
+
+                wallBoxModelInstances.get(i).transform.setTranslation(new Vector3((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2()));
+                //System.out.println("pos:" +wall_boxes[i].getPosition() + "    rot:"+wall_boxes[i].getRotation());
+            }
+        } else {
+            for (i = 0; i < wb; i++) {
+                b = wall_boxes[i].getBody();
+                if (b.isEnabled())
+                    color.set(1,1,1,1);
+                else
+                    color.set(0.4f,0.4f,0.4f,1);
+
+                DVector3 ss = new DVector3();
+                wall_boxes[i].getLengths (ss);
+                //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);
+            }
+        }
+
+        color.set(0,1,1,1);
+        DVector3 sides = new DVector3(LENGTH,WIDTH,HEIGHT);
+        for (i = 0; i < boxes; i++)       ;
+            //dsDrawBox (box[i].getPosition(),box[i].getRotation(),sides);
+        color.set(1,1,1,1);
+
+        for (i=0; i< spheres; i++)   ;
+            //dsDrawSphere (sphere[i].getPosition(), sphere[i].getRotation(),RADIUS);
+
+        // draw the cannon
+        color.set(1,1,0,1);
+        DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
+        dRFromAxisAndAngle (R2,0,0,1,cannon_angle);
+        dRFromAxisAndAngle (R3,0,1,0,cannon_elevation);
+        dMultiply0 (R4,R2,R3);
+        DVector3 cpos = new DVector3(CANNON_X,CANNON_Y,1);
+        DVector3 csides = new DVector3(2,2,2);
+        //dsDrawBox (cpos,R2,csides);
+        for (i=0; i<3; i++) cpos.add(i,  1.5*R4.get(i, 2));//[i*4+2]);
+        //dsDrawCylinder (cpos,R4,3f,0.5f);
+
+        // draw the cannon ball
+        //dsDrawSphere (cannon_ball_body.getPosition(),cannon_ball_body.getRotation(), CANNON_BALL_RADIUS);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        // Resize your screen here. The parameters represent the new window size.
+    }
+
+    @Override
+    public void pause() {
+        // Invoked when your application is paused.
+    }
+
+    @Override
+    public void resume() {
+        // Invoked when your application is resumed after pause.
+    }
+
+    @Override
+    public void hide() {
+        // This method is called when another screen replaces this one.
+    }
+
+    @Override
+    public void dispose() {
+        // Destroy screen's assets here.
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char cmd) {
+        switch (cmd) {
+            case '+':
+                speed += 0.3;
+                break;
+            case '-':
+                speed -= 0.3;
+                break;
+            case ',':
+                turn += 0.1;
+                if (turn > 0.3)
+                    turn = 0.3f;
+                break;
+            case '.':
+                turn -= 0.1;
+                if (turn < -0.3)
+                    turn = -0.3f;
+                break;
+            case ' ':
+                speed = 0;
+                turn = 0;
+                break;
+            case 'f': case 'F':
+                doFast = !doFast;
+                break;
+            case 'r': case 'R':
+                shutdownSimulation();
+                setupSimulation();
+                break;
+            case '[':
+                cannon_angle += 0.1;
+                break;
+            case ']':
+                cannon_angle -= 0.1;
+                break;
+            case '1':
+                cannon_elevation += 0.1;
+                break;
+            case '2':
+                cannon_elevation -= 0.1;
+                break;
+            case 'x': case 'X': {
+                DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
+                dRFromAxisAndAngle (R2,0,0,1,cannon_angle);
+                dRFromAxisAndAngle (R3,0,1,0,cannon_elevation);
+                dMultiply0 (R4,R2,R3);
+                double[] cpos = {CANNON_X,CANNON_Y,1};
+                for (int i=0; i<3; i++) cpos[i] += 3*R4.get(i, 2);//[i*4+2];
+                cannon_ball_body.setPosition (cpos[0],cpos[1],cpos[2]);
+                double force = 10;
+                cannon_ball_body.setLinearVel (force*R4.get(0, 2),force*R4.get(1,2),force*R4.get(2,2));
+                cannon_ball_body.setAngularVel (0,0,0);
+                break;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
+    }
+
+    private void setupSimulation() {
+        int i;
+        for (i = 0; i < 1000; i++)
+            wb_stepsdis[i] = 0;
+
+        // recreate world
+
+        world = OdeHelper.createWorld();
+
+        //  space = dHashSpaceCreate( null );
+        //	space = dSimpleSpaceCreate( null );
+        space = OdeHelper.createSapSpace( null, DSapSpace.AXES.XYZ );
+
+        m = OdeHelper.createMass();
+
+        contactgroup = OdeHelper.createJointGroup();
+        world.setGravity (0,0,-1.5);
+        world.setCFM (1e-5);
+        world.setERP (0.8);
+        world.setQuickStepNumIterations (ITERS);
+
+        //TODO
+//	    DThreadingImplementation threading = OdeHelper.allocateMultiThreaded();
+//	    DThreadingThreadPool pool = OdeHelper.allocateThreadPool(4, 0, /*dAllocateFlagBasicData,*/ null);
+//	    pool.serveMultiThreadedImplementation(threading);
+//	    // dWorldSetStepIslandsProcessingMaxThreadCount(world, 1);
+//	    world.setStepThreadingImplementation(threading.dThreadingImplementationGetFunctions(), threading);
+
+        OdeHelper.createPlane (space,0,0,1,0);
+
+        bodies = 0;
+        joints = 0;
+        boxes = 0;
+        spheres = 0;
+        wb = 0;
+        IrContainer ir = new IrContainer();
+        if (CARS) {//#ifdef CARS
+            for (double x = 0.0; x < COLS*(LENGTH+RADIUS); x += LENGTH+RADIUS)
+                for (double y = -((ROWS-1)*(WIDTH/2+RADIUS)); y <= ((ROWS-1)*(WIDTH/2+RADIUS)); y += WIDTH+RADIUS*2)
+                    makeCar(x, y, ir);
+            bodies = ir.bodyIr;
+            joints = ir.jointIr;
+            boxes = ir.boxIr;
+            spheres = ir.sphereIr;
+        }//#endif
+        if (WALL) {//#ifdef WALL
+            boolean offset = false;
+            for (double z = WBOXSIZE/2.0; z <= WALLHEIGHT; z+=WBOXSIZE) {
+                offset = !offset;
+                for (double y = (-WALLWIDTH+z)/2; y <= (WALLWIDTH-z)/2; y+=WBOXSIZE) {
+                    wall_bodies[wb] = OdeHelper.createBody (world);
+                    wall_bodies[wb].setPosition (500,y,500 + z);
+                    m.setBox (1,WBOXSIZE,WBOXSIZE,WBOXSIZE);
+                    m.adjust (WALLMASS);
+                    wall_bodies[wb].setMass (m);
+                    wall_boxes[wb] = OdeHelper.createBox (space,WBOXSIZE,WBOXSIZE,WBOXSIZE);
+                    wall_boxes[wb].setBody (wall_bodies[wb]);
+                    //dBodyDisable(wall_bodies[wb++]);
+
+                    model = modelBuilder.createBox(WBOXSIZE, WBOXSIZE, WBOXSIZE,
+                        new Material(ColorAttribute.createDiffuse(Color.GRAY)),
+                        VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+                    wallBoxModelInstances.add(new ModelInstance(model));
+                    wb++;
+                }
+            }
+            System.out.println("wall boxes: " + wb);
+        }//#endif
+        if (BALLS) {//#ifdef BALLS
+            for (double x = -7; x <= -4; x+=1)
+                for (double y = -1.5; y <= 1.5; y+=1)
+                    for (double z = 1; z <= 4; z+=1)
+                    {
+                        b = OdeHelper.createBody (world);
+                        b.setPosition (x*RADIUS*2,y*RADIUS*2,z*RADIUS*2);
+                        m.setSphere (1,RADIUS);
+                        m.adjust (BALLMASS);
+                        b.setMass (m);
+                        sphere[spheres] = OdeHelper.createSphere (space,RADIUS);
+                        sphere[spheres++].setBody (b);
+                    }
+        }//#endif
+        if (ONEBALL) {//#ifdef ONEBALL
+            b = OdeHelper.createBody (world);
+            b.setPosition (0,0,2);
+            m.setSphere (1,RADIUS);
+            m.adjust (1);
+            b.setMass (m);
+            sphere[spheres] = OdeHelper.createSphere (space,RADIUS);
+            sphere[spheres++].setBody (b);
+        }//#endif
+        if (BALLSTACK) {//#ifdef BALLSTACK
+            for (double z = 1; z <= 6; z+=1)
+            {
+                b = OdeHelper.createBody (world);
+                b.setPosition (0,0,z*RADIUS*2);
+                m.setSphere (1,RADIUS);
+                m.adjust (0.1);
+                b.setMass (m);
+                sphere[spheres] = OdeHelper.createSphere (space,RADIUS);
+                sphere[spheres++].setBody (b);
+            }
+        }//#endif
+        if (CENTIPEDE) {//#ifdef CENTIPEDE
+            DBody lastb = null;
+            for (double y = 0; y < 10*LENGTH; y+=LENGTH+0.1)
+            {
+                // chassis body
+
+                b = body[bodies] = OdeHelper.createBody (world);
+                body[bodies].setPosition (-15,y,STARTZ);
+                m.setBox (1,WIDTH,LENGTH,HEIGHT);
+                m.adjust (CMASS);
+                body[bodies].setMass (m);
+                box[boxes] = OdeHelper.createBox (space,WIDTH,LENGTH,HEIGHT);
+                box[boxes++].setBody (body[bodies++]);
+
+                for (double x = -17; x > -20; x-=RADIUS*2) {
+                    body[bodies] = OdeHelper.createBody (world);
+                    body[bodies].setPosition(x, y, STARTZ);
+                    m.setSphere(1, RADIUS);
+                    m.adjust(WMASS);
+                    body[bodies].setMass(m);
+                    sphere[spheres] = OdeHelper.createSphere (space, RADIUS);
+                    sphere[spheres++].setBody (body[bodies]);
+
+                    joint[joints] = OdeHelper.createHinge2Joint (world,null);
+                    if (x == -17)
+                        joint[joints].attach (b,body[bodies]);
+                    else
+                        joint[joints].attach (body[bodies-2],body[bodies]);
+                    DVector3C a = body[bodies++].getPosition ();
+                    DHinge2Joint j = joint[joints++];
+                    j.setAnchor (a);
+                    j.setAxis1 (0,0,1);
+                    j.setAxis2 (1,0,0);
+                    j.setParamSuspensionERP (1.0);
+                    j.setParamSuspensionCFM (1e-5);
+                    j.setParamLoStop (0);
+                    j.setParamHiStop (0);
+                    j.setParamVel2 (-10.0);
+                    j.setParamFMax2 (FMAX);
+
+                    body[bodies] = OdeHelper.createBody (world);
+                    body[bodies].setPosition(-30 - x, y, STARTZ);
+                    m.setSphere(1, RADIUS);
+                    m.adjust(WMASS);
+                    body[bodies].setMass(m);
+                    sphere[spheres] = OdeHelper.createSphere (space, RADIUS);
+                    sphere[spheres++].setBody (body[bodies]);
+
+                    joint[joints] = OdeHelper.createHinge2Joint (world,null);
+                    if (x == -17)
+                        joint[joints].attach (b,body[bodies]);
+                    else
+                        joint[joints].attach (body[bodies-2],body[bodies]);
+                    DVector3C b = body[bodies++].getPosition ();
+                    j = joint[joints++];
+                    j.setAnchor (b);
+                    j.setAxis1 (0,0,1);
+                    j.setAxis2 (1,0,0);
+                    j.setParamSuspensionERP (1.0);
+                    j.setParamSuspensionCFM (1e-5);
+                    j.setParamLoStop (0);
+                    j.setParamHiStop (0);
+                    j.setParamVel2 (10.0);
+                    j.setParamFMax2 (FMAX);
+                }
+                if (lastb!=null)
+                {
+                    DFixedJoint j = OdeHelper.createFixedJoint(world,null);
+                    j.attach (b, lastb);
+                    j.setFixed();
+                }
+                lastb = b;
+            }
+        }//#endif
+        if (BOX) {//#ifdef BOX
+            body[bodies] = OdeHelper.createBody (world);
+            body[bodies].setPosition (0,0,HEIGHT/2);
+            m.setBox (1,LENGTH,WIDTH,HEIGHT);
+            m.adjust (1);
+            body[bodies].setMass (m);
+            box[boxes] = OdeHelper.createBox (space,LENGTH,WIDTH,HEIGHT);
+            box[boxes++].setBody (body[bodies++]);
+        }//#endif
+        if (CANNON) {//#ifdef CANNON
+            cannon_ball_body = OdeHelper.createBody (world);
+            cannon_ball_geom = OdeHelper.createSphere (space,CANNON_BALL_RADIUS);
+            m.setSphereTotal (CANNON_BALL_MASS,CANNON_BALL_RADIUS);
+            cannon_ball_body.setMass (m);
+            cannon_ball_geom.setBody (cannon_ball_body);
+            cannon_ball_body.setPosition (CANNON_X,CANNON_Y,CANNON_BALL_RADIUS);
+        }//#endif
+    }
+
+    private void continueLoading() {
+
+        if (mundus.continueLoading()) {
+            // Loading complete, load a scene.
+            scene = mundus.loadScene("Main Scene.mundus");
+            scene.cam.position.set(0, 10, 0);
+            // setup input
+            controller = new FirstPersonCameraController(scene.cam);
+            controller.setVelocity(200f);
+            Gdx.input.setInputProcessor(controller);
+            // Update our game state
+            gameState = GameState.PLAYING;
+        }
+    }
 
     private DNearCallback nearCallback = new DNearCallback() {
         @Override
@@ -210,475 +771,19 @@ public class CrashTest implements Screen, InputProcessor {
 
     private void shutdownSimulation() {
         // destroy world if it exists
-        if (bodies!=0)
-        {
+        if (bodies!=0)  {
             //TODO
 //		    threading.shutdownProcessing();//dThreadingImplementationShutdownProcessing(threading);
 //		    pool.freeThreadPool();
 //		    world.setStepThreadingImplementation(null, null);
 //		    threading.free();
 
-            contactgroup.destroy ();
-            space.destroy ();
-            world.destroy ();
+            contactgroup.destroy();
+            space.destroy();
+            world.destroy();
 
             bodies = 0;
         }
     }
 
-    private void setupSimulation() {
-        int i;
-        for (i = 0; i < 1000; i++)
-            wb_stepsdis[i] = 0;
-
-        // recreate world
-
-        world = OdeHelper.createWorld();
-
-        //  space = dHashSpaceCreate( null );
-        //	space = dSimpleSpaceCreate( null );
-        space = OdeHelper.createSapSpace( null, DSapSpace.AXES.XYZ );
-
-        m = OdeHelper.createMass();
-
-        contactgroup = OdeHelper.createJointGroup();
-        world.setGravity (0,0,-1.5);
-        world.setCFM (1e-5);
-        world.setERP (0.8);
-        world.setQuickStepNumIterations (ITERS);
-
-        //TODO
-//	    DThreadingImplementation threading = OdeHelper.allocateMultiThreaded();
-//	    DThreadingThreadPool pool = OdeHelper.allocateThreadPool(4, 0, /*dAllocateFlagBasicData,*/ null);
-//	    pool.serveMultiThreadedImplementation(threading);
-//	    // dWorldSetStepIslandsProcessingMaxThreadCount(world, 1);
-//	    world.setStepThreadingImplementation(threading.dThreadingImplementationGetFunctions(), threading);
-
-        OdeHelper.createPlane (space,0,0,1,0);
-
-        bodies = 0;
-        joints = 0;
-        boxes = 0;
-        spheres = 0;
-        wb = 0;
-        IrContainer ir = new IrContainer();
-        if (CARS) {//#ifdef CARS
-            for (double x = 0.0; x < COLS*(LENGTH+RADIUS); x += LENGTH+RADIUS)
-                for (double y = -((ROWS-1)*(WIDTH/2+RADIUS)); y <= ((ROWS-1)*(WIDTH/2+RADIUS)); y += WIDTH+RADIUS*2)
-                    makeCar(x, y, ir);
-            bodies = ir.bodyIr;
-            joints = ir.jointIr;
-            boxes = ir.boxIr;
-            spheres = ir.sphereIr;
-        }//#endif
-        if (WALL) {//#ifdef WALL
-            boolean offset = false;
-            for (double z = WBOXSIZE/2.0; z <= WALLHEIGHT; z+=WBOXSIZE)
-            {
-                offset = !offset;
-                for (double y = (-WALLWIDTH+z)/2; y <= (WALLWIDTH-z)/2; y+=WBOXSIZE)
-                {
-                    wall_bodies[wb] = OdeHelper.createBody (world);
-                    wall_bodies[wb].setPosition (-20,y,z);
-                    m.setBox (1,WBOXSIZE,WBOXSIZE,WBOXSIZE);
-                    m.adjust (WALLMASS);
-                    wall_bodies[wb].setMass (m);
-                    wall_boxes[wb] = OdeHelper.createBox (space,WBOXSIZE,WBOXSIZE,WBOXSIZE);
-                    wall_boxes[wb].setBody (wall_bodies[wb]);
-                    //dBodyDisable(wall_bodies[wb++]);
-                    wb++;
-                }
-            }
-            System.out.println("wall boxes: " + wb);
-        }//#endif
-        if (BALLS) {//#ifdef BALLS
-            for (double x = -7; x <= -4; x+=1)
-                for (double y = -1.5; y <= 1.5; y+=1)
-                    for (double z = 1; z <= 4; z+=1)
-                    {
-                        b = OdeHelper.createBody (world);
-                        b.setPosition (x*RADIUS*2,y*RADIUS*2,z*RADIUS*2);
-                        m.setSphere (1,RADIUS);
-                        m.adjust (BALLMASS);
-                        b.setMass (m);
-                        sphere[spheres] = OdeHelper.createSphere (space,RADIUS);
-                        sphere[spheres++].setBody (b);
-                    }
-        }//#endif
-        if (ONEBALL) {//#ifdef ONEBALL
-            b = OdeHelper.createBody (world);
-            b.setPosition (0,0,2);
-            m.setSphere (1,RADIUS);
-            m.adjust (1);
-            b.setMass (m);
-            sphere[spheres] = OdeHelper.createSphere (space,RADIUS);
-            sphere[spheres++].setBody (b);
-        }//#endif
-        if (BALLSTACK) {//#ifdef BALLSTACK
-            for (double z = 1; z <= 6; z+=1)
-            {
-                b = OdeHelper.createBody (world);
-                b.setPosition (0,0,z*RADIUS*2);
-                m.setSphere (1,RADIUS);
-                m.adjust (0.1);
-                b.setMass (m);
-                sphere[spheres] = OdeHelper.createSphere (space,RADIUS);
-                sphere[spheres++].setBody (b);
-            }
-        }//#endif
-        if (CENTIPEDE) {//#ifdef CENTIPEDE
-            DBody lastb = null;
-            for (double y = 0; y < 10*LENGTH; y+=LENGTH+0.1)
-            {
-                // chassis body
-
-                b = body[bodies] = OdeHelper.createBody (world);
-                body[bodies].setPosition (-15,y,STARTZ);
-                m.setBox (1,WIDTH,LENGTH,HEIGHT);
-                m.adjust (CMASS);
-                body[bodies].setMass (m);
-                box[boxes] = OdeHelper.createBox (space,WIDTH,LENGTH,HEIGHT);
-                box[boxes++].setBody (body[bodies++]);
-
-                for (double x = -17; x > -20; x-=RADIUS*2)
-                {
-                    body[bodies] = OdeHelper.createBody (world);
-                    body[bodies].setPosition(x, y, STARTZ);
-                    m.setSphere(1, RADIUS);
-                    m.adjust(WMASS);
-                    body[bodies].setMass(m);
-                    sphere[spheres] = OdeHelper.createSphere (space, RADIUS);
-                    sphere[spheres++].setBody (body[bodies]);
-
-                    joint[joints] = OdeHelper.createHinge2Joint (world,null);
-                    if (x == -17)
-                        joint[joints].attach (b,body[bodies]);
-                    else
-                        joint[joints].attach (body[bodies-2],body[bodies]);
-                    DVector3C a = body[bodies++].getPosition ();
-                    DHinge2Joint j = joint[joints++];
-                    j.setAnchor (a);
-                    j.setAxis1 (0,0,1);
-                    j.setAxis2 (1,0,0);
-                    j.setParamSuspensionERP (1.0);
-                    j.setParamSuspensionCFM (1e-5);
-                    j.setParamLoStop (0);
-                    j.setParamHiStop (0);
-                    j.setParamVel2 (-10.0);
-                    j.setParamFMax2 (FMAX);
-
-                    body[bodies] = OdeHelper.createBody (world);
-                    body[bodies].setPosition(-30 - x, y, STARTZ);
-                    m.setSphere(1, RADIUS);
-                    m.adjust(WMASS);
-                    body[bodies].setMass(m);
-                    sphere[spheres] = OdeHelper.createSphere (space, RADIUS);
-                    sphere[spheres++].setBody (body[bodies]);
-
-                    joint[joints] = OdeHelper.createHinge2Joint (world,null);
-                    if (x == -17)
-                        joint[joints].attach (b,body[bodies]);
-                    else
-                        joint[joints].attach (body[bodies-2],body[bodies]);
-                    DVector3C b = body[bodies++].getPosition ();
-                    j = joint[joints++];
-                    j.setAnchor (b);
-                    j.setAxis1 (0,0,1);
-                    j.setAxis2 (1,0,0);
-                    j.setParamSuspensionERP (1.0);
-                    j.setParamSuspensionCFM (1e-5);
-                    j.setParamLoStop (0);
-                    j.setParamHiStop (0);
-                    j.setParamVel2 (10.0);
-                    j.setParamFMax2 (FMAX);
-                }
-                if (lastb!=null)
-                {
-                    DFixedJoint j = OdeHelper.createFixedJoint(world,null);
-                    j.attach (b, lastb);
-                    j.setFixed();
-                }
-                lastb = b;
-            }
-        }//#endif
-        if (BOX) {//#ifdef BOX
-            body[bodies] = OdeHelper.createBody (world);
-            body[bodies].setPosition (0,0,HEIGHT/2);
-            m.setBox (1,LENGTH,WIDTH,HEIGHT);
-            m.adjust (1);
-            body[bodies].setMass (m);
-            box[boxes] = OdeHelper.createBox (space,LENGTH,WIDTH,HEIGHT);
-            box[boxes++].setBody (body[bodies++]);
-        }//#endif
-        if (CANNON) {//#ifdef CANNON
-            cannon_ball_body = OdeHelper.createBody (world);
-            cannon_ball_geom = OdeHelper.createSphere (space,CANNON_BALL_RADIUS);
-            m.setSphereTotal (CANNON_BALL_MASS,CANNON_BALL_RADIUS);
-            cannon_ball_body.setMass (m);
-            cannon_ball_geom.setBody (cannon_ball_body);
-            cannon_ball_body.setPosition (CANNON_X,CANNON_Y,CANNON_BALL_RADIUS);
-        }//#endif
-    }
-
-
-    @Override
-    public void show() {
-        // Prepare your screen here.
-
-        doFast = true;
-
-        OdeHelper.initODE2(0);
-
-        bodies = 0;
-        joints = 0;
-        boxes = 0;
-        spheres = 0;
-
-        setupSimulation();
-
-        // run simulation
-        //dsSimulationLoop (args,352,288,this);
-
-        shutdownSimulation();
-        OdeHelper.closeODE();
-    }
-
-    @Override
-    public void render(float delta) {
-        // Draw your screen here. "delta" is the time since last render in seconds.
-    }
-
-
-    // simulation loop
-    private void simLoop (boolean pause)  {
-        int i, j;
-
-        //dsSetTexture (DS_TEXTURE_NUMBER.DS_WOOD);
-
-        if (!pause) {
-            if (BOX) {
-                //dBodyAddForce(body[bodies-1],lspeed,0,0);
-                body[bodies-1].addForce(speed,0,0);
-            }
-            for (j = 0; j < joints; j++)
-            {
-                DHinge2Joint j2 = joint[j];
-                double curturn = j2.getAngle1 ();
-                //dMessage (0,"curturn %e, turn %e, vel %e", curturn, turn, (turn-curturn)*1.0);
-                j2.setParamVel((turn-curturn)*1.0);
-                j2.setParamFMax(dInfinity);
-                j2.setParamVel2(speed);
-                j2.setParamFMax2(FMAX);
-                j2.getBody(0).enable();
-                j2.getBody(1).enable();
-            }
-            if (doFast)
-            {
-                space.collide (null,nearCallback);
-                world.quickStep (0.05);
-                contactgroup.empty ();
-            }
-            else
-            {
-                space.collide (null,nearCallback);
-                world.step (0.05);
-                contactgroup.empty ();
-            }
-
-            for (i = 0; i < wb; i++)
-            {
-                b = wall_boxes[i].getBody();
-                if (b.isEnabled())
-                {
-                    boolean disable = true;
-                    DVector3C lvel = b.getLinearVel();
-                    double lspeed = lvel.lengthSquared();
-                    if (lspeed > DISABLE_THRESHOLD)
-                        disable = false;
-                    DVector3C avel = b.getAngularVel();
-                    double aspeed = avel.lengthSquared();
-                    if (aspeed > DISABLE_THRESHOLD)
-                        disable = false;
-
-                    if (disable)
-                        wb_stepsdis[i]++;
-                    else
-                        wb_stepsdis[i] = 0;
-
-                    if (wb_stepsdis[i] > DISABLE_STEPS)
-                    {
-                        b.disable();
-                        //dsSetColor(0.5f,0.5f,1);
-                    }
-                    else              ;
-                        //dsSetColor(1,1,1);
-
-                }
-                else                 ;
-                    //dsSetColor(0.4f,0.4f,0.4f);
-                DVector3 ss = new DVector3();
-                wall_boxes[i].getLengths (ss);
-                //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);
-            }
-        }
-        else
-        {
-            for (i = 0; i < wb; i++)
-            {
-                b = wall_boxes[i].getBody();
-                if (b.isEnabled())          ;
-                    //dsSetColor(1,1,1);
-                else                            ;
-                    //dsSetColor(0.4f,0.4f,0.4f);
-                DVector3 ss = new DVector3();
-                wall_boxes[i].getLengths (ss);
-                //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);
-            }
-        }
-
-        //dsSetColor (0,1,1);
-        DVector3 sides = new DVector3(LENGTH,WIDTH,HEIGHT);
-        for (i = 0; i < boxes; i++)       ;
-            //dsDrawBox (box[i].getPosition(),box[i].getRotation(),sides);
-        //dsSetColor (1,1,1);
-
-        for (i=0; i< spheres; i++)   ;
-            //dsDrawSphere (sphere[i].getPosition(), sphere[i].getRotation(),RADIUS);
-
-        // draw the cannon
-        //dsSetColor (1,1,0);
-        DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
-        dRFromAxisAndAngle (R2,0,0,1,cannon_angle);
-        dRFromAxisAndAngle (R3,0,1,0,cannon_elevation);
-        dMultiply0 (R4,R2,R3);
-        DVector3 cpos = new DVector3(CANNON_X,CANNON_Y,1);
-        DVector3 csides = new DVector3(2,2,2);
-        //dsDrawBox (cpos,R2,csides);
-        for (i=0; i<3; i++) cpos.add(i,  1.5*R4.get(i, 2));//[i*4+2]);
-        //dsDrawCylinder (cpos,R4,3f,0.5f);
-
-        // draw the cannon ball
-        //dsDrawSphere (cannon_ball_body.getPosition(),cannon_ball_body.getRotation(), CANNON_BALL_RADIUS);
-    }
-
-
-
-    @Override
-    public void resize(int width, int height) {
-        // Resize your screen here. The parameters represent the new window size.
-    }
-
-    @Override
-    public void pause() {
-        // Invoked when your application is paused.
-    }
-
-    @Override
-    public void resume() {
-        // Invoked when your application is resumed after pause.
-    }
-
-    @Override
-    public void hide() {
-        // This method is called when another screen replaces this one.
-    }
-
-    @Override
-    public void dispose() {
-        // Destroy screen's assets here.
-    }
-
-    @Override
-    public boolean keyDown(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char cmd) {
-        switch (cmd) {
-            case 'a': case 'A':
-                speed += 0.3;
-                break;
-            case 'z': case 'Z':
-                speed -= 0.3;
-                break;
-            case ',':
-                turn += 0.1;
-                if (turn > 0.3)
-                    turn = 0.3f;
-                break;
-            case '.':
-                turn -= 0.1;
-                if (turn < -0.3)
-                    turn = -0.3f;
-                break;
-            case ' ':
-                speed = 0;
-                turn = 0;
-                break;
-            case 'f': case 'F':
-                doFast = !doFast;
-                break;
-            case 'r': case 'R':
-                shutdownSimulation();
-                setupSimulation();
-                break;
-            case '[':
-                cannon_angle += 0.1;
-                break;
-            case ']':
-                cannon_angle -= 0.1;
-                break;
-            case '1':
-                cannon_elevation += 0.1;
-                break;
-            case '2':
-                cannon_elevation -= 0.1;
-                break;
-            case 'x': case 'X': {
-                DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
-                dRFromAxisAndAngle (R2,0,0,1,cannon_angle);
-                dRFromAxisAndAngle (R3,0,1,0,cannon_elevation);
-                dMultiply0 (R4,R2,R3);
-                double[] cpos = {CANNON_X,CANNON_Y,1};
-                for (int i=0; i<3; i++) cpos[i] += 3*R4.get(i, 2);//[i*4+2];
-                cannon_ball_body.setPosition (cpos[0],cpos[1],cpos[2]);
-                double force = 10;
-                cannon_ball_body.setLinearVel (force*R4.get(0, 2),force*R4.get(1,2),force*R4.get(2,2));
-                cannon_ball_body.setAngularVel (0,0,0);
-                break;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
-    @Override
-    public boolean scrolled(float amountX, float amountY) {
-        return false;
-    }
 }

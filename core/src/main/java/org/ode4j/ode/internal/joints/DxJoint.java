@@ -762,8 +762,7 @@ public abstract class DxJoint extends DObject implements DJoint {
 	}
 
 
-	public void dJointAttach (DBody b1, DBody b2)
-	{
+	public void dJointAttach (DBody b1, DBody b2) {
 		DxBody body1 = (DxBody) b1;
 		DxBody body2 = (DxBody) b2;
 		// check arguments
