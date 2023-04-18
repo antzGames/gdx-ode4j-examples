@@ -75,7 +75,7 @@ public class DxPlane extends DxGeom implements DPlane {
 	}
 
 
-	DxPlane (DxSpace space, double a, double b, double c, double d) 
+	DxPlane (DxSpace space, double a, double b, double c, double d)
 	//dxGeom (space,0)
 	{
 		super(space, false);
@@ -115,8 +115,7 @@ public class DxPlane extends DxGeom implements DPlane {
 
 
 	public static DxPlane dCreatePlane (DxSpace space,
-			double a, double b, double c, double d)
-	{
+			double a, double b, double c, double d)	{
 		return new DxPlane (space,a,b,c,d);
 	}
 
@@ -162,7 +161,7 @@ public class DxPlane extends DxGeom implements DPlane {
 		return _pD - _pV.dot(p);
 	}
 
-	//TZ 
+	//TZ
 	@Override
 	public DVector3C getNormal() {
 		return _pV;
@@ -171,7 +170,7 @@ public class DxPlane extends DxGeom implements DPlane {
 	public double getDepth() {
 		return _pD;
 	}
-	
+
 	// **********************************
 	// API dPlane
 	// **********************************
@@ -182,7 +181,7 @@ public class DxPlane extends DxGeom implements DPlane {
 	@Override
 	public void setParams (DVector3C abc, double d)
 	{ dGeomPlaneSetParams (abc.get0(), abc.get1(), abc.get2(), d); }
-	public void getParams (DVector4 result) 
+	public void getParams (DVector4 result)
 	{ dGeomPlaneGetParams (result); }
 
 	@Override
@@ -191,7 +190,7 @@ public class DxPlane extends DxGeom implements DPlane {
 		throw new UnsupportedOperationException(
 				"ERROR: getPosition() is not supported for Planes.");
 	}
-	
+
 	@Override
 	public DMatrix3C getRotation() {
 		throw new UnsupportedOperationException(
