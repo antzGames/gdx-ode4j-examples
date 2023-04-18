@@ -24,15 +24,17 @@
  *************************************************************************/
 package org.ode4j.ode.internal;
 
+import com.badlogic.gdx.Gdx;
+
 import org.ode4j.ode.internal.cpp4j.java.Ref;
 import org.ode4j.ode.internal.joints.OdeJointsFactoryImpl;
 import org.ode4j.ode.internal.joints.DxJoint;
 import org.ode4j.ode.internal.joints.DxJointNode;
 
+import text.formic.Stringf;
+
 import static org.ode4j.ode.OdeMath.*;
 import static org.ode4j.ode.internal.ErrorHandler.*;
-import static org.ode4j.ode.internal.cpp4j.Cstdio.*;
-
 
 /**
  * this source file is mostly concerned with the data structures, not the
@@ -49,7 +51,7 @@ public class OdeFactoryImpl extends OdeJointsFactoryImpl {
 
 	//Moved to Objects_H.java
 
-	
+
 
 	//// remove the joint from neighbour lists of all connected bodies
 	//
@@ -230,17 +232,17 @@ public class OdeFactoryImpl extends OdeJointsFactoryImpl {
 	// testing
 
 	//#define NUM 100
-	private static final int NUM = 100; 
+	private static final int NUM = 100;
 
 	//#define DO(x)
 
 
-	//extern "C" 
+	//extern "C"
 	public void dTestDataStructures()
 	{
 		int i;
 		//DO(
-		printf ("testDynamicsStuff()\n");
+        System.out.println("testDynamicsStuff()\n");
 
 		DxBody[] body = new DxBody[NUM];
 		int nb = 0;
@@ -251,37 +253,37 @@ public class OdeFactoryImpl extends OdeJointsFactoryImpl {
 		for (i=0; i<NUM; i++) joint[i] = null;
 
 		//DO(
-		printf ("creating world\n");
+        System.out.println("creating world\n");
 		DxWorld w = DxWorld.dWorldCreate();
 		checkWorld (w);
 
 		for (;;) {
 			if (nb < NUM && dRandReal() > 0.5) {
 				//DO(
-				printf ("creating body\n");
+                System.out.println("creating body\n");
 				body[nb] = DxBody.dBodyCreate (w);
 				//DO(
-				printf ("\t--> %p\n",body[nb].toString());
+                System.out.println(Stringf.format("\t--> %p\n", body[nb].toString()));
 				nb++;
 				checkWorld (w);
 				//DO(
-				printf ("%d BODIES, %d JOINTS\n",nb,nj);
+                System.out.println(Stringf.format("%d BODIES, %d JOINTS\n",nb,nj));
 			}
 			if (nj < NUM && nb > 2 && dRandReal() > 0.5) {
 				DxBody b1 = body [(int) (dRand() % nb)];
 				DxBody b2 = body [(int) (dRand() % nb)];
 				if (b1 != b2) {
 					//DO(
-					printf ("creating joint, attaching to %p,%p\n",b1,b2);
+                    System.out.println(Stringf.format("creating joint, attaching to %p,%p\n",b1,b2));
 					joint[nj] = dJointCreateBall (w,null);
 					//DO(
-					printf ("\t-->%p\n",joint[nj]);
+                    System.out.println(Stringf.format("\t-->%p\n",joint[nj]));
 					checkWorld (w);
 					joint[nj].dJointAttach (b1,b2);
 					nj++;
 					checkWorld (w);
 					//DO(
-					printf ("%d BODIES, %d JOINTS\n",nb,nj);
+                    System.out.println(Stringf.format("%d BODIES, %d JOINTS\n",nb,nj));
 				}
 			}
 			if (nj > 0 && nb > 2 && dRandReal() > 0.5) {
@@ -290,31 +292,31 @@ public class OdeFactoryImpl extends OdeJointsFactoryImpl {
 				if (b1 != b2) {
 					int k = (int) (dRand() % nj);
 					//DO(
-					printf ("reattaching joint %p\n",joint[k]);
+                    System.out.println(Stringf.format("reattaching joint %p\n",joint[k]));
 					joint[k].dJointAttach (b1,b2);
 					checkWorld (w);
 					//DO(
-					printf ("%d BODIES, %d JOINTS\n",nb,nj);
+                    System.out.println(Stringf.format("%d BODIES, %d JOINTS\n",nb,nj));
 				}
 			}
 			if (nb > 0 && dRandReal() > 0.5) {
 				int k = (int) (dRand() % nb);
 				//DO(
-				printf ("destroying body %p\n",body[k]);
+				System.out.println(Stringf.format("destroying body %p\n",body[k]));
 				body[k].dBodyDestroy ();
 				checkWorld (w);
 				for (; k < (NUM-1); k++) body[k] = body[k+1];
 				nb--;
-				printf ("%d BODIES, %d JOINTS\n",nb,nj);
+                System.out.println(Stringf.format("%d BODIES, %d JOINTS\n",nb,nj));
 			}
 			if (nj > 0 && dRandReal() > 0.5) {
 				int k = (int) (dRand() % nj);
-				printf ("destroying joint %p\n",joint[k]);
+                System.out.println(Stringf.format("destroying joint %p\n",joint[k]));
 				dJointDestroy (joint[k]);
 				checkWorld (w);
 				for (; k < (NUM-1); k++) joint[k] = joint[k+1];
 				nj--;
-				printf ("%d BODIES, %d JOINTS\n",nb,nj);
+                System.out.println(Stringf.format("%d BODIES, %d JOINTS\n",nb,nj));
 			}
 		}
 
@@ -459,8 +461,8 @@ public class OdeFactoryImpl extends OdeJointsFactoryImpl {
 
 		//; // END
 	}
-	
-	//const char* 
+
+	//const char*
 	public String _dGetConfiguration ()
 	{
 		return ode_configuration;
@@ -499,10 +501,10 @@ public class OdeFactoryImpl extends OdeJointsFactoryImpl {
 
 			terminator = where + ext_length;
 
-//			if ( (where == start || *(where - 1) == ' ') && 
+//			if ( (where == start || *(where - 1) == ' ') &&
 //					(*terminator == ' ' || *terminator == '\0') )
-			if ( (where == start || extension.charAt(where - 1) == ' ') && 
-					(extension.charAt(terminator) == ' ' || 
+			if ( (where == start || extension.charAt(where - 1) == ' ') &&
+					(extension.charAt(terminator) == ' ' ||
 							terminator == extension.length()) )
 			{
 				return true;

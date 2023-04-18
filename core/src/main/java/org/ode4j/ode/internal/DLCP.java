@@ -45,13 +45,11 @@ import static org.ode4j.ode.internal.Misc.dMaxDifference;
 import static org.ode4j.ode.internal.Misc.dRandReal;
 import static org.ode4j.ode.internal.cpp4j.java.Cstring.memcpy;
 import static org.ode4j.ode.internal.cpp4j.java.Cstring.memmove;
-
 import org.ode4j.math.DMatrixN;
 import org.ode4j.ode.DStopwatch;
 import org.ode4j.ode.OdeConfig;
 import org.ode4j.ode.internal.processmem.DxUtil.BlockPointer;
 import org.ode4j.ode.internal.processmem.DxWorldProcessMemArena;
-
 import text.formic.Stringf;
 
 

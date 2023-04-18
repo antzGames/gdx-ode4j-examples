@@ -24,18 +24,15 @@
  *************************************************************************/
 package org.ode4j.ode.internal;
 
-import org.ode4j.ode.internal.ErrorHandler.dMessageFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.badlogic.gdx.Gdx;
 
+import org.ode4j.ode.internal.ErrorHandler.dMessageFunction;
 
 /**
  *
  * Error handlers.
  */
 public class ErrorHdl {
-
-	public static Logger logger = LoggerFactory.getLogger(ErrorHdl.class);
 
 	    /**
 	 * @author Tilmann Zaeschke
@@ -109,28 +106,28 @@ public class ErrorHdl {
 
 
 	/**
-	 * generate a fatal error, debug trap or a message. 
+	 * generate a fatal error, debug trap or a message.
 	 * @param num error number
 	 * @param msg message
-	 * @param ap objects 
+	 * @param ap objects
 	 */
 	public static void dError (int num, String msg, Object ... ap) {
 		//  va_list ap;
 		//  va_start (ap,msg);
 		if (error_function != null) {
 			error_function.call (num,msg,ap);
-		} 
-		logger.error("ODE Error " + num + ": " + msg, ap);
+		}
+		Gdx.app.log(ap.getClass().getName(), "ODE Error " + num + ": " + msg);
 		throw new RuntimeException("#"+num + ": " + msg);
 		//System.exit (1);
 	}
 
 
 	/**
-	 * generate a fatal error, debug trap or a message. 
+	 * generate a fatal error, debug trap or a message.
 	 * @param num error number
 	 * @param msg message
-	 * @param ap objects 
+	 * @param ap objects
 	 */
 	public static void dDebug (int num, String msg, Object ... ap) {
 		//  va_list ap;
@@ -138,7 +135,7 @@ public class ErrorHdl {
 		if (debug_function != null) {
 			debug_function.call (num,msg,ap);
 		}
-		logger.debug("ODE INTERNAL ERROR " + " " + num + ": " + msg, ap);
+		Gdx.app.debug(ap.getClass().getName(), "ODE INTERNAL ERROR " + " " + num + ": " + msg);
 		// *((char *)0) = 0;   ... commit SEGVicide
 		//abort();
 //		msg += " -> ";
@@ -149,10 +146,10 @@ public class ErrorHdl {
 
 
 	/**
-	 * generate a fatal error, debug trap or a message. 
+	 * generate a fatal error, debug trap or a message.
 	 * @param num error number
 	 * @param msg message
-	 * @param ap objects 
+	 * @param ap objects
 	 */
 	public static void dMessage (int num, String msg, Object ... ap) {
 		//  va_list ap;
@@ -161,7 +158,7 @@ public class ErrorHdl {
 			message_function.call (num,msg,ap);
 		} else {
 			//printMessage (num,"ODE Message",msg,ap);
-			logger.info("ODE Message " + num + ": " + msg, ap);
+			Gdx.app.log(ap.getClass().getName(), "ODE Message " + num + ": " + msg);
 		}
 	}
 }

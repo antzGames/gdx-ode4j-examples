@@ -31,7 +31,8 @@ import org.ode4j.ode.DHashSpace;
 import org.ode4j.ode.internal.cpp4j.java.RefInt;
 
 import static org.ode4j.ode.OdeMath.*;
-import static org.ode4j.ode.internal.cpp4j.C_All.*;
+import static org.ode4j.ode.internal.cpp4j.java.Cmath.frexp;
+import static org.ode4j.ode.internal.cpp4j.java.Cmath.ldexp;
 
 /**
  * From collision_space.cpp
@@ -123,7 +124,7 @@ public class DxHashSpace extends DxSpace implements DHashSpace {
 		int r = level*1000 + x*100 + y*10 + z;
 		//TODO remove check ?!?
 		if (r>=Integer.MAX_VALUE) {
-		    throw new IllegalArgumentException("level: " + level + " x=" + x + 
+		    throw new IllegalArgumentException("level: " + level + " x=" + x +
 		            " y=" + y + " z="+ z);
 		}
 		return Math.abs(r);
@@ -266,7 +267,7 @@ public class DxHashSpace extends DxSpace implements DHashSpace {
 		for (i=0; i<NUM_PRIMES; i++) {
 			if (prime[i] >= (8*n)) break;
 		}
-		if (i >= NUM_PRIMES) 
+		if (i >= NUM_PRIMES)
 			i = NUM_PRIMES-1;	// probably pointless
 		int sz = prime[i];
 
@@ -311,12 +312,12 @@ public class DxHashSpace extends DxSpace implements DHashSpace {
 					for (int yi = db[2]; yi <= db[3]; yi++) {
 						for (int zi = db[4]; zi <= db[5]; zi++) {
 							// get the hash index
-							//int TZ long 
+							//int TZ long
 							int hi = getVirtualAddress (level,xi,yi,zi) % sz;
 							// search all nodes at this index
 							for (Node node = table[hi]; node != null; node=node.next) {
 								// node points to an AABB that may intersect aabb
-								if (node.aabb == aabb) 
+								if (node.aabb == aabb)
 									continue;
 								if (node.aabb.level == level &&
 										node.x == xi && node.y == yi && node.z == zi) {
@@ -343,7 +344,7 @@ public class DxHashSpace extends DxSpace implements DHashSpace {
 					}
 				}
 				// get the discrete bounds for the next level up
-				for (i=0; i<6; i++) 
+				for (i=0; i<6; i++)
 					db[i] >>= 1;
 			}
 		}

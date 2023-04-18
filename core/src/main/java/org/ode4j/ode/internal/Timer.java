@@ -24,16 +24,14 @@
  *************************************************************************/
 package org.ode4j.ode.internal;
 
-
-import static org.ode4j.ode.internal.cpp4j.Cstdio.*;
-
 import org.ode4j.ode.DStopwatch;
-import org.ode4j.ode.internal.cpp4j.FILE;
+
+import text.formic.Stringf;
 
 /**
  * TODO
  * ----
- * 
+ *
  * - gettimeofday() and the pentium time stamp counter return the real time,
  *   not the process time. fix this somehow!
  *
@@ -88,10 +86,10 @@ public class Timer {
 		long cc2;
 		long cc1 = System.nanoTime();
 		do {
-			cc2 = System.nanoTime(); 
+			cc2 = System.nanoTime();
 		} while (cc1 == cc2);
 		do {
-			cc1 = System.nanoTime(); 
+			cc1 = System.nanoTime();
 		} while (cc1 == cc2);
 
 		return (cc1-cc2) / dTimerTicksPerSecond();
@@ -221,38 +219,35 @@ public class Timer {
 	// print report
 
 	//static void fprintDoubleWithPrefix (FILE *f, double a, const char *fmt)
-	private static void fprintDoubleWithPrefix (FILE f, double a, final String fmt)
+	private static void fprintDoubleWithPrefix (double a, final String fmt)
 	{
 		if (a >= 0.999999) {
-			fprintf (f,fmt,a);
+//			fprintf (f,fmt,a);
 			return;
 		}
 		a *= 1000.0;
 		if (a >= 0.999999) {
-			fprintf (f,fmt,a);
-			fprintf (f,"m");
+//			fprintf (f,fmt,a);
+//			fprintf (f,"m");
 			return;
 		}
 		a *= 1000.0;
 		if (a >= 0.999999) {
-			fprintf (f,fmt,a);
-			fprintf (f,"u");
 			return;
 		}
 		a *= 1000.0;
-		fprintf (f,fmt,a);
-		fprintf (f,"n");
+//		fprintf (f,fmt,a);
+//		fprintf (f,"n");
 	}
 
 
-	public static void dTimerReport (FILE fout, int average)
-	{
+	public static void dTimerReport (int average) {
 		int i;
 		int maxl;//size_t maxl;
 		double ccunit = 1.0/dTimerTicksPerSecond();
-		fprintf (fout,"\nTimer Report (");
-		fprintDoubleWithPrefix (fout,ccunit,"%.2f ");
-		fprintf (fout,"s resolution)\n------------\n");
+//		fprintf (fout,"\nTimer Report (");
+		fprintDoubleWithPrefix (ccunit,"%.2f ");
+//		fprintf (fout,"s resolution)\n------------\n");
 		if (num < 1) return;
 
 		// get maximum description length
@@ -292,15 +287,12 @@ public class Timer {
 				p = 100.0;
 			}
 			//fprintf (fout,"%-*s %7.2fms %6.2f%%",(int)maxl,event[i].description, //TODO -*
-			fprintf (fout,"%s %7.2fms %6.2f%%",event[i].description,  //TODO (int)maxl
-					t*ccunit * 1000.0, p);
+			//fprintf (fout,"%s %7.2fms %6.2f%%",event[i].description,  //TODO (int)maxlt*ccunit * 1000.0, p);
 			if (average!=0 && i < (num-1)) {
-				fprintf (fout,"  (avg %7.2fms %6.2f%%)",
-						(event[i].total_t / event[i].count)*ccunit * 1000.0,
-						event[i].total_p / event[i].count);
+				//fprintf (fout,"  (avg %7.2fms %6.2f%%)",						(event[i].total_t / event[i].count)*ccunit * 1000.0,						event[i].total_p / event[i].count);
 			}
-			fprintf (fout,"\n");
+			//fprintf (fout,"\n");
 		}
-		fprintf (fout,"\n");
+		//fprintf (fout,"\n");
 	}
 }
