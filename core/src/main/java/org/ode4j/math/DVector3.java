@@ -37,7 +37,7 @@ import org.ode4j.math.DMatrix3.DVector3ColView;
  *   generic methods in super-classes showed to slow down operations
  *   like add() or set() by a factor of ~10 (SUN JDK 6 on SuSE 11.1 64bit).
  * - Using complex methods (e.g. v0.sum(v1, v2, s2)) showed to be about
- *   2 times faster than concatenating methods, e.g. v0.set(v2).scale(s2).add(v1). 
+ *   2 times faster than concatenating methods, e.g. v0.set(v2).scale(s2).add(v1).
  *
  * @author Tilmann Zaeschke
  *
@@ -51,12 +51,12 @@ public class DVector3 implements DVector3I, DVector3C {
 	/**
 	 * Creates a (0,0,0) vector.
 	 */
-	public DVector3() { 
+	public DVector3() {
 		d0 = 0;
 		d1 = 0;
 		d2 = 0;
 	}
-	
+
 	/**
 	 * Creates a vector initialised as copy of v2.
 	 * @param v2 v2
@@ -65,7 +65,7 @@ public class DVector3 implements DVector3I, DVector3C {
 		this();
 		set(v2);
 	}
-	
+
     /**
      * Creates a vector initialised with the first three values of v2.
      * @param v2 v2
@@ -74,7 +74,7 @@ public class DVector3 implements DVector3I, DVector3C {
 		this();
 		set(v2);
 	}
-	
+
     /**
      * Creates a (i,j,k) vector.
      * @param i value  at position 0
@@ -85,7 +85,7 @@ public class DVector3 implements DVector3I, DVector3C {
 		this();
 		set(i, j, k);
 	}
-	
+
 	public final DVector3 set(double[] v2) {
 		set(v2[0], v2[1], v2[2]);
 		return this;
@@ -94,28 +94,28 @@ public class DVector3 implements DVector3I, DVector3C {
 	public void set(float[] v2) {
 		set(v2[0], v2[1], v2[2]);
 	}
-	
+
 	public final DVector3 set(double x, double y, double z) {
 		//set0( x ); set1( y ); set2( z );
 		d0 = x; d1 = y; d2 = z;
 		return this;
 	}
-	
+
 	public final DVector3 set(DVector3C v2) {
 		set0( v2.get0() ); set1( v2.get1() ); set2( v2.get2() );
 		return this;
 	}
-	
+
 	public final DVector3 set(DVector3ColView v2) {
 		set0( v2.get0() ); set1( v2.get1() ); set2( v2.get2() );
 		return this;
 	}
-	
+
 	@Override
 	public DVector3 clone() {
 		return new DVector3(this);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "DVector3[ " +
@@ -128,37 +128,37 @@ public class DVector3 implements DVector3I, DVector3C {
 	public final void set0(double d) {
 		d0 = d;
 	}
-	
+
 	@Override
 	public final void set1(double d) {
 		d1 = d;
 	}
-	
+
 	@Override
 	public final void set2(double d) {
 		d2 = d;
 	}
-	
+
 	@Override
 	public final double get0() {
 		return d0;
 	}
-	
+
 	@Override
 	public final double get1() {
 		return d1;
 	}
-	
+
 	@Override
 	public final double get2() {
 		return d2;
 	}
-	
+
 	public final DVector3 add(double a, double b, double c) {
 		d0 += a; d1 += b; d2 += c;
 		return this;
 	}
-	
+
 	/**
 	 * Adds v2 to the current vector.
 	 * @param v2 v2
@@ -168,20 +168,20 @@ public class DVector3 implements DVector3I, DVector3C {
 		d0 += v2.get0(); d1 += v2.get1(); d2 += v2.get2();
 		return this;
 	}
-	
+
 	/**
 	 * Sets current vector = v2 + v3.
 	 * @param v2 v2
-	 * @param v3 v3 
+	 * @param v3 v3
 	 * @return Current vector.
 	 */
 	public final DVector3 eqSum(DVector3C v2, DVector3C v3) {
-		set0( v2.get0() + v3.get0() ); 
-		set1( v2.get1() + v3.get1() ); 
+		set0( v2.get0() + v3.get0() );
+		set1( v2.get1() + v3.get1() );
 		set2( v2.get2() + v3.get2() );
 		return this;
 	}
-	
+
 	/**
 	 * Convenience function that performs:
 	 * this = v2*s2 + v3*s3
@@ -192,12 +192,12 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * @return this
 	 */
 	public final DVector3 eqSum(DVector3C v2, double s2, DVector3C v3, double s3) {
-		set0( v2.get0()*s2 + v3.get0()*s3 ); 
-		set1( v2.get1()*s2 + v3.get1()*s3 ); 
+		set0( v2.get0()*s2 + v3.get0()*s3 );
+		set1( v2.get1()*s2 + v3.get1()*s3 );
 		set2( v2.get2()*s2 + v3.get2()*s3 );
 		return this;
 	}
-	
+
 	/**
 	 * Convenience function that performs:
 	 * this = v2*s2 + v3*s3
@@ -208,12 +208,12 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * @return this
 	 */
 	public final DVector3 eqSum(DVector3ColView v2, double s2, DVector3C v3, double s3) {
-		set0( v2.get0()*s2 + v3.get0()*s3 ); 
-		set1( v2.get1()*s2 + v3.get1()*s3 ); 
+		set0( v2.get0()*s2 + v3.get0()*s3 );
+		set1( v2.get1()*s2 + v3.get1()*s3 );
 		set2( v2.get2()*s2 + v3.get2()*s3 );
 		return this;
 	}
-	
+
 	/**
 	 * Convenience function that performs:
 	 * this = v2*s2 + v3*s3
@@ -224,12 +224,12 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * @return this
 	 */
 	public final DVector3 eqSum(DVector3ColView v2, double s2, DVector3ColView v3, double s3) {
-		set0( v2.get0()*s2 + v3.get0()*s3 ); 
-		set1( v2.get1()*s2 + v3.get1()*s3 ); 
+		set0( v2.get0()*s2 + v3.get0()*s3 );
+		set1( v2.get1()*s2 + v3.get1()*s3 );
 		set2( v2.get2()*s2 + v3.get2()*s3 );
 		return this;
 	}
-	
+
 	/**
 	 * Convenience function that performs:
 	 * this = v2 + v3*s3
@@ -239,8 +239,8 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * @return this
 	 */
 	public final DVector3 eqSum(DVector3C v2, DVector3C v3, double s3) {
-		set0( v2.get0() + v3.get0()*s3 ); 
-		set1( v2.get1() + v3.get1()*s3 ); 
+		set0( v2.get0() + v3.get0()*s3 );
+		set1( v2.get1() + v3.get1()*s3 );
 		set2( v2.get2() + v3.get2()*s3 );
 		return this;
 	}
@@ -254,12 +254,12 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * @return this
 	 */
 	public final DVector3 eqSum(DVector3C v2, DVector3ColView v3, double s3) {
-		set0( v2.get0() + v3.get0()*s3 ); 
-		set1( v2.get1() + v3.get1()*s3 ); 
+		set0( v2.get0() + v3.get0()*s3 );
+		set1( v2.get1() + v3.get1()*s3 );
 		set2( v2.get2() + v3.get2()*s3 );
 		return this;
 	}
-	
+
 	public final DVector3 sub(double a, double b, double c) {
 		d0 -= a; d1 -= b; d2 -= c;
 		return this;
@@ -295,7 +295,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	public final double dot(DVector3C b) {
 		return get0()*b.get0() + get1()*b.get1() + get2()*b.get2();
 	}
-	
+
 	/**
 	 * Return the 'dot' product of two vectors.
 	 * r = a0*b0 + a1*b1 + a2*b2;
@@ -306,7 +306,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	public final double dot(DVector3View b) {
 		return get0()*b.get0() + get1()*b.get1() + get2()*b.get2();
 	}
-	
+
 	/**
 	 * Return the 'dot' product of two vectors.
 	 * r = a0*b0 + a1*b1 + a2*b2;
@@ -317,7 +317,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	public final double dot(double[] da, int pos) {
 		return get0()*da[pos] + get1()*da[pos+1] + get2()*da[pos+2];
 	}
-	
+
 //	/**
 //	 * Calculate the 'dot' or 'inner' product. <br>
 //	 * x = b_t * c  <br>
@@ -328,22 +328,22 @@ public class DVector3 implements DVector3I, DVector3C {
 //	 */
 //	public double eqDot(final dVector3C b, final dVector3C c) {
 //		return b.get0()*c.get0() + b.get1()*c.get1() + b.get2()*c.get2();
-//		
+//
 //	}
-	
+
 	/**
 	 * Sets the current vector v0 = v2 - v3.
 	 * @param v2 v2
-	 * @param v3 v3 
+	 * @param v3 v3
 	 * @return (this).
 	 */
 	public final DVector3 eqDiff(DVector3C v2, DVector3C v3) {
-		d0 = v2.get0() - v3.get0(); 
-		d1 = v2.get1() - v3.get1(); 
+		d0 = v2.get0() - v3.get0();
+		d1 = v2.get1() - v3.get1();
 		d2 = v2.get2() - v3.get2();
 		return this;
 	}
-	
+
 	/**
 	 * Return a new vector v0 = v(this) - v2.
 	 * @param v2 v2
@@ -356,7 +356,7 @@ public class DVector3 implements DVector3I, DVector3C {
 				get1() - v2.get1(),
 				get2() - v2.get2());
 	}
-	
+
 	/**
 	 * this may be called for vectors `a' with extremely small magnitude, for
 	 * example the result of a cross product on two nearly perpendicular vectors.
@@ -365,7 +365,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * all the components by 1/a[i]. then we can compute the length of `a' and
 	 * scale the components by 1/l. this has been verified to work with vectors
 	 * containing the smallest representable numbers.
-	 * 
+	 *
 	 * This method returns (1,0,0) if no normal can be determined.
 	 * @return 'false' if no normal could be determined
 	 */
@@ -414,7 +414,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * all the components by 1/a[i]. then we can compute the length of `a' and
 	 * scale the components by 1/l. this has been verified to work with vectors
 	 * containing the smallest representable numbers.
-	 * 
+	 *
 	 * This method throws an IllegalArgumentEception if no normal can be determined.
 	 */
 	public final void normalize()
@@ -435,7 +435,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	    double r3 = get2()-a.get2();
 	    return Math.sqrt(r1*r1 + r2*r2 + r3*r3);
 	}
-	
+
 	/**
 	 * Check whether two vectors contains the same values.
 	 * Due to Java's polymorphism handling, this method can be much faster than
@@ -456,12 +456,12 @@ public class DVector3 implements DVector3I, DVector3C {
 		set1( Math.abs(get1()));
 		set2( Math.abs(get2()));
 	}
-	
+
 //	public void dMultiply0 (final dMatrix3C B, final dVector3C C)
 //	{
 //		eqMul(B, C);
 //	}
-//	
+//
 //	public void eqMul (final dMatrix3C B, final dVector3C c)
 //	{
 ////		double[] B2 = ((dMatrix3) B).v;
@@ -495,7 +495,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return '3'.
 	 */
 	public final int dim() {
@@ -533,7 +533,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	public final void setZero() {
 		eqZero();
 	}
-	
+
 	public final void eqIdentity() {
 		set(1, 0, 0);
 	}
@@ -546,7 +546,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	public final float[] toFloatArray4() {
 		return new float[]{ (float) get0(), (float) get1(), (float) get2(), 0.0f };
 	}
-	
+
 	/**
 	 * @return The geometric length of this vector.
 	 */
@@ -559,7 +559,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	public final double lengthSquared() {
 		return get0()*get0() + get1()*get1() + get2()*get2();
 	}
-	
+
 	@Override
 	public final double get(int i) {
 	    switch (i) {
@@ -574,7 +574,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	public final float[] toFloatArray() {
 		return new float[]{(float) get0(), (float) get1(), (float) get2()};
 	}
-	
+
 	public final void set(int i, double d) {
         switch (i) {
         case 0: d0 = d; break;
@@ -601,9 +601,9 @@ public class DVector3 implements DVector3I, DVector3C {
         default: throw new IllegalArgumentException("i=" + i);
         }
 	}
-	
+
 	/**
-	 * Calculates the dot product of this vector with the specified column 
+	 * Calculates the dot product of this vector with the specified column
 	 * of the given Matrix.
 	 * @param m m
 	 * @param col col
@@ -620,11 +620,11 @@ public class DVector3 implements DVector3I, DVector3C {
 			throw new IllegalArgumentException("col="+col);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Do not use. This can be slow, use isEq() instead.
-	 * 
+	 *
 	 * Any implementation of DVector3I will return true if get0(), get1()
 	 * and get2() return the same values.
 	 */
@@ -637,16 +637,16 @@ public class DVector3 implements DVector3I, DVector3C {
 		DVector3I v = (DVector3I) obj;
 		return get0()==v.get0() && get1()==v.get1() && get2()==v.get2();
 	}
-	
+
 	@Override
 	public int hashCode() {
-		return (int) (Double.doubleToRawLongBits(get0())  * 
-		Double.doubleToRawLongBits(get1()) * 
-		Double.doubleToRawLongBits(get2()));
+		return (int) (Double. doubleToLongBits(get0())  *
+		Double. doubleToLongBits(get1()) *
+		Double. doubleToLongBits(get2()));
 	}
 
-	/** 
-	 * Scales the first parameter with the second and then adds the 
+	/**
+	 * Scales the first parameter with the second and then adds the
 	 * result to the current vector.
 	 * @param v2 Vector
 	 * @param d scale
@@ -663,18 +663,18 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * @param c c
 	 */
 	public final void eqCross(DVector3C b, DVector3C c) {
-		set0( b.get1()*c.get2() - b.get2()*c.get1() ); 
-		set1( b.get2()*c.get0() - b.get0()*c.get2() ); 
+		set0( b.get1()*c.get2() - b.get2()*c.get1() );
+		set1( b.get2()*c.get0() - b.get0()*c.get2() );
 		set2( b.get0()*c.get1() - b.get1()*c.get0() );
 	}
 
-	/** 
+	/**
 	 * Calculates the ordinary matrix product for a 3x3 Matrix and a 3-Vector.
 	 * <pre>
-	 * a0 = m00*v0 + m01*v1 + m02*v2 
-	 * a1 = m10*v0 + m11*v1 + m12*v2 
+	 * a0 = m00*v0 + m01*v1 + m02*v2
+	 * a1 = m10*v0 + m11*v1 + m12*v2
 	 * a2 = m20*v0 + m21*v1 + m22*v2
-	 * </pre> 
+	 * </pre>
 	 * @param m matrix m
 	 * @param v2 vector v
 	 */

@@ -24,11 +24,10 @@
  *************************************************************************/
 package org.ode4j.ode.internal;
 
+import com.badlogic.gdx.utils.GdxRuntimeException;
+
 import static org.ode4j.ode.internal.DxGimpactCollision.GIM_AABB_COPY;
 import static org.ode4j.ode.internal.DxGimpactCollision.MakeMatrix;
-
-import java.nio.channels.UnsupportedAddressTypeException;
-
 import org.ode4j.math.DVector3;
 import org.ode4j.ode.DBox;
 import org.ode4j.ode.DCapsule;
@@ -42,7 +41,7 @@ import org.ode4j.ode.internal.gimpact.GimGeometry.mat4f;
 import org.ode4j.ode.internal.gimpact.GimGeometry.vec3f;
 
 /**
- * 
+ *
  *
  * @author Tilmann Zaeschke
  */
@@ -55,12 +54,12 @@ public class DxGimpact extends DxTriMesh {
 
 	//void dGeomTriMeshSetLastTransform( DMatrix4 last_trans ) { //stub
 	void dGeomTriMeshSetLastTransform( Object last_trans ) { //stub
-		throw new UnsupportedAddressTypeException();
+		throw new GdxRuntimeException("xxx");
 	}
 
 	//	DMatrix4 dGeomTriMeshGetLastTransform() {
 	Object dGeomTriMeshGetLastTransform() {
-		throw new UnsupportedAddressTypeException();
+        throw new GdxRuntimeException("xxx");
 		//		return null; // stub
 	}
 
@@ -98,7 +97,7 @@ public class DxGimpact extends DxTriMesh {
 	// Trimesh
 
 	//dxTriMesh::dxTriMesh(dSpaceID Space, dTriMeshDataID Data) : dxGeom(Space, 1){
-	DxGimpact(DxSpace Space, DxGimpactData Data) { 
+	DxGimpact(DxSpace Space, DxGimpactData Data) {
 		super(Space);
 		_Data = Data;
 		type = dTriMeshClass;
@@ -108,8 +107,8 @@ public class DxGimpact extends DxTriMesh {
 		RayCallback = null;
 		TriMergeCallback = null; // Not initialized in dCreateTriMesh
 
-//		for (int i=0; i < m_buffer_managers.length; i++) { 
-//			m_buffer_managers[i] = new GBUFFER_MANAGER_DATA(); 
+//		for (int i=0; i < m_buffer_managers.length; i++) {
+//			m_buffer_managers[i] = new GBUFFER_MANAGER_DATA();
 //		}
 //		GimBufferArray.gim_init_buffer_managers(m_buffer_managers);
 
@@ -236,7 +235,7 @@ public class DxGimpact extends DxTriMesh {
 	//dTriTriMergeCallback* dGeomTriMeshGetTriMergeCallback(dGeomID g)
 	DTriTriMergeCallback dGeomTriMeshGetTriMergeCallback()
 	{
-		//dUASSERT(g && g->type == dTriMeshClass, "argument not a trimesh");	
+		//dUASSERT(g && g->type == dTriMeshClass, "argument not a trimesh");
 		return TriMergeCallback;
 	}
 
@@ -353,7 +352,7 @@ public class DxGimpact extends DxTriMesh {
 	//void dGeomTriMeshGetPoint(dGeomID g, int Index, dReal u, dReal v, dVector3 Out){
 	void dGeomTriMeshGetPoint(int Index, double u, double v, DVector3 Out){
 		vec3f[] dv = { new vec3f(), new vec3f(), new vec3f() };
-		m_collision_trimesh.gim_trimesh_locks_work_data();	
+		m_collision_trimesh.gim_trimesh_locks_work_data();
 		m_collision_trimesh.gim_trimesh_get_triangle_vertices(Index, dv[0],dv[1],dv[2]);
 		DxGimpactCollision.GetPointFromBarycentric(dv, u, v, Out);
 		m_collision_trimesh.gim_trimesh_unlocks_work_data();

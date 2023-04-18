@@ -46,7 +46,7 @@ public class SameThreadTaskExecutor extends AbstractTaskExecutor {
                 task.parent.subtaskCompleted();
             }
 	        task.runnable.run();
-	        task.completed.countDown();
+	        task.completed = true;
 	    }
 	}
 }

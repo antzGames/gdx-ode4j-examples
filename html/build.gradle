@@ -29,8 +29,8 @@ gwt {
 
 dependencies {
   implementation project(':core')
-  implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-  implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+//  implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+//  implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
   implementation "com.github.tommyettinger:formic:$formicVersion:sources"
   implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
@@ -43,8 +43,8 @@ dependencies {
 //// If you do, follow the steps at https://github.com/tommyettinger/gdx-backends#gwt-2902100-support
 //// and you can use GWT 2.10.0, which gives you access to Java 11 language features.
 //// These releases use libGDX 1.11.0, and are not compatible with other versions.
-//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1100.0"
-//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1100.0:sources"
+	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1100.0"
+	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1100.0:sources"
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask

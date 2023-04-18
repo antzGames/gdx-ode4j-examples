@@ -1,6 +1,5 @@
 package com.antz.ode4libGDX.screens;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import org.ode4j.math.DMatrix3;

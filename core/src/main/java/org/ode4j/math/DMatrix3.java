@@ -29,19 +29,19 @@ package org.ode4j.math;
  * @author Tilmann Zaeschke
  */
 public final class DMatrix3 implements DMatrix3C {
-	
+
 	private final double[] v;
 	public static final int MAX_I = 3;
 	public static final int MAX_J = 4;
 	public static final int LEN = MAX_I*MAX_J;
 	public static final DMatrix3C ZERO = new DMatrix3();
 
-	/** 
-	 * 
-	 * @param d row 0 column 0 
-	 * @param e row 0 column 1 
+	/**
+	 *
+	 * @param d row 0 column 0
+	 * @param e row 0 column 1
 	 * @param f row 0 column 2
-	 * @param g row 0 column 3 (must be 0) 
+	 * @param g row 0 column 3 (must be 0)
 	 * @param h row 1 column 0
 	 * @param i row 1 column 1
 	 * @param j row 1 column 2
@@ -50,7 +50,7 @@ public final class DMatrix3 implements DMatrix3C {
 	 * @param m row 2 column 1
 	 * @param n row 2 column 2
 	 * @param o row 2 column 3
-	 * @deprecated 
+	 * @deprecated
 	 */
 	@Deprecated
     public DMatrix3(double d, double e, double f,
@@ -64,8 +64,8 @@ public final class DMatrix3 implements DMatrix3C {
 			System.err.println("Warning: 4th column in dMatrix3 != 0 !");
 		}
 	}
-	
-	
+
+
 	/**
 	 * Create new Matrix of the form:
 	 * <pre>
@@ -86,9 +86,9 @@ public final class DMatrix3 implements DMatrix3C {
 	public DMatrix3(double d, double e, double f, double g, double h, double i,
 			double j, double k, double l) {
 		this();
-		v[0] = d; v[1] = e; v[2] = f; 
-		v[4] = g; v[5] = h; v[6] = i; 
-		v[8] = j; v[9] = k; v[10] = l; 
+		v[0] = d; v[1] = e; v[2] = f;
+		v[4] = g; v[5] = h; v[6] = i;
+		v[8] = j; v[9] = k; v[10] = l;
 	}
 
 
@@ -96,12 +96,12 @@ public final class DMatrix3 implements DMatrix3C {
 		this();
 		set(matrix3);
 	}
-	
-	
+
+
 	public DMatrix3() {
 		v = new double[MAX_I * MAX_J];
 	}
-	
+
 
 	/**
 	 * Private to enforce usage of wrap().
@@ -110,13 +110,13 @@ public final class DMatrix3 implements DMatrix3C {
 	private DMatrix3(double[] a) {
 		v = a;
 	}
-	
-	
+
+
 	public static DMatrix3 wrap(double[] a) {
 		return new DMatrix3(a);
 	}
-	
-	
+
+
 	public DMatrix3 set(DMatrix3C m) {
 //		System.arraycopy(((DMatrix3)m3).v, 0, v, 0, v.length);
 //		//v[0] = v3.v[0]; v[1] = v3.v[1]; v[2] = v3.v[2]; v[3] = v3.v[3];
@@ -125,8 +125,8 @@ public final class DMatrix3 implements DMatrix3C {
 		set20( m.get20() ); set21( m.get21() ); set22( m.get22() );
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * Returns a clone of this Matrix.
 	 */
@@ -134,8 +134,8 @@ public final class DMatrix3 implements DMatrix3C {
 	public DMatrix3 clone() {
 		return new DMatrix3(this);
 	}
-	
-	
+
+
 	@Override
 	public String toString() {
 //		StringBuffer b = new StringBuffer();
@@ -174,8 +174,8 @@ public final class DMatrix3 implements DMatrix3C {
 		set10( l ); set11( m ); set12( n );
 		set20( o ); set21( p ); set22( q );
 	}
-	/** 
-	 * Initialises this matrix from a 3*4 double [] with 12 fields, ignoring 
+	/**
+	 * Initialises this matrix from a 3*4 double [] with 12 fields, ignoring
 	 * the 4th, 8th and 12th field. This is useful when using padded arrays.
 	 * @param da Initialisztion matrix
 	 * @param da_ofs Reading offset
@@ -183,11 +183,11 @@ public final class DMatrix3 implements DMatrix3C {
 	public void set12(double[] da, int da_ofs) {
 		System.arraycopy(da, da_ofs, v, 0, da.length);
 	}
-	
+
 	public double get(int i) {
 		return v[i];
 	}
-	
+
 	/**
 	 * Return a new dVector containing the specified column.
 	 * For padding=4 this uses the elements c, 4+c, 8+c;
@@ -205,7 +205,7 @@ public final class DMatrix3 implements DMatrix3C {
 		set00( get00() + m.get00() ); set01( get01() + m.get01() ); set02( get02() + m.get02() );
 		set10( get10() + m.get10() ); set11( get11() + m.get11() ); set12( get12() + m.get12() );
 		set20( get20() + m.get20() ); set21( get21() + m.get21() ); set22( get22() + m.get22() );
-//		DMatrix3 M = (DMatrix3) M2; 
+//		DMatrix3 M = (DMatrix3) M2;
 //		for (int i = 0; i < v.length; i++) {
 //			v[i] += M.v[i];
 //		}
@@ -218,8 +218,8 @@ public final class DMatrix3 implements DMatrix3C {
 			v[i] *= scale;
 		}
 	}
-	
-	/** 
+
+	/**
 	 * Matrix multiplication. all matrices are stored in standard row format.
 	 * the digit refers to the argument that is transposed:
 	 *   0:   A = B  * C   (sizes: A:p*r B:p*q C:q*r)
@@ -230,11 +230,11 @@ public final class DMatrix3 implements DMatrix3C {
 	 * @param B source B
 	 * @param C source C
 	 */
-	public void dMultiply0 (final DMatrix3C B, 
+	public void dMultiply0 (final DMatrix3C B,
 			final DMatrix3C C) {
 		eqMul(B, C);
-	}	
-	public void eqMul (final DMatrix3C B, 
+	}
+	public void eqMul (final DMatrix3C B,
 			final DMatrix3C C)
 	{
 //		dMatrix3 B2 = (dMatrix3) B;
@@ -273,8 +273,8 @@ public final class DMatrix3 implements DMatrix3C {
 		set22( B.get20()*C.get02() + B.get21()*C.get12() + B.get22()*C.get22() );
 	}
 
-	
-	
+
+
 //	public void dMultiply0 (final dMatrix B, final dMatrix C)
 //	{
 //		int i,j,k,qskip,rskip,rpad;
@@ -298,7 +298,7 @@ public final class DMatrix3 implements DMatrix3C {
 //				sum = 0;
 //				//for (k=q; k > 0; k--, cPos+=rskip) sum += (*(b++))*(*c);
 //				for (k=q; k > 0; k--, cPos+=rskip) sum += B.v[bPos++] * C.v[cPos];
-//				//*(A++) = sum; 
+//				//*(A++) = sum;
 //				v[aPos++] = sum;
 //			}
 //			//			A += rpad;
@@ -310,7 +310,7 @@ public final class DMatrix3 implements DMatrix3C {
 //	}
 //
 //
-//	/** 
+//	/**
 //	 * Matrix multiplication. all matrices are stored in standard row format.
 //	 * the digit refers to the argument that is transposed:
 //	 *   0:   A = B  * C   (sizes: A:p*r B:p*q C:q*r)
@@ -337,7 +337,7 @@ public final class DMatrix3 implements DMatrix3C {
 //	}
 //
 //
-//	/** 
+//	/**
 //	 * Matrix multiplication. all matrices are stored in standard row format.
 //	 * the digit refers to the argument that is transposed:
 //	 *   0:   A = B  * C   (sizes: A:p*r B:p*q C:q*r)
@@ -367,8 +367,8 @@ public final class DMatrix3 implements DMatrix3C {
 //				sum = 0;
 //				//for (k=q; k>0; k--,z++) sum += bb[z] * cc[z];
 //				for (k=q; k>0; k--,z++) sum += B.v[bPos + z] * C.v[cPos + z];
-//				//*(A++) = sum; 
-//				v[aPos++] = sum; 
+//				//*(A++) = sum;
+//				v[aPos++] = sum;
 //				//cc += qskip;
 //				cPos += qskip;
 //			}
@@ -378,8 +378,8 @@ public final class DMatrix3 implements DMatrix3C {
 //			bPos += qskip;
 //		}
 //	}
-	
-	
+
+
 	/**
 	 * View a particular column as dVector3. For example: <br><tt>
 	 * //  dir[0] = R[0*4+2];  <br>
@@ -393,35 +393,35 @@ public final class DMatrix3 implements DMatrix3C {
 	public DVector3ColView viewCol(int column) {
 		return new DVector3ColView(column);
 	}
-	
+
 
 	public DVector3RowTView viewRowT(int row) {
 		return new DVector3RowTView(row);
 	}
 
-	
+
 	public class DVector3ColView extends DVector3View {
 		private final int _column;
-		
+
 		public DVector3ColView(int c) {
 			_column = c;
 		}
-		
+
 		@Override
 		public double get(int i) {
 			return v[i * MAX_J + _column];
 		}
-		
+
 		@Override
 		public double get0() {
 			return v[_column];
 		}
-		
+
 		@Override
 		public double get1() {
 			return v[1 * MAX_J + _column];
 		}
-		
+
 		@Override
 		public double get2() {
 			return v[2 * MAX_J + _column];
@@ -431,12 +431,12 @@ public final class DMatrix3 implements DMatrix3C {
 		public void set0(double d) {
 			v[_column] = d;
 		}
-		
+
 		@Override
 		public void set1(double d) {
 			v[1 * MAX_J + _column] = d;
 		}
-		
+
 		@Override
 		public void set2(double d) {
 			v[2 * MAX_J + _column] = d;
@@ -450,26 +450,26 @@ public final class DMatrix3 implements DMatrix3C {
 
 	public class DVector3RowTView extends DVector3View {
 		private final int _ofs;
-		
+
 		public DVector3RowTView(int row) {
 			_ofs = row * MAX_J;
 		}
-		
+
 		@Override
 		public double get(int i) {
 			return v[_ofs + i];
 		}
-		
+
 		@Override
 		public double get0() {
 			return v[_ofs];
 		}
-		
+
 		@Override
 		public double get1() {
 			return v[1 + _ofs];
 		}
-		
+
 		@Override
 		public double get2() {
 			return v[2 + _ofs];
@@ -576,7 +576,7 @@ public final class DMatrix3 implements DMatrix3C {
 		return v[2*MAX_J + 2];
 	}
 
-	
+
 	public final void set00(double d) {
 		v[0] = d;
 	}
@@ -631,7 +631,7 @@ public final class DMatrix3 implements DMatrix3C {
 		//TODO MAX_J, once MAX_J==3
 		return 3;
 	}
-	
+
 	/**
 	 * Compares two matrices for equality.
 	 * This is marginally faster than <tt>equals(Object o)</tt>.
@@ -677,7 +677,7 @@ public final class DMatrix3 implements DMatrix3C {
 	public int hashCode() {
 		int h = 0;
 		for (double d: v) {
-			h |= Double.doubleToRawLongBits(d);
+			h |= Double. doubleToLongBits(d);
 			h <<= 2;
 		}
 		return h;
@@ -705,7 +705,7 @@ public final class DMatrix3 implements DMatrix3C {
 		return this;
 	}
 
-	
+
 	/**
 	 * Set the matrix to zero.
 	 * Same as setZero().
@@ -728,7 +728,7 @@ public final class DMatrix3 implements DMatrix3C {
 
 	@Override
 	public final float[] toFloatArray12() {
-		return new float[]{ 
+		return new float[]{
 				(float)get00(), (float)get01(), (float)get02(), 0.0f,
 				(float)get10(), (float)get11(), (float)get12(), 0.0f,
 				(float)get20(), (float)get21(), (float)get22(), 0.0f };
@@ -737,13 +737,13 @@ public final class DMatrix3 implements DMatrix3C {
 
 	@Override
 	public final float[] toFloatArray() {
-		return new float[]{ 
+		return new float[]{
 				(float)get00(), (float)get01(), (float)get02(),
 				(float)get10(), (float)get11(), (float)get12(),
 				(float)get20(), (float)get21(), (float)get22() };
 	}
-	
-	
+
+
 	/**
 	 * Transpose this matrix.
 	 * @return This matrix.
@@ -755,8 +755,8 @@ public final class DMatrix3 implements DMatrix3C {
 		t = get21(); set21( get12() ); set12( t );
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * Create a new transposed version of this matrix.
 	 * @return The transposed copy of this matrix.
@@ -768,8 +768,8 @@ public final class DMatrix3 implements DMatrix3C {
 				get01(), get11(), get21(),
 				get02(), get12(), get22());
 	}
-	
-	
+
+
 	/**
 	 * Calculates the dot product of the the specified column of this matrix
 	 * with the given vector.
@@ -809,8 +809,8 @@ public final class DMatrix3 implements DMatrix3C {
 	}
 
 	/**
-	 * Calculates the dot product of the the specified column <tt>col</tt> 
-	 * of this matrix with the specified column <tt>col2</tt> of the second 
+	 * Calculates the dot product of the the specified column <tt>col</tt>
+	 * of this matrix with the specified column <tt>col2</tt> of the second
 	 * matrix <tt>m2</tt>.
 	 * @param col column pos
 	 * @param m2 matrix M2
@@ -842,14 +842,14 @@ public final class DMatrix3 implements DMatrix3C {
 			} else if (col2 == 2) {
 				return get02()*m2.get02() + get12()*m2.get12() + get22()*m2.get22();
 			}
-		} 
+		}
 		throw new IllegalArgumentException("col="+col+" col2="+col2);
 	}
 
 
 	/**
-	 * Calculates the dot product of the the specified row <tt>row</tt> 
-	 * of this matrix with the specified column <tt>col2</tt> of the second 
+	 * Calculates the dot product of the the specified row <tt>row</tt>
+	 * of this matrix with the specified column <tt>col2</tt> of the second
 	 * matrix <tt>m2</tt>.
 	 * @param row Row pos
 	 * @param m2 Matrix M2
@@ -881,7 +881,7 @@ public final class DMatrix3 implements DMatrix3C {
 			} else if (col2 == 2) {
 				return get20()*m2.get02() + get21()*m2.get12() + get22()*m2.get22();
 			}
-		} 
+		}
 		throw new IllegalArgumentException("row="+row+" col2="+col2);
 	}
 
@@ -908,8 +908,8 @@ public final class DMatrix3 implements DMatrix3C {
 
 
 	/**
-	 * Calculates the dot product of the the specified row <tt>row</tt> 
-	 * of this matrix with the specified row <tt>row2</tt> of the second 
+	 * Calculates the dot product of the the specified row <tt>row</tt>
+	 * of this matrix with the specified row <tt>row2</tt> of the second
 	 * matrix <tt>m2</tt>.
 	 * @param row row pos
 	 * @param m2 Matrix M2
@@ -941,13 +941,13 @@ public final class DMatrix3 implements DMatrix3C {
 			} else if (row2 == 2) {
 				return get20()*m2.get20() + get21()*m2.get21() + get22()*m2.get22();
 			}
-		} 
+		}
 		throw new IllegalArgumentException("row="+row+" row2="+row2);
 	}
 
 
 	/**
-	 * @param i row 
+	 * @param i row
 	 * @param j column
 	 * @return Value at (i,j).
 	 */
@@ -990,7 +990,7 @@ public final class DMatrix3 implements DMatrix3C {
 	public void getColumn2(DVector3 result) {
 		result.set(get02(), get12(), get22());
 	}
-	
+
 	/**
 	 * Create an array of DVector instances.
 	 * @param size Size of array

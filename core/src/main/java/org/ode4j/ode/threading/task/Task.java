@@ -23,7 +23,7 @@
  *************************************************************************/
 package org.ode4j.ode.threading.task;
 
-import java.util.concurrent.CountDownLatch;
+//import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Task implements Runnable {
@@ -32,7 +32,7 @@ public class Task implements Runnable {
     public final String name;
     public final TaskGroup parent;
     public final Runnable runnable;
-    protected final CountDownLatch completed;
+    public boolean completed;
     protected final AtomicInteger subtaskCount;
 
     protected Task(TaskExecutor executor, String name, TaskGroup parent, Runnable runnable) {
@@ -41,15 +41,11 @@ public class Task implements Runnable {
         this.parent = parent;
         this.runnable = runnable;
         subtaskCount = new AtomicInteger(0);
-        completed = new CountDownLatch(1);
+        completed = false;
     }
 
     public void awaitCompletion() {
-        try {
             executor.flush();
-            completed.await();
-        } catch (InterruptedException e) {
-        }
     }
 
     public void submit() {
@@ -65,7 +61,7 @@ public class Task implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            completed.countDown();
+            completed = true;
             if (parent != null) {
                 parent.subtaskCompleted();
             }

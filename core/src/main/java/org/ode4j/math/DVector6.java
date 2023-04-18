@@ -28,7 +28,7 @@ public class DVector6 {
 
 	private final double[] v;
 	private static final int LEN = 6;
-	
+
 	public DVector6() {
 		v = new double[LEN];
 	}
@@ -38,7 +38,7 @@ public class DVector6 {
 		set(v2);
 	}
 
-	public DVector6(double d0, double d1, double d2, double d3, double d4, 
+	public DVector6(double d0, double d1, double d2, double d3, double d4,
 			double d5) {
 		this();
 		set(d0, d1, d2, d3, d4, d5);
@@ -67,10 +67,10 @@ public class DVector6 {
 
 	public void set(DVector6 v2) {
 		for (int i = 0; i < LEN; i++) {
-			v[i] = v2.v[i]; 
+			v[i] = v2.v[i];
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuffer b = new StringBuffer();
@@ -109,7 +109,7 @@ public class DVector6 {
 	public double get5() {
 		return v[5];
 	}
-	
+
 	public final double get(int i) {
 		return v[i];
 	}
@@ -117,7 +117,7 @@ public class DVector6 {
 	public boolean isEq(DVector6 v2) {
 		return Arrays.equals(v, v2.v);
 	}
-	
+
 	/**
 	 * Do not use. This can be slow, use isEq() instead.
 	 */
@@ -134,7 +134,7 @@ public class DVector6 {
 	public int hashCode() {
 		int h = 0;
 		for (double d: v) {
-			h |= Double.doubleToRawLongBits(d);
+			h |= Double. doubleToLongBits(d);
 			h <<= 4;
 		}
 		return h;
@@ -143,23 +143,23 @@ public class DVector6 {
 	public void set0(double d) {
 		v[0] = d;
 	}
-	
+
 	public void set1(double d) {
 		v[1] = d;
 	}
-	
+
 	public void set2(double d) {
 		v[2] = d;
 	}
-	
+
 	public void set3(double d) {
 		v[3] = d;
 	}
-	
+
 	public void set4(double d) {
 		v[4] = d;
 	}
-	
+
 	public void set5(double d) {
 		v[5] = d;
 	}
@@ -172,7 +172,7 @@ public class DVector6 {
 	public final void set(int i, double d) {
 		v[i] = d;
 	}
-	
+
 
 	public void add(int i, double d) {
 		v[i] += d;
@@ -186,10 +186,10 @@ public class DVector6 {
 	}
 
 	public final double lengthSquared() {
-		return get0()*get0() + get1()*get1() + get2()*get2() 
+		return get0()*get0() + get1()*get1() + get2()*get2()
 				+ get3()*get3() + get4()*get4() + get5()*get5();
 	}
-	
+
 	/**
 	 * this may be called for vectors `a' with extremely small magnitude, for
 	 * example the result of a cross product on two nearly perpendicular vectors.
@@ -209,21 +209,21 @@ public class DVector6 {
 				d = Math.abs(v[i]);
 			}
 		}
-		
+
 		if (d <= Double.MIN_NORMAL) {
 			set(1.0, 0, 0, 0, 0, 0);
 			return false;
 		}
-		
+
 		for (int i = 0; i < v.length; i++) {
 			v[i] /= d;
 		}
-		
+
 		double sum = 0;
 		for (double d2: v) {
 			sum += d2*d2;
 		}
-		
+
 		double l = 1./Math.sqrt(sum);
 		for (int i = 0; i < v.length; i++) {
 			v[i] *= l;

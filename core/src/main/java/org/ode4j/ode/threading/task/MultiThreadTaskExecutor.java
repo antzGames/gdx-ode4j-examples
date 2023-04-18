@@ -28,36 +28,37 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class MultiThreadTaskExecutor extends AbstractTaskExecutor {
+public class MultiThreadTaskExecutor {
+//public class MultiThreadTaskExecutor extends AbstractTaskExecutor {
 
-	private final ThreadPoolExecutor executor;
-
-	public MultiThreadTaskExecutor(int threads) {
-		executor = new ThreadPoolExecutor(threads, threads, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
-				new DaemonThreadFactory());
-	}
-
-	private class DaemonThreadFactory implements ThreadFactory {
-		@Override
-		public Thread newThread(Runnable r) {
-			Thread t = new Thread(r);
-			t.setDaemon(true);
-			return t;
-		}
-	}
-
-	@Override
-	public void submit(Task task) {
-		executor.execute(task);
-	}
-
-	@Override
-	public int getThreadCount() {
-		return executor.getCorePoolSize();
-	}
-
-    @Override
-    public void flush() {
-    }
+//	private final ThreadPoolExecutor executor;
+//
+//	public MultiThreadTaskExecutor(int threads) {
+//		executor = new ThreadPoolExecutor(threads, threads, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
+//				new DaemonThreadFactory());
+//	}
+//
+//	private class DaemonThreadFactory implements ThreadFactory {
+//		@Override
+//		public Thread newThread(Runnable r) {
+//			Thread t = new Thread(r);
+//			t.setDaemon(true);
+//			return t;
+//		}
+//	}
+//
+//	@Override
+//	public void submit(Task task) {
+//		executor.execute(task);
+//	}
+//
+//	@Override
+//	public int getThreadCount() {
+//		return executor.getCorePoolSize();
+//	}
+//
+//    @Override
+//    public void flush() {
+//    }
 
 }

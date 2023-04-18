@@ -174,13 +174,13 @@ public class DQuaternion implements DQuaternionC {
 	@Override
 	public int hashCode() {
 		int h = 0;
-		h |= Double.doubleToRawLongBits(w);
+		h |= Double. doubleToLongBits(w);
 		h <<= 6;
-		h |= Double.doubleToRawLongBits(x);
+		h |= Double. doubleToLongBits(x);
 		h <<= 6;
-		h |= Double.doubleToRawLongBits(y);
+		h |= Double. doubleToLongBits(y);
 		h <<= 6;
-		h |= Double.doubleToRawLongBits(z);
+		h |= Double. doubleToLongBits(z);
 		h <<= 6;
 		return h;
 	}

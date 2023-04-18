@@ -40,7 +40,7 @@ import static org.ode4j.ode.internal.ErrorHandler.*;
  * configuration stuff.
  */
 @SuppressWarnings("unused")
-public class Common extends OdeConstants { 
+public class Common extends OdeConstants {
 
 	/** configuration stuff */
 
@@ -62,7 +62,7 @@ public class Common extends OdeConstants {
 
 	public static final boolean dNODEBUG = false;
 
-	
+
 	public static final boolean dDOUBLE = true;
 	public static final boolean dSINGLE = false;
 	public static final double dEpsilon;
@@ -80,7 +80,7 @@ public class Common extends OdeConstants {
 			MAX_FLOAT = Float.MAX_VALUE;
 		}
 	}
-	
+
 	// Use the error-checking memory allocation system.  Because this system uses heap
 	//  (malloc) instead of stack (alloca), it is slower.  However, it allows you to
 	//  simulate larger scenes, as well as handle out-of-memory errors in a somewhat
@@ -94,9 +94,9 @@ public class Common extends OdeConstants {
 	//#endif
 	//TODO why check for dUSE_MALLOC_FOR_ALLOCA
 	/** no memory errors. */
-	public static final int d_MEMORY_OK = 0;             
+	public static final int d_MEMORY_OK = 0;
 	/** malloc failed due to out of memory error. */
-	public static final int d_MEMORY_OUT_OF_MEMORY = 1;  
+	public static final int d_MEMORY_OUT_OF_MEMORY = 1;
 
 
 //From config-defaults.h
@@ -115,13 +115,13 @@ public class Common extends OdeConstants {
 	//#define FLOAT_EQ(x,v) (((v - EPSILON) < x) && (x <( v + EPSILON)))
 	//public static final double DBL_EPSILON = 2.22045e-16;
 	public static final double DBL_EPSILON = 2.2204460492503131e-016;
-	
+
 	public static final void dIVERIFY(boolean a) {
 	    dIASSERT(a);
 	}
 
-	/** 
-	 * Internal assertion 
+	/**
+	 * Internal assertion
 	 * @param b Fail if 'false'
 	 */
 	public static final void dIASSERT(boolean b) {
@@ -158,15 +158,15 @@ public class Common extends OdeConstants {
 
 	public static void dDEBUGMSG(String msg) {
 		StringWriter sw = new StringWriter();
-		new PrintWriter(sw);
-		new RuntimeException(msg).printStackTrace(new PrintWriter(sw));
+//		new PrintWriter(sw);
+//		new RuntimeException(msg).printStackTrace(new PrintWriter(sw));
 		String msg2 = sw.toString();
 		dMessage (d_ERR_UASSERT, msg2);
 	}
 
-	/** 
-	 * Assert 'not-null'. 
-	 * @param aa Object to assert 
+	/**
+	 * Assert 'not-null'.
+	 * @param aa Object to assert
 	 */
 	public static void dAASSERT(Object ... aa) {
 		for (Object a: aa) {
@@ -194,9 +194,9 @@ public class Common extends OdeConstants {
 		}
 	}
 
-	/** 
-	 * Assert 'true'. 
-	 * @param b Fail if 'false' 
+	/**
+	 * Assert 'true'.
+	 * @param b Fail if 'false'
 	 */
 	public static void dAASSERT(boolean b) {
 		if (!b)
@@ -262,8 +262,8 @@ public class Common extends OdeConstants {
 	//#endif // dTRIMESH_16BIT_INDICES
 //	public static final Class<?> dTRIMESH = Integer.TYPE;
 
-	/** 
-	 * Round an integer up to a multiple of 4, except that 0 and 1 
+	/**
+	 * Round an integer up to a multiple of 4, except that 0 and 1
 	 * are unmodified (used to compute matrix leading dimensions).
 	 * TODO Check that returned value is used!! (NOT Call by reference).
 	 * deprecated-keep for now (Remove this if possible) (TZ)
@@ -275,21 +275,21 @@ public class Common extends OdeConstants {
 	}
 	//#define dPAD(a) (((a) > 1) ? ((((a)-1)|3)+1) : (a))
 
-//	/** 
-//	 * These types are mainly just used in headers. 
-//	 * deprecated TZ: Do we really need this class??? 
+//	/**
+//	 * These types are mainly just used in headers.
+//	 * deprecated TZ: Do we really need this class???
 //	 */
-//	public static class DMatrix4 { 
+//	public static class DMatrix4 {
 //		public DMatrix4(double d, double e, double f, double g, double h,
 //				double i, double j, double k, double l, double m, double n,
 //				double o, double p, double q, double r, double s) {
-//			v[0] = d; v[1] = e; v[2] = f; v[3] = g; 
-//			v[4] = h; v[5] = i; v[6] = j; v[7] = k; 
-//			v[8] = l; v[9] = m; v[10] = n; v[11] = o; 
-//			v[12] = p; v[13] = q; v[14] = r; v[15] = s; 
+//			v[0] = d; v[1] = e; v[2] = f; v[3] = g;
+//			v[4] = h; v[5] = i; v[6] = j; v[7] = k;
+//			v[8] = l; v[9] = m; v[10] = n; v[11] = o;
+//			v[12] = p; v[13] = q; v[14] = r; v[15] = s;
 //		}
 //
-//		public double[] v = new double[4*4]; 
+//		public double[] v = new double[4*4];
 //	}
 	//private static class dMatrix6 { public double[] v = new double[8*6]; }
 	//typedef dReal dVector3[4];
@@ -361,7 +361,7 @@ public class Common extends OdeConstants {
 	public static final double dAcos(double x) {
 		return Math.acos(x);
 	}
-	
+
 	//#define dFMod(a,b) (fmod((a),(b))) //TODO replace
 	public static final double dFMod(double x) {
 		throw new UnsupportedOperationException();
@@ -369,18 +369,18 @@ public class Common extends OdeConstants {
 	}
 	//#define dFloor(x) floor(x) //TODO replace
 	public static final double dFloor(double x) { return Math.floor(x); }
-	
+
 	//#define dCeil(x) ceilf(x)          /* ceil */
 	public static final double dCeil(double x) { return Math.ceil(x); }
-	
+
 	//#define dCopySign(a,b) ((dReal)copysignf(a,b)) /* copy value sign */
-    public static final double dCopysign(double magnitude, double sign) { 
-        return Math.copySign(magnitude, sign); 
+    public static final double dCopysign(double magnitude, double sign) {
+        return Math.copySign(magnitude, sign);
     }
 
     //#define dNextAfter(x, y) nextafterf(x, y) /* next value after */
-    public static final double dNextAfter(double start, double direction) { 
-        return Math.nextAfter(start, direction); 
+    public static final double dNextAfter(double start, double direction) {
+        return Math.nextAfter(start, direction);
     }
 
 
