@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -15,9 +14,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-
 import com.badlogic.gdx.math.Vector3;
-
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.runtime.Mundus;
@@ -41,9 +38,7 @@ import org.ode4j.ode.DMass;
 import org.ode4j.ode.DSpace;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.DGeom.DNearCallback;
-
 import java.util.ArrayList;
-
 import static org.ode4j.ode.OdeMath.*;
 
 /** First screen of the application. Displayed after the application is created. */
@@ -61,6 +56,7 @@ public class CrashTest implements Screen, InputProcessor {
     public ModelBuilder modelBuilder;
     public Model model;
     public ModelInstance cannonBallModelInstance;
+    public ModelInstance cannonBodyModelInstance;
     public ArrayList<ModelInstance> sphereModelInstances = new ArrayList<>();
     public ArrayList<ModelInstance> boxesModelInstances = new ArrayList<>();
     public ArrayList<ModelInstance> wallBoxModelInstances = new ArrayList<>();
@@ -73,7 +69,7 @@ public class CrashTest implements Screen, InputProcessor {
     private static final float WIDTH = 2.5f;		// chassis width
     private static final float HEIGHT = 1.0f;		// chassis height
     private static final float RADIUS = 0.5f;	// wheel radius
-    private static final float STARTZ = 1.0f;	// starting height of chassis
+    private static final float STARTY = 1.0f;	// starting height of chassis
     private static final float CMASS = 1;			// chassis mass
     private static final float WMASS = 1;			// wheel mass
     private static final float COMOFFSET = -5;		// center of mass offset
@@ -84,12 +80,12 @@ public class CrashTest implements Screen, InputProcessor {
     private static final float COLS = 1	;		// columns of cars
     private static final int ITERS = 20;		// number of iterations
     private static final float WBOXSIZE = 1.0f;		// size of wall boxes
-    private static final float WALLWIDTH = 12;		// width of wall
-    private static final float WALLHEIGHT = 10;		// height of wall
+    private static final float WALLWIDTH = 24;		// width of wall
+    private static final float WALLHEIGHT = 20;		// height of wall
     private static final float DISABLE_THRESHOLD = 0.008f;	// maximum velocity (squared) a body can have and be disabled
     private static final float DISABLE_STEPS = 10;	// number of steps a box has to have been disable-able before it will be disabled
     private static final float CANNON_X = 100;		// x position of cannon
-    private static final float CANNON_Y = 90;	// y position of cannon
+    private static final float CANNON_Z = 90;	// y position of cannon
     private static final float CANNON_BALL_MASS = 10;	// mass of the cannon ball
     private static final float CANNON_BALL_RADIUS = 0.5f;
 
@@ -102,11 +98,11 @@ public class CrashTest implements Screen, InputProcessor {
 //	private static boolean CENTIPEDE = false;
 //	private static boolean CANNON = true;
     private static boolean BOX = false;
-    private static boolean CARS = true;
+    private static boolean CARS = false;
     private static boolean WALL = true;
     private static boolean BALLS = false;
     private static boolean BALLSTACK = false;
-    private static boolean ONEBALL = true;
+    private static boolean ONEBALL = false;
     private static boolean CENTIPEDE = false;
     private static boolean CANNON = true;
 
@@ -135,7 +131,8 @@ public class CrashTest implements Screen, InputProcessor {
 
     // things that the user controls
     private static float turn = 0, speed = 0;	// user commands
-    private static float cannon_angle=0,cannon_elevation=-1.2f;
+    private static float cannon_angle=0;
+    private static float cannon_elevation=0f;
 
     @Override
     public void show() {
@@ -262,20 +259,19 @@ public class CrashTest implements Screen, InputProcessor {
                         b.disable();
                         color.set(0.5f,0.5f,1,1);
                     }
-                    else              ;
+                    else
                         color.set(1,1,1,1);
 
-                } else                 ;
+                } else
                     color.set(0.4f,0.4f,0.4f,1);
 
                 DVector3 ss = new DVector3();
                 wall_boxes[i].getLengths (ss);
                 //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);
 
+                wallBoxModelInstances.get(i).model.materials.get(0).set(ColorAttribute.createDiffuse(color));
                 wallBoxModelInstances.get(i).transform.setTranslation(new Vector3((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2()));
                 modelBatch.render(wallBoxModelInstances.get(i));
-
-                //System.out.println("pos:" +wall_boxes[i].getPosition() + "    rot:"+wall_boxes[i].getRotation());
             }
         } else {
             for (i = 0; i < wb; i++) {
@@ -285,6 +281,7 @@ public class CrashTest implements Screen, InputProcessor {
                 else
                     color.set(0.4f,0.4f,0.4f,1);
 
+                wallBoxModelInstances.get(i).model.materials.get(0).set(ColorAttribute.createDiffuse(color));
                 DVector3 ss = new DVector3();
                 wall_boxes[i].getLengths (ss);
                 wallBoxModelInstances.get(i).transform.setTranslation(new Vector3((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2()));
@@ -298,10 +295,8 @@ public class CrashTest implements Screen, InputProcessor {
         for (i = 0; i < boxes; i++) {
             boxesModelInstances.get(i).transform.setTranslation(new Vector3((float)box[i].getPosition().get0(), (float)box[i].getPosition().get1(), (float)box[i].getPosition().get2()));
             modelBatch.render(boxesModelInstances.get(i));
-
             //dsDrawBox (box[i].getPosition(),box[i].getRotation(),sides);
         }
-
 
         color.set(1,1,1,1);
 
@@ -314,15 +309,17 @@ public class CrashTest implements Screen, InputProcessor {
         // draw the cannon
         color.set(1,1,0,1);
         DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
-        dRFromAxisAndAngle (R2,0,0,1,cannon_angle);
-        dRFromAxisAndAngle (R3,0,1,0,cannon_elevation);
+        dRFromAxisAndAngle (R2,0,1,0,cannon_angle);
+        dRFromAxisAndAngle (R3,0,0,1,cannon_elevation);
         dMultiply0 (R4,R2,R3);
-        DVector3 cpos = new DVector3(CANNON_X,1,CANNON_Y);
+        DVector3 cpos = new DVector3(CANNON_X,1,CANNON_Z);
         DVector3 csides = new DVector3(2,2,2);
         //dsDrawBox (cpos,R2,csides);
 
         for (i=0; i<3; i++) cpos.add(i,  1.5*R4.get(i, 2));//[i*4+2]);
-        // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&NNNNNNNNNNNNNNNN
+
+        cannonBodyModelInstance.transform.setTranslation(CANNON_X,1,CANNON_Z);
+        modelBatch.render(cannonBodyModelInstance);
         //dsDrawCylinder (cpos,R4,3f,0.5f);
 
         // draw the cannon ball
@@ -366,8 +363,8 @@ public class CrashTest implements Screen, InputProcessor {
         IrContainer ir = new IrContainer();
         if (CARS) {//#ifdef CARS
             for (double x = 0.0; x < COLS*(LENGTH+RADIUS); x += LENGTH+RADIUS)
-                for (double y = -((ROWS-1)*(WIDTH/2+RADIUS)); y <= ((ROWS-1)*(WIDTH/2+RADIUS)); y += WIDTH+RADIUS*2)
-                    makeCar(x, y, ir);
+                for (double z = -((ROWS-1)*(WIDTH/2+RADIUS)); z <= ((ROWS-1)*(WIDTH/2+RADIUS)); z += WIDTH+RADIUS*2)
+                    makeCar(x, z, ir);
             bodies = ir.bodyIr;
             joints = ir.jointIr;
             boxes = ir.boxIr;
@@ -387,8 +384,8 @@ public class CrashTest implements Screen, InputProcessor {
                     wall_boxes[wb].setBody (wall_bodies[wb]);
                     //dBodyDisable(wall_bodies[wb++]);
 
-                    model = modelBuilder.createBox(WBOXSIZE, WBOXSIZE, WBOXSIZE,
-                        new Material(ColorAttribute.createDiffuse(Color.GRAY)),
+                    model = modelBuilder.createBox(WBOXSIZE, WBOXSIZE, WBOXSIZE, GL20.GL_LINES,
+                        new Material(ColorAttribute.createDiffuse(Color.RED)),
                         VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
                     wallBoxModelInstances.add(new ModelInstance(model));
                     wb++;
@@ -422,10 +419,6 @@ public class CrashTest implements Screen, InputProcessor {
             sphere[spheres] = OdeHelper.createSphere (space,RADIUS);
             sphere[spheres++].setBody (b);
 
-            model = modelBuilder.createSphere(RADIUS*2, RADIUS*2, RADIUS*2, 10, 10,
-                new Material(ColorAttribute.createDiffuse(Color.ORANGE)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-            cannonBallModelInstance = new ModelInstance(model);
         }//#endif
         if (BALLSTACK) {//#ifdef BALLSTACK
             for (double z = 1; z <= 6; z+=1)
@@ -452,7 +445,7 @@ public class CrashTest implements Screen, InputProcessor {
                 // chassis body
 
                 b = body[bodies] = OdeHelper.createBody (world);
-                body[bodies].setPosition (-15,y,STARTZ);
+                body[bodies].setPosition (-15,STARTY,y);
                 m.setBox (1,WIDTH,LENGTH,HEIGHT);
                 m.adjust (CMASS);
                 body[bodies].setMass (m);
@@ -466,7 +459,7 @@ public class CrashTest implements Screen, InputProcessor {
 
                 for (double x = -17; x > -20; x-=RADIUS*2) {
                     body[bodies] = OdeHelper.createBody (world);
-                    body[bodies].setPosition(x, y, STARTZ);
+                    body[bodies].setPosition(x, STARTY, y);
                     m.setSphere(1, RADIUS);
                     m.adjust(WMASS);
                     body[bodies].setMass(m);
@@ -496,7 +489,7 @@ public class CrashTest implements Screen, InputProcessor {
                     j.setParamFMax2 (FMAX);
 
                     body[bodies] = OdeHelper.createBody (world);
-                    body[bodies].setPosition(-30 - x, y, STARTZ);
+                    body[bodies].setPosition(-30 - x, STARTY,y);
                     m.setSphere(1, RADIUS);
                     m.adjust(WMASS);
                     body[bodies].setMass(m);
@@ -562,7 +555,20 @@ public class CrashTest implements Screen, InputProcessor {
 
             cannon_ball_body.setMass (m);
             cannon_ball_geom.setBody (cannon_ball_body);
-            cannon_ball_body.setPosition (CANNON_X, CANNON_BALL_RADIUS, CANNON_Y);
+            cannon_ball_body.setPosition (CANNON_X, CANNON_BALL_RADIUS, CANNON_Z);
+
+            model = modelBuilder.createSphere(RADIUS, RADIUS, RADIUS, 10, 10,
+                new Material(ColorAttribute.createDiffuse(Color.ORANGE)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+            cannonBallModelInstance = new ModelInstance(model);
+
+            model = modelBuilder.createCylinder(0.5f,3f,0.5f, 10,
+                new Material(ColorAttribute.createDiffuse(Color.PINK)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+            cannonBodyModelInstance = new ModelInstance(model);
+            cannonBodyModelInstance.transform.translate(CANNON_X,1,CANNON_Z);
+            cannonBodyModelInstance.transform.setToRotation(Vector3.X, 90);
+
         }//#endif
     }
 
@@ -632,15 +638,19 @@ public class CrashTest implements Screen, InputProcessor {
                 setupSimulation();
                 break;
             case '[':
+                cannonBodyModelInstance.transform.rotateRad(Vector3.Z, -0.1f);
                 cannon_angle += 0.1;
                 break;
             case ']':
+                cannonBodyModelInstance.transform.rotateRad(Vector3.Z, 0.1f);
                 cannon_angle -= 0.1;
                 break;
             case '1':
                 cannon_elevation += 0.1;
+                cannonBodyModelInstance.transform.rotateRad(Vector3.X, -0.1f);
                 break;
             case '2':
+                cannonBodyModelInstance.transform.rotateRad(Vector3.X, 0.1f);
                 cannon_elevation -= 0.1;
                 break;
             case 'x': case 'X': {
@@ -648,7 +658,7 @@ public class CrashTest implements Screen, InputProcessor {
                 dRFromAxisAndAngle (R2,0,0,1,cannon_angle);
                 dRFromAxisAndAngle (R3,0,1,0,cannon_elevation);
                 dMultiply0 (R4,R2,R3);
-                double[] cpos = {CANNON_X,1, CANNON_Y};
+                double[] cpos = {CANNON_X,1, CANNON_Z};
                 for (int i=0; i<3; i++) cpos[i] += 3*R4.get(i, 2);//[i*4+2];
                 cannon_ball_body.setPosition (cpos[0],cpos[1],cpos[2]);
                 double force = 10;
@@ -740,9 +750,6 @@ public class CrashTest implements Screen, InputProcessor {
         }
     }
 
-    private static float[] xyz = {3.8548f,9.0843f,7.5900f};
-    private static float[] hpr = {-145.5f,-22.5f,0.25f};
-
     private static class IrContainer {
         int bodyIr, jointIr, boxIr, sphereIr;
     }
@@ -750,7 +757,7 @@ public class CrashTest implements Screen, InputProcessor {
     //private void makeCar(double x, double y, int &bodyI, int &jointI, int &boxI, int &sphereI)
     private void makeCar(double x, double z, IrContainer ir) {
 
-        x = 90; z = 90;
+        x = 80; z = 80;
 
         final int bodyI = ir.bodyIr;
         final int jointI = ir.jointIr;
@@ -761,15 +768,15 @@ public class CrashTest implements Screen, InputProcessor {
 
         // chassis body
         body[bodyI] = OdeHelper.createBody(world);
-        body[bodyI].setPosition (x ,STARTZ,z);
-        m.setBox (1,LENGTH,WIDTH,HEIGHT);
+        body[bodyI].setPosition (x ,STARTY, z);
+        m.setBox (1,LENGTH, WIDTH, HEIGHT);
         m.adjust (CMASS/2.0);
         body[bodyI].setMass (m);
-        box[boxI] = OdeHelper.createBox (space,LENGTH,WIDTH,HEIGHT);
+        box[boxI] = OdeHelper.createBox (space,LENGTH,WIDTH, HEIGHT);
         box[boxI].setBody (body[bodyI]);
 
-        model = modelBuilder.createBox(WIDTH, HEIGHT, LENGTH,
-            new Material(ColorAttribute.createDiffuse(Color.GRAY)),
+        model = modelBuilder.createBox(LENGTH, HEIGHT, WIDTH,
+            new Material(ColorAttribute.createDiffuse(Color.GREEN)),
             VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
         boxesModelInstances.add(new ModelInstance(model));
 
@@ -786,14 +793,14 @@ public class CrashTest implements Screen, InputProcessor {
             sphere[sphereI+i-1].setBody (body[bodyI+i]);
 
             model = modelBuilder.createSphere(RADIUS*2, RADIUS*2, RADIUS*2, 10, 10,
-                new Material(ColorAttribute.createDiffuse(Color.BLACK)),
+                new Material(ColorAttribute.createDiffuse(Color.PURPLE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
             sphereModelInstances.add(new ModelInstance(model));
         }
-        body[bodyI+1].setPosition (x+0.4*LENGTH-0.5*RADIUS,STARTZ-HEIGHT*0.5,z+WIDTH*0.5);
-        body[bodyI+2].setPosition (x+0.4*LENGTH-0.5*RADIUS,STARTZ-HEIGHT*0.5,z-WIDTH*0.5);
-        body[bodyI+3].setPosition (x-0.4*LENGTH+0.5*RADIUS,STARTZ-HEIGHT*0.5,z+WIDTH*0.5);
-        body[bodyI+4].setPosition (x-0.4*LENGTH+0.5*RADIUS,STARTZ-HEIGHT*0.5,z-WIDTH*0.5);
+        body[bodyI+1].setPosition (x+0.4*LENGTH-0.5*RADIUS,STARTY-HEIGHT*0.5,z+WIDTH*0.5);
+        body[bodyI+2].setPosition (x+0.4*LENGTH-0.5*RADIUS,STARTY-HEIGHT*0.5,z-WIDTH*0.5);
+        body[bodyI+3].setPosition (x-0.4*LENGTH+0.5*RADIUS,STARTY-HEIGHT*0.5,z+WIDTH*0.5);
+        body[bodyI+4].setPosition (x-0.4*LENGTH+0.5*RADIUS,STARTY-HEIGHT*0.5,z-WIDTH*0.5);
 
         // front and back wheel hinges
         for (i=0; i<4; i++) {
@@ -801,7 +808,7 @@ public class CrashTest implements Screen, InputProcessor {
             DHinge2Joint j = joint[jointI+i];
             j.attach (body[bodyI],body[bodyI+i+1]);
             DVector3C a = body[bodyI+i+1].getPosition ();
-            j.setAnchor (a);
+            j.setAnchor(a);
             j.setAxis1 (0,0,(i<2 ? 1 : -1));
             j.setAxis2 (0,1,0);
             j.setParamSuspensionERP (0.8);
@@ -812,8 +819,8 @@ public class CrashTest implements Screen, InputProcessor {
 
         //center of mass offset body. (hang another copy of the body COMOFFSET units below it by a fixed joint)
         DBody b = OdeHelper.createBody (world);
-        b.setPosition (x,STARTZ+COMOFFSET, z);
-        m.setBox (1,LENGTH,WIDTH,HEIGHT);
+        b.setPosition (x,STARTY+COMOFFSET, z);
+        m.setBox (1,LENGTH,WIDTH, HEIGHT);
         m.adjust (CMASS/2.0);
         b.setMass (m);
         DFixedJoint j = OdeHelper.createFixedJoint(world, null);
