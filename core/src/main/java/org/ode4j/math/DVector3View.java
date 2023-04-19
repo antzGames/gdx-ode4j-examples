@@ -84,7 +84,7 @@ public abstract class DVector3View implements DVector3I {
 
 	@Override
 	public int hashCode() {
-		return (int) (Double. doubleToLongBits(get0())  *
+		return (int) (Double.doubleToLongBits(get0())  *
 		Double. doubleToLongBits(get1()) *
 		Double. doubleToLongBits(get2()));
 	}

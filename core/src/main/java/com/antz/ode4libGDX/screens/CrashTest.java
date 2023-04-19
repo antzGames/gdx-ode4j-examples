@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -80,8 +81,8 @@ public class CrashTest implements Screen, InputProcessor {
     private static final float COLS = 1	;		// columns of cars
     private static final int ITERS = 20;		// number of iterations
     private static final float WBOXSIZE = 1.0f;		// size of wall boxes
-    private static final float WALLWIDTH = 24;		// width of wall
-    private static final float WALLHEIGHT = 20;		// height of wall
+    private static final float WALLWIDTH = 12;		// width of wall
+    private static final float WALLHEIGHT = 10;		// height of wall
     private static final float DISABLE_THRESHOLD = 0.008f;	// maximum velocity (squared) a body can have and be disabled
     private static final float DISABLE_STEPS = 10;	// number of steps a box has to have been disable-able before it will be disabled
     private static final float CANNON_X = 100;		// x position of cannon
@@ -109,21 +110,21 @@ public class CrashTest implements Screen, InputProcessor {
     // dynamics and collision objects (chassis, 3 wheels, environment)
     private static DWorld world;
     private static DSpace space;
-    private static DBody[] body=new DBody[10000];
+    private static DBody[] body=new DBody[1000];
     private static int bodies;
-    private static DHinge2Joint[] joint=new DHinge2Joint[100000];
+    private static DHinge2Joint[] joint=new DHinge2Joint[1000];
     private static int joints;
     private static DJointGroup contactgroup;
     //private static DGeom ground;
-    private static DBox[] box=new DBox[10000];
+    private static DBox[] box=new DBox[1000];
     private static int boxes;
-    private static DSphere[] sphere=new DSphere[10000];
+    private static DSphere[] sphere=new DSphere[1000];
     private static int spheres;
-    private static DBox[] wall_boxes=new DBox[10000];
-    private static DBody[] wall_bodies=new DBody[10000];
+    private static DBox[] wall_boxes=new DBox[1000];
+    private static DBody[] wall_bodies=new DBody[1000];
     private static DSphere cannon_ball_geom;
     private static DBody cannon_ball_body;
-    private static int[] wb_stepsdis=new int[10000];
+    private static int[] wb_stepsdis=new int[1000];
     private static int wb;
     private static boolean doFast;
     private static DBody b;
@@ -154,17 +155,18 @@ public class CrashTest implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        System.out.println("Press:\t'+' to increase speed.\n" +
-            "\t'-' to decrease speed.\n" +
-            "\t',' to steer left.\n" +
-            "\t'.' to steer right.\n" +
-            "\t' ' to reset speed and steering.\n" +
+        System.out.println("" +
+//            "Press:\t'+' to increase speed.\n" +
+//            "\t'-' to decrease speed.\n" +
+//            "\t',' to steer left.\n" +
+//            "\t'.' to steer right.\n" +
+//            "\t' ' to reset speed and steering.\n" +
             "\t'[' to turn the cannon left.\n" +
             "\t']' to turn the cannon right.\n" +
-            "\t'1' to raise the cannon.\n" +
-            "\t'2' to lower the cannon.\n" +
-            "\t'x' to shoot from the cannon.\n" +
-            "\t'f' to toggle fast step mode.\n" +
+            "\t'+' to raise the cannon.\n" +
+            "\t'-' to lower the cannon.\n" +
+            "\t'SPACE' to shoot from the cannon.\n" +
+//            "\t'f' to toggle fast step mode.\n" +
             "\t'r' to reset simulation.\n");
         inputMultiplexer.addProcessor(this);
 
@@ -257,17 +259,21 @@ public class CrashTest implements Screen, InputProcessor {
 
                     if (wb_stepsdis[i] > DISABLE_STEPS) {
                         b.disable();
-                        color.set(0.5f,0.5f,1,1);
+                        //color.set(0.5f,0.5f,1,1);
                     }
-                    else
-                        color.set(1,1,1,1);
+//                    else
+//                        color.set(1,1,1,1);
 
-                } else
-                    color.set(0.4f,0.4f,0.4f,1);
+                }
+//                else
+//                    color.set(0.4f,0.4f,0.4f,1);
 
                 DVector3 ss = new DVector3();
                 wall_boxes[i].getLengths (ss);
                 //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);
+                wallBoxModelInstances.get(i).transform.setFromEulerAngles((float)wall_boxes[i].getQuaternion().toEulerDegrees().get0(),
+                    (float)wall_boxes[i].getQuaternion().toEulerDegrees().get1(),
+                    (float)wall_boxes[i].getQuaternion().toEulerDegrees().get2());
 
                 wallBoxModelInstances.get(i).model.materials.get(0).set(ColorAttribute.createDiffuse(color));
                 wallBoxModelInstances.get(i).transform.setTranslation(new Vector3((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2()));
@@ -276,12 +282,12 @@ public class CrashTest implements Screen, InputProcessor {
         } else {
             for (i = 0; i < wb; i++) {
                 b = wall_boxes[i].getBody();
-                if (b.isEnabled())
-                    color.set(1,1,1,1);
-                else
-                    color.set(0.4f,0.4f,0.4f,1);
+//                if (b.isEnabled())
+//                    color.set(1,1,1,1);
+//                else
+//                    color.set(0.4f,0.4f,0.4f,1);
 
-                wallBoxModelInstances.get(i).model.materials.get(0).set(ColorAttribute.createDiffuse(color));
+                //wallBoxModelInstances.get(i).model.materials.get(0).set(ColorAttribute.createDiffuse(color));
                 DVector3 ss = new DVector3();
                 wall_boxes[i].getLengths (ss);
                 wallBoxModelInstances.get(i).transform.setTranslation(new Vector3((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2()));
@@ -290,7 +296,7 @@ public class CrashTest implements Screen, InputProcessor {
             }
         }
 
-        color.set(0,1,1,1);
+        //color.set(0,1,1,1);
         DVector3 sides = new DVector3(LENGTH,WIDTH,HEIGHT);
         for (i = 0; i < boxes; i++) {
             boxesModelInstances.get(i).transform.setTranslation(new Vector3((float)box[i].getPosition().get0(), (float)box[i].getPosition().get1(), (float)box[i].getPosition().get2()));
@@ -298,7 +304,7 @@ public class CrashTest implements Screen, InputProcessor {
             //dsDrawBox (box[i].getPosition(),box[i].getRotation(),sides);
         }
 
-        color.set(1,1,1,1);
+        //color.set(1,1,1,1);
 
         for (i=0; i< spheres; i++){
             sphereModelInstances.get(i).transform.setTranslation(new Vector3((float)sphere[i].getPosition().get0(), (float)sphere[i].getPosition().get1(), (float)sphere[i].getPosition().get2()));
@@ -307,16 +313,16 @@ public class CrashTest implements Screen, InputProcessor {
         }
 
         // draw the cannon
-        color.set(1,1,0,1);
+        //color.set(1,1,0,1);
         DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
         dRFromAxisAndAngle (R2,0,1,0,cannon_angle);
-        dRFromAxisAndAngle (R3,0,0,1,cannon_elevation);
+        dRFromAxisAndAngle (R3,1,0,0,cannon_elevation);
         dMultiply0 (R4,R2,R3);
         DVector3 cpos = new DVector3(CANNON_X,1,CANNON_Z);
-        DVector3 csides = new DVector3(2,2,2);
-        //dsDrawBox (cpos,R2,csides);
-
-        for (i=0; i<3; i++) cpos.add(i,  1.5*R4.get(i, 2));//[i*4+2]);
+//        DVector3 csides = new DVector3(2,2,2);
+//        //dsDrawBox (cpos,R2,csides);
+//
+//        for (i=0; i<3; i++) cpos.add(i,  1.5*R4.get(i, 2));//[i*4+2]);
 
         cannonBodyModelInstance.transform.setTranslation(CANNON_X,1,CANNON_Z);
         modelBatch.render(cannonBodyModelInstance);
@@ -329,6 +335,9 @@ public class CrashTest implements Screen, InputProcessor {
     }
 
     private void setupSimulation() {
+        cannon_angle = 0;
+        cannon_elevation = 0;
+
         int i;
         for (i = 0; i < 1000; i++) wb_stepsdis[i] = 0;
 
@@ -440,8 +449,7 @@ public class CrashTest implements Screen, InputProcessor {
         }//#endif
         if (CENTIPEDE) {//#ifdef CENTIPEDE
             DBody lastb = null;
-            for (double y = 0; y < 10*LENGTH; y+=LENGTH+0.1)
-            {
+            for (double y = 0; y < 10*LENGTH; y+=LENGTH+0.1)      {
                 // chassis body
 
                 b = body[bodies] = OdeHelper.createBody (world);
@@ -500,7 +508,6 @@ public class CrashTest implements Screen, InputProcessor {
                         new Material(ColorAttribute.createDiffuse(Color.ORANGE)),
                         VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
                     sphereModelInstances.add(new ModelInstance(model));
-
 
                     joint[joints] = OdeHelper.createHinge2Joint (world,null);
                     if (x == -17)
@@ -610,29 +617,29 @@ public class CrashTest implements Screen, InputProcessor {
     @Override
     public boolean keyTyped(char cmd) {
         switch (cmd) {
-            case '=':
-                speed += 0.3;
-                break;
-            case '-':
-                speed -= 0.3;
-                break;
-            case ',':
-                turn += 0.1;
-                if (turn > 0.3)
-                    turn = 0.3f;
-                break;
-            case '.':
-                turn -= 0.1;
-                if (turn < -0.3)
-                    turn = -0.3f;
-                break;
-            case ' ':
-                speed = 0;
-                turn = 0;
-                break;
-            case 'f': case 'F':
-                doFast = !doFast;
-                break;
+//            case '=':
+//                speed += 0.3;
+//                break;
+//            case '-':
+//                speed -= 0.3;
+//                break;
+//            case ',':
+//                turn += 0.1;
+//                if (turn > 0.3)
+//                    turn = 0.3f;
+//                break;
+//            case '.':
+//                turn -= 0.1;
+//                if (turn < -0.3)
+//                    turn = -0.3f;
+//                break;
+//            case ' ':
+//                speed = 0;
+//                turn = 0;
+//                break;
+//            case 'f': case 'F':
+//                doFast = !doFast;
+//                break;
             case 'r': case 'R':
                 shutdownSimulation();
                 setupSimulation();
@@ -645,18 +652,18 @@ public class CrashTest implements Screen, InputProcessor {
                 cannonBodyModelInstance.transform.rotateRad(Vector3.Z, 0.1f);
                 cannon_angle -= 0.1;
                 break;
-            case '1':
-                cannon_elevation += 0.1;
+            case '-': case '_':
+                cannon_elevation -= 0.1;
                 cannonBodyModelInstance.transform.rotateRad(Vector3.X, -0.1f);
                 break;
-            case '2':
+            case '+': case '=':
                 cannonBodyModelInstance.transform.rotateRad(Vector3.X, 0.1f);
-                cannon_elevation -= 0.1;
+                cannon_elevation += 0.1;
                 break;
-            case 'x': case 'X': {
+            case ' ': {
                 DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
-                dRFromAxisAndAngle (R2,0,0,1,cannon_angle);
-                dRFromAxisAndAngle (R3,0,1,0,cannon_elevation);
+                dRFromAxisAndAngle (R2,0,1,0,cannon_angle);
+                dRFromAxisAndAngle (R3,1,0,0,cannon_elevation);
                 dMultiply0 (R4,R2,R3);
                 double[] cpos = {CANNON_X,1, CANNON_Z};
                 for (int i=0; i<3; i++) cpos[i] += 3*R4.get(i, 2);//[i*4+2];
@@ -701,7 +708,7 @@ public class CrashTest implements Screen, InputProcessor {
         if (mundus.continueLoading()) {
             // Loading complete, load a scene.
             scene = mundus.loadScene("Main Scene.mundus");
-            scene.cam.position.set(50, 10, 50);
+            scene.cam.position.set(90, 10, 90);
             scene.cam.lookAt(100,0,100);
             // setup input
             controller = new FirstPersonCameraController(scene.cam);
