@@ -38,7 +38,7 @@ Becasue I did not migrate the draw helper classes, every demo from ode4j will no
 
 ## Demos
 
-Currently I have 1 working demo which is based on the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in ode4j demo package.  This demo is shown on the video at the top of this page.
+Currently I have 1 working demo which is a modified version of the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in ode4j demo package.  This demo is shown on the video at the top of this page.
 
 ## Repo structure
 
