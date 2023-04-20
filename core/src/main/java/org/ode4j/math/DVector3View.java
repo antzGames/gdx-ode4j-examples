@@ -21,6 +21,8 @@
  *************************************************************************/
 package org.ode4j.math;
 
+import com.badlogic.gdx.utils.NumberUtils;
+
 public abstract class DVector3View implements DVector3I {
 	@Override
 	public abstract double get0();
@@ -84,8 +86,8 @@ public abstract class DVector3View implements DVector3I {
 
 	@Override
 	public int hashCode() {
-		return (int) (Double.doubleToLongBits(get0())  *
-		Double. doubleToLongBits(get1()) *
-		Double. doubleToLongBits(get2()));
+		return (int) (NumberUtils.doubleToLongBits(get0())  *
+            NumberUtils.doubleToLongBits(get1()) *
+            NumberUtils.doubleToLongBits(get2()));
 	}
 }

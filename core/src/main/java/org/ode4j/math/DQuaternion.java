@@ -22,6 +22,8 @@
 package org.ode4j.math;
 
 
+import com.badlogic.gdx.utils.NumberUtils;
+
 import static org.ode4j.ode.internal.Common.M_PI;
 
 /**
@@ -174,13 +176,13 @@ public class DQuaternion implements DQuaternionC {
 	@Override
 	public int hashCode() {
 		int h = 0;
-		h |= Double. doubleToLongBits(w);
+		h |= NumberUtils.doubleToLongBits(w);
 		h <<= 6;
-		h |= Double. doubleToLongBits(x);
+		h |= NumberUtils.doubleToLongBits(x);
 		h <<= 6;
-		h |= Double. doubleToLongBits(y);
+		h |= NumberUtils.doubleToLongBits(y);
 		h <<= 6;
-		h |= Double. doubleToLongBits(z);
+		h |= NumberUtils.doubleToLongBits(z);
 		h <<= 6;
 		return h;
 	}

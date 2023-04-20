@@ -24,6 +24,8 @@
  *************************************************************************/
 package org.ode4j.ode.internal;
 
+import com.badlogic.gdx.utils.NumberUtils;
+
 import java.io.StringWriter;
 import org.ode4j.math.DVector3;
 import org.ode4j.ode.DGeom.DNearCallback;
@@ -382,13 +384,13 @@ public class Common extends OdeConstants {
         long transducer;
         if (start > direction) {
             if (start != 0.0D) {
-                transducer = Double.doubleToLongBits(start);
+                transducer = NumberUtils.doubleToLongBits(start);
                 return Double.longBitsToDouble(transducer + (transducer > 0L ? -1L : 1L));
             } else {
                 return -4.9E-324D;
             }
         } else if (start < direction) {
-            transducer = Double.doubleToLongBits(start + 0.0D);
+            transducer = NumberUtils.doubleToLongBits(start + 0.0D);
             return Double.longBitsToDouble(transducer + (transducer >= 0L ? 1L : -1L));
         } else {
             return start == direction ? direction : start + direction;

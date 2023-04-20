@@ -21,6 +21,8 @@
  *************************************************************************/
 package org.ode4j.ode.internal.cpp4j.java;
 
+import com.badlogic.gdx.utils.NumberUtils;
+
 import org.ode4j.ode.internal.cpp4j.java.RefInt;
 
 public class Cmath extends Csetjmp {
@@ -89,8 +91,9 @@ public class Cmath extends Csetjmp {
 //		double mantissa = Math.pow(10, log10  - exp.i);
 //		return mantissa;
 		//http://www.math.northwestern.edu/~wphooper/code/java/
-		long bits=Double.doubleToLongBits(num);
+		long bits= NumberUtils.doubleToLongBits(num);
 		exp.i=(int)((0x7ff0000000000000L & bits)>>52)-1022;
+        // TODO  Should this be changed to NumberUtils?
 		return Double.longBitsToDouble((0x800fffffffffffffL & bits)| 0x3fe0000000000000L);
 	}
 }

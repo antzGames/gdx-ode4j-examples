@@ -22,6 +22,8 @@
 package org.ode4j.math;
 
 
+import com.badlogic.gdx.utils.NumberUtils;
+
 /**
  * 3x3 matrix class.
  * Internally this uses a 4x3 matrix for compatibility.
@@ -677,7 +679,7 @@ public final class DMatrix3 implements DMatrix3C {
 	public int hashCode() {
 		int h = 0;
 		for (double d: v) {
-			h |= Double. doubleToLongBits(d);
+			h |= NumberUtils.doubleToLongBits(d);
 			h <<= 2;
 		}
 		return h;

@@ -21,6 +21,8 @@
  *************************************************************************/
 package org.ode4j.math;
 
+import com.badlogic.gdx.utils.NumberUtils;
+
 import java.util.Arrays;
 
 
@@ -134,7 +136,7 @@ public class DVector6 {
 	public int hashCode() {
 		int h = 0;
 		for (double d: v) {
-			h |= Double. doubleToLongBits(d);
+			h |= NumberUtils.doubleToLongBits(d);
 			h <<= 4;
 		}
 		return h;

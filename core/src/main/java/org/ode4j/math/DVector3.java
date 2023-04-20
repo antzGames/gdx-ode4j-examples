@@ -21,6 +21,8 @@
  *************************************************************************/
 package org.ode4j.math;
 
+import com.badlogic.gdx.utils.NumberUtils;
+
 import org.ode4j.math.DMatrix3.DVector3ColView;
 
 /**
@@ -640,9 +642,9 @@ public class DVector3 implements DVector3I, DVector3C {
 
 	@Override
 	public int hashCode() {
-		return (int) (Double. doubleToLongBits(get0())  *
-		Double. doubleToLongBits(get1()) *
-		Double. doubleToLongBits(get2()));
+		return (int) (NumberUtils.doubleToLongBits(get0())  *
+            NumberUtils.doubleToLongBits(get1()) *
+            NumberUtils.doubleToLongBits(get2()));
 	}
 
 	/**
