@@ -385,13 +385,13 @@ public class Common extends OdeConstants {
         if (start > direction) {
             if (start != 0.0D) {
                 transducer = NumberUtils.doubleToLongBits(start);
-                return Double.longBitsToDouble(transducer + (transducer > 0L ? -1L : 1L));
+                return NumberUtils.longBitsToDouble(transducer + (transducer > 0L ? -1L : 1L));
             } else {
                 return -4.9E-324D;
             }
         } else if (start < direction) {
             transducer = NumberUtils.doubleToLongBits(start + 0.0D);
-            return Double.longBitsToDouble(transducer + (transducer >= 0L ? 1L : -1L));
+            return NumberUtils.longBitsToDouble(transducer + (transducer >= 0L ? 1L : -1L));
         } else {
             return start == direction ? direction : start + direction;
         }

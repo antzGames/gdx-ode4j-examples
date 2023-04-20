@@ -94,6 +94,6 @@ public class Cmath extends Csetjmp {
 		long bits= NumberUtils.doubleToLongBits(num);
 		exp.i=(int)((0x7ff0000000000000L & bits)>>52)-1022;
         // TODO  Should this be changed to NumberUtils?
-		return Double.longBitsToDouble((0x800fffffffffffffL & bits)| 0x3fe0000000000000L);
+		return NumberUtils.longBitsToDouble((0x800fffffffffffffL & bits)| 0x3fe0000000000000L);
 	}
 }
