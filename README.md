@@ -22,7 +22,7 @@ ode4j discord channel : https://discord.gg/UFXJcXv2P8 ode4j/Java
 
 ode4j contains also some features that are not present in ODE, such as a ragdoll and heightfields with holes. See pde4j's [Wiki](https://github.com/tzaeschke/ode4j/wiki/Functionality-beyond-ODE).
 
-The [ODE forum](https://groups.google.com/forum/#!forum/ode-users) is useful for questions around physics and general API usage: 
+The [ODE forum](https://groups.google.com/forum/#!forum/ode-users) is useful for questions around physics and general API usage.
 
 The [ode4j forum](https://groups.google.com/forum/?hl=en#!forum/ode4j) is for problems and functionality specific to ode4j/Java. 
 
@@ -31,6 +31,8 @@ There is also the [old website](https://tzaeschke.github.io/ode4j-old/), includi
 ## What you don't get
 
 So this is a 3D physics library only.  You will have to implement your own draw calls.  ode4j demos use an unoptimized custom drawing helper classes based on LWJGL.  Even ode4j's documentation says that thier render implementation has poor performance and is not optimized.  Regardless, there was no point migrating the drawing helper classes over becasue we use libGDX.
+
+Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.
 
 ## Demos
 
