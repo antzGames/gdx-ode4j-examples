@@ -4,7 +4,7 @@ This repository hosts an experimental version of Open Dynamics Engine for Java (
 
 If you want to use ode4j only on libGDX Desktop/Android/iOS backends then I recommend you use the [odej4](https://github.com/tzaeschke/ode4j) directly.  However if you want cross platform support (i.e include GWT support) then you could use this library for all platforms.
 
-I created this repository is to play with a 3D physics engine that works on libGDX's GWT backend for game JAMS and other fun stuff.  I do not recommend to use in important projects.
+I created this repository to play with a 3D physics engine that works on libGDX's GWT backend for game JAMS and other fun stuff.  I do not recommend to use in important projects.
 
 ### What I changed from ode4j's codebase
 
