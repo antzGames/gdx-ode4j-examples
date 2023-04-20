@@ -36,6 +36,10 @@ So this is a 3D physics library only.  You will have to implement your own draw 
 
 Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.
 
+## Some headache
+
+So ODE has its own math classes such similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to covert ODE's versions to libGDX's version when writing your game.  In addition ODE uses double and not float as most of libGDX's math classes use.
+
 ## Demos
 
 Currently I have 1 working demo which is a modified version of the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in ode4j demo package.  This demo is shown on the video at the top of this page.
