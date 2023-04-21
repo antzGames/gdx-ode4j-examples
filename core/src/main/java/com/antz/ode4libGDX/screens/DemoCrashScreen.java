@@ -60,11 +60,11 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     private ModelBatch modelBatch;
     private ModelBuilder modelBuilder;
     private Model model;
-    private ModelInstance cannonBallModelInstance;
-    private ModelInstance cannonBodyModelInstance;
-    private ArrayList<ModelInstance> sphereModelInstances = new ArrayList<>();  // The view for sphere[] array
-    private ArrayList<ModelInstance> boxesModelInstances = new ArrayList<>();    // The view for boxes[] array
-    private ArrayList<ModelInstance> wallBoxModelInstances = new ArrayList<>();
+    private ModelInstance cannonBallModelInstance;                              // the cannonball model
+    private ModelInstance cannonBodyModelInstance;                              // cannon body model
+    private ArrayList<ModelInstance> sphereModelInstances = new ArrayList<>();  // The models for sphere[] array (not used)
+    private ArrayList<ModelInstance> boxesModelInstances = new ArrayList<>();   // The models for boxes[] array (not used)
+    private ArrayList<ModelInstance> wallBoxModelInstances = new ArrayList<>(); // The models for wall_boxes[] array
     private InputMultiplexer inputMultiplexer;
     private FirstPersonCameraController controller;
 
@@ -90,27 +90,28 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
     /**
      libGDX user note: All the ode4j demos create very large arrays for joints, boxes, bodies etc.
-     The original version had 100,000 per array.  I reduced it to 1000.
+     And then they have a integer keeping track of how many actual used elements in the array.
+     The original version had 100,000 elements per array.  I reduced it to 1000.
      I think this is a relic from the C language malloc to reserve memory.
      Either way this is a todo to switch to an Array
     **/
 
-    // dynamics and collision objects (chassis, 3 wheels, environment)
+    // dynamics and collision objects
     private static DWorld world;
     private static DSpace space;
     private static int bodies;
-    private static DHinge2Joint[] joint=new DHinge2Joint[1000];
+    private static DHinge2Joint[] joint = new DHinge2Joint[1000];
     private static int joints;
     private static DJointGroup contactgroup;
 
     //private static DGeom ground;
-    private static DBox[] box=new DBox[1000];
+    private static DBox[] box =new DBox[1000];
     private static int boxes;
-    private static DSphere[] sphere=new DSphere[1000];
+    private static DSphere[] sphere = new DSphere[1000];
     private static int spheres;
-    private static DBox[] wall_boxes=new DBox[1000];
-    private static DBody[] wall_bodies=new DBody[1000];
-    private static int[] wb_stepsdis=new int[1000];
+    private static DBox[] wall_boxes = new DBox[1000];
+    private static DBody[] wall_bodies = new DBody[1000];
+    private static int[] wb_stepsdis = new int[1000];
 
     private static DSphere cannon_ball_geom;
     private static DBody cannon_ball_body;
@@ -148,7 +149,8 @@ public class DemoCrashScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        info = "LEFT-CURSOR to turn the cannon left.\n" +
+        info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
+            "LEFT-CURSOR to turn the cannon left.\n" +
             "RIGHT-CURSOR to turn the cannon right.\n" +
             "SPACE to shoot from the cannon.\n" +
             "R to reset simulation.\n";
@@ -193,7 +195,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "NumOfBoxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 120);
+        font.draw(batch, info + "NumOfBoxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 130);
         batch.end();
     }
 
@@ -475,6 +477,8 @@ public class DemoCrashScreen implements Screen, InputProcessor {
             scene = mundus.loadScene("Main Scene.mundus");
             scene.cam.position.set(90, 10, 90);
             scene.cam.lookAt(100,0,100);
+            scene.cam.up.set(Vector3.Y);
+            scene.cam.update();;
             // setup input
             controller = new FirstPersonCameraController(scene.cam);
             controller.setVelocity(20f);
