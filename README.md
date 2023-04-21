@@ -16,7 +16,7 @@ Here is a brief summary of what I had to change to get ode4j to work on libGDX's
 
 I also removed most of the cpp (C++) packages and classes.
 
-## Where to get ODE documentation and help
+## Where to get ODE/ode4j documentation and help
 
 ODE official manual: http://ode.org/wiki/index.php/Manual
 
@@ -34,11 +34,11 @@ There is also the [old website](https://tzaeschke.github.io/ode4j-old/), includi
 
 This is a 3D physics library only.  You will have to implement your own draw calls.  ode4j demos use an unoptimized custom drawing helper classes based on LWJGL.  Even ode4j's documentation says that thier render implementation has poor performance and is not optimized.  Regardless, there was no point migrating the drawing helper classes over because we use libGDX.
 
-Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.
+Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.  
 
 ## Some headaches
 
-ODE has its own math classes such similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to covert ODE's versions to libGDX's version when writing your game.  In addition ODE uses double and not float as most of libGDX's math classes use.
+Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to convert ode4j's versions to libGDX's versions when during your render loop.  In addition ode4j uses double and not float like most of libGDX's math classes.
 
 ## Demo
 
@@ -70,7 +70,7 @@ My modified ode4j [source code](https://github.com/antzGames/ode4j-GTW-Compatibl
 - `android`: Android mobile platform. Needs Android SDK.
 - `html`: Web platform using GWT and WebGL. Supports only Java projects.
 
-## ODE and ode4j Licenses
+## ODE, ode4j and other Licenses
 
 ### Licensing & Copyright for ODE and ode4j
 
