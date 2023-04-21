@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 
 android {
-  compileSdk 30
+  compileSdk 29
   sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
@@ -63,7 +63,7 @@ repositories {
 configurations { natives }
 
 dependencies {
-  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
+  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
   implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
   implementation project(':core')
 

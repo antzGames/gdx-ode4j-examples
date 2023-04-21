@@ -1,5 +1,6 @@
 package com.antz.ode4libGDX.screens;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -411,20 +412,24 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                 cannon_angle -= 0.1;
                 break;
             case Input.Keys.SPACE: {
-                DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
-                dRFromAxisAndAngle (R2,0,1,0,cannon_angle);
-                dRFromAxisAndAngle (R3,1,0,0,cannon_elevation);
-                dMultiply0 (R4,R2,R3);
-                double[] cpos = {CANNON_X,1, CANNON_Z};
-                for (int i=0; i<3; i++) cpos[i] += 3*R4.get(i, 2);//[i*4+2];
-                cannon_ball_body.setPosition (cpos[0],cpos[1],cpos[2]);
-                double force = 10;
-                cannon_ball_body.setLinearVel (force*R4.get(0, 2),force*R4.get(1,2),force*R4.get(2,2));
-                cannon_ball_body.setAngularVel (0,0,0);
+                fireCannon();
                 break;
             }
         }
         return false;
+    }
+
+    private void fireCannon() {
+        DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
+        dRFromAxisAndAngle (R2,0,1,0,cannon_angle);
+        dRFromAxisAndAngle (R3,1,0,0,cannon_elevation);
+        dMultiply0 (R4,R2,R3);
+        double[] cpos = {CANNON_X,1, CANNON_Z};
+        for (int i=0; i<3; i++) cpos[i] += 3*R4.get(i, 2);//[i*4+2];
+        cannon_ball_body.setPosition (cpos[0],cpos[1],cpos[2]);
+        double force = 10;
+        cannon_ball_body.setLinearVel (force*R4.get(0, 2),force*R4.get(1,2),force*R4.get(2,2));
+        cannon_ball_body.setAngularVel (0,0,0);
     }
 
     @Override
@@ -439,6 +444,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if (Gdx.app.getType().equals(Application.ApplicationType.Android)) fireCannon();
         return false;
     }
 
