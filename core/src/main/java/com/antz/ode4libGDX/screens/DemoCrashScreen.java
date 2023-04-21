@@ -192,7 +192,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "NumOFBoxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 120);
+        font.draw(batch, info + "NumOfBoxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 120);
         batch.end();
     }
 
