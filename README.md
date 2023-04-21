@@ -22,7 +22,7 @@ ODE official manual: http://ode.org/wiki/index.php/Manual
 
 ode4j discord channel : https://discord.gg/UFXJcXv2P8 ode4j/Java
 
-ode4j contains also some features that are not present in ODE, such as a ragdoll and heightfields with holes. See pde4j's [Wiki](https://github.com/tzaeschke/ode4j/wiki/Functionality-beyond-ODE).
+ode4j contains also some features that are not present in ODE, such as a ragdoll and heightfields with holes. See ode4j's [Wiki](https://github.com/tzaeschke/ode4j/wiki/Functionality-beyond-ODE).
 
 The [ODE forum](https://groups.google.com/forum/#!forum/ode-users) is useful for questions around physics and general API usage.
 
