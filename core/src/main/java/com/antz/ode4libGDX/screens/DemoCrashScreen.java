@@ -71,9 +71,9 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     // **** ode4j DemoCrash original stuff below
 
     // some constants
-    private static final float RADIUS = 0.5f;	    // wheel radius
+    private static final float RADIUS = 0.5f;	    // canon ball radius
     private static final float WALLMASS = 1	;	    // wall box mass
-    private static final float FMAX = 25;			// car engine fmax
+    private static final float FMAX = 25;			// max force
     private static final int   ITERS = 20;		    // number of iterations
     private static final float WBOXSIZE = 1.0f;		// size of wall boxes
     private static final float WALLWIDTH = 12;		// width of wall
@@ -182,16 +182,13 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     }
 
     private void draw() {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
         controller.update(); // camera controller
         scene.sceneGraph.update(); // update Mundus
         scene.render(); // render Mundus scene
 
         // 3D models drawing
         modelBatch.begin(scene.cam);
-        simLoop(false, modelBatch); // so the original did rendering in the simulation loop, I did the same thing, but I think its not a good idea
+        simLoop(false, modelBatch); // so the original demo did rendering in the simulation loop, I did the same thing, but I think its not a good idea
         modelBatch.end();
 
         // 2D stuff for info text
@@ -401,6 +398,11 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         // Destroy screen's assets here.
+        mundus.dispose();
+        model.dispose();
+        modelBatch.dispose();
+        batch.dispose();
+        font.dispose();
     }
 
     @Override
