@@ -51,7 +51,7 @@ It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome ba
     private static final float WALLHEIGHT = 10;		// height of wall
 ```
 
-For me if when I generate over 200 boxes my fps goes down significantly.  To experiment for yourself, modify the [DemoCrashScreen](https://github.com/antzGames/ode4j-GTW-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/screens/DemoCrashScreen.java).
+For me if when I generate over 200 boxes my fps goes down significantly.  To experiment for yourself, modify the [DemoCrashScreen](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/screens/DemoCrashScreen.java).
 
 The demo was tested on GWT, Desktop and Android.
 
@@ -63,7 +63,7 @@ A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://git
 
 This project was generated with a template including simple application launchers and a main class extending `Game` that sets the first screen.
 
-My modified ode4j [source code](https://github.com/antzGames/ode4j-GTW-Compatible-libGDX/tree/master/core/src/main/java/org/ode4j) is included in this repo.  Currently no work has been done to make and publish this as a library.  Still too experiemental for that.  Once I have used this in a few game JAMS, I might make a library out of it.
+My modified ode4j [source code](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/tree/master/core/src/main/java/org/ode4j) is included in this repo.  Currently no work has been done to make and publish this as a library.  Still too experiemental for that.  Once I have used this in a few game JAMS, I might make a library out of it.
 
 ### Platforms
 
