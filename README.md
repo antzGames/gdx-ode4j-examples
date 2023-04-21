@@ -38,7 +38,7 @@ Becasue I did not migrate the draw helper classes, every demo from ode4j will no
 
 ## Some headaches
 
-Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to convert ode4j's versions to libGDX's versions when during your render loop.  In addition ode4j uses double and not float like most of libGDX's math classes.
+Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to convert ode4j's versions to libGDX's versions in your render loop.  In addition ode4j uses double and not float like most of libGDX's math classes.
 
 ## Demo
 
