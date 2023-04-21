@@ -61,7 +61,7 @@ A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://git
 
 This project was generated with a template including simple application launchers and a main class extending `Game` that sets the first screen.
 
-My modified ode4j [source code](https://github.com/antzGames/ode4j-GTW-Compatible-libGDX/tree/master/core/src/main/java/org/ode4j) is included in this repo.  Currently no work has been done to make and publish this as a library.  Still to experiemental for that.
+My modified ode4j [source code](https://github.com/antzGames/ode4j-GTW-Compatible-libGDX/tree/master/core/src/main/java/org/ode4j) is included in this repo.  Currently no work has been done to make and publish this as a library.  Still too experiemental for that.  Once I have used this in a few game JAMS, I might make a library out of it.
 
 ## Platforms
 
