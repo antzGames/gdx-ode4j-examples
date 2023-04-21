@@ -40,9 +40,18 @@ Becasue I did not migrate the draw helper classes, every demo from ode4j will no
 
 So ODE has its own math classes such similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to covert ODE's versions to libGDX's version when writing your game.  In addition ODE uses double and not float as most of libGDX's math classes use.
 
-## Demos
+## Demo
 
-Currently I have 1 working demo which is a modified version of the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in ode4j demo package.  This demo is shown on the video at the top of this page.
+My demo is a modified version of the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in ode4j demo package.  This demo is shown on the video at the top of this page.
+
+It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome based browser.  You can increase the size of the wall, resulting in more boxes by modifying these two constants:
+
+```java
+    private static final float WALLWIDTH = 12;		// width of wall
+    private static final float WALLHEIGHT = 10;		// height of wall
+```
+
+For me if when I generate over 200 boxes my fps goes down significantly.  To experiment for yourself, modify the [DemoCrashScreen](https://github.com/antzGames/ode4j-GTW-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/screens/DemoCrashScreen.java).
 
 ## Repo structure
 
