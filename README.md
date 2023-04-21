@@ -32,13 +32,13 @@ There is also the [old website](https://tzaeschke.github.io/ode4j-old/), includi
 
 ## What you don't get
 
-So this is a 3D physics library only.  You will have to implement your own draw calls.  ode4j demos use an unoptimized custom drawing helper classes based on LWJGL.  Even ode4j's documentation says that thier render implementation has poor performance and is not optimized.  Regardless, there was no point migrating the drawing helper classes over because we use libGDX.
+This is a 3D physics library only.  You will have to implement your own draw calls.  ode4j demos use an unoptimized custom drawing helper classes based on LWJGL.  Even ode4j's documentation says that thier render implementation has poor performance and is not optimized.  Regardless, there was no point migrating the drawing helper classes over because we use libGDX.
 
 Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.
 
 ## Some headaches
 
-So ODE has its own math classes such similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to covert ODE's versions to libGDX's version when writing your game.  In addition ODE uses double and not float as most of libGDX's math classes use.
+ODE has its own math classes such similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to covert ODE's versions to libGDX's version when writing your game.  In addition ODE uses double and not float as most of libGDX's math classes use.
 
 ## Demo
 
