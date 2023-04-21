@@ -42,7 +42,7 @@ Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quatern
 
 ## Demo
 
-My demo is a modified version of the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in ode4j demo package.  This demo is shown on the video at the top of this page.
+My demo is a modified version of the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in the ode4j [demo package](https://github.com/tzaeschke/ode4j/tree/master/demo/src/main/java/org/ode4j/demo).  This demo is shown on the video at the top of this page.
 
 It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome based browser.  You can increase the size of the wall, resulting in more boxes by modifying these two constants:
 
