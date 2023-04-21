@@ -83,7 +83,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     private static final float CANNON_X = 100;		// x position of cannon
     private static final float CANNON_Z = 90;	    // y position of cannon
     private static final float CANNON_BALL_MASS = 10;	// mass of the cannon ball
-    private static final float CANNON_BALL_RADIUS = 0.5f;
+    private static final float CANNON_BALL_RADIUS = 0.5f;  // cannon ball radius
 
     private static boolean WALL = true;
     private static boolean CANNON = true;
@@ -94,6 +94,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
      The original version had 100,000 elements per array.  I reduced it to 1000.
      I think this is a relic from the C language malloc to reserve memory.
      Either way this is a todo to switch to an Array
+     There is also some weird code format and variable names.  I think its due to relics of ported C/C++ code.
     **/
 
     // dynamics and collision objects
