@@ -90,9 +90,9 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
     /**
      libGDX user note: All the ode4j demos create very large arrays for joints, boxes, bodies etc.
-     And then they have a integer keeping track of how many actual used elements in the array.
+     And then they have a integer keeping track of how many actual elements in the array are used.
      The original version had 100,000 elements per array.  I reduced it to 1000.
-     I think this is a relic from the C language malloc to reserve memory.
+     I think this is a relic from the C language malloc to reserve memory?
      Either way this is a todo to switch to an Array
      There is also some weird code format and variable names.  I think its due to relics of ported C/C++ code.
     **/
@@ -196,7 +196,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "NumOfBoxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 130);
+        font.draw(batch, info + "Number of Boxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 130);
         batch.end();
     }
 
@@ -337,6 +337,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                     wall_boxes[wb].setBody (wall_bodies[wb]);
                     //dBodyDisable(wall_bodies[wb++]);
 
+                    // libGDX model code
                     model = modelBuilder.createBox(WBOXSIZE, WBOXSIZE, WBOXSIZE, GL20.GL_LINES,
                         new Material(ColorAttribute.createDiffuse(Color.RED)),
                         VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
@@ -351,6 +352,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
             cannon_ball_geom = OdeHelper.createSphere (space,CANNON_BALL_RADIUS);
             m.setSphereTotal (CANNON_BALL_MASS,CANNON_BALL_RADIUS);
 
+            // libGDX model code
             model = modelBuilder.createSphere(CANNON_BALL_RADIUS*2, CANNON_BALL_RADIUS*2, CANNON_BALL_RADIUS*2, 10, 10,
                 new Material(ColorAttribute.createDiffuse(Color.ORANGE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
@@ -360,11 +362,13 @@ public class DemoCrashScreen implements Screen, InputProcessor {
             cannon_ball_geom.setBody (cannon_ball_body);
             cannon_ball_body.setPosition (CANNON_X, CANNON_BALL_RADIUS, CANNON_Z);
 
+            // libGDX model code
             model = modelBuilder.createSphere(RADIUS, RADIUS, RADIUS, 10, 10,
                 new Material(ColorAttribute.createDiffuse(Color.ORANGE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
             cannonBallModelInstance = new ModelInstance(model);
 
+            // libGDX model code
             model = modelBuilder.createCylinder(0.5f,3f,0.5f, 10,
                 new Material(ColorAttribute.createDiffuse(Color.PINK)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
