@@ -32,7 +32,7 @@ There is also the [old website](https://tzaeschke.github.io/ode4j-old/), includi
 
 ## What you don't get
 
-So this is a 3D physics library only.  You will have to implement your own draw calls.  ode4j demos use an unoptimized custom drawing helper classes based on LWJGL.  Even ode4j's documentation says that thier render implementation has poor performance and is not optimized.  Regardless, there was no point migrating the drawing helper classes over becasue we use libGDX.
+So this is a 3D physics library only.  You will have to implement your own draw calls.  ode4j demos use an unoptimized custom drawing helper classes based on LWJGL.  Even ode4j's documentation says that thier render implementation has poor performance and is not optimized.  Regardless, there was no point migrating the drawing helper classes over because we use libGDX.
 
 Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.
 
