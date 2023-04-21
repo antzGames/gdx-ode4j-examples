@@ -53,6 +53,8 @@ It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome ba
 
 For me if when I generate over 200 boxes my fps goes down significantly.  To experiment for yourself, modify the [DemoCrashScreen](https://github.com/antzGames/ode4j-GTW-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/screens/DemoCrashScreen.java).
 
+The demo was tested on GWT, Desktop and Android.
+
 I plan to convert more ode4j demos over to libGDX rendering.  Stay tuned.
 
 ## Repo structure
