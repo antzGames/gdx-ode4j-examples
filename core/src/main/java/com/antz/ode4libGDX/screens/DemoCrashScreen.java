@@ -43,7 +43,6 @@ import org.ode4j.ode.DGeom.DNearCallback;
 import java.util.ArrayList;
 import static org.ode4j.ode.OdeMath.*;
 
-
 public class DemoCrashScreen implements Screen, InputProcessor {
 
     // My stuff
@@ -247,9 +246,9 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
                 DVector3 ss = new DVector3();
                 wall_boxes[i].getLengths (ss);
-                wallBoxModelInstances.get(i).transform.setFromEulerAngles((float)wall_boxes[i].getQuaternion().toEulerDegrees().get0(),
+                wallBoxModelInstances.get(i).transform.setFromEulerAngles((float)wall_boxes[i].getQuaternion().toEulerDegrees().get2(),
                     (float)wall_boxes[i].getQuaternion().toEulerDegrees().get1(),
-                    (float)wall_boxes[i].getQuaternion().toEulerDegrees().get2());
+                    (float)wall_boxes[i].getQuaternion().toEulerDegrees().get0());
 
                 wallBoxModelInstances.get(i).transform.setTranslation(new Vector3((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2()));
                 modelBatch.render(wallBoxModelInstances.get(i));
