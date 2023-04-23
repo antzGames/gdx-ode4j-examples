@@ -1,8 +1,9 @@
 # ode4j experimental version on GWT libGDX
 
-https://user-images.githubusercontent.com/10563814/233501942-d7043084-1781-4413-bcf3-16b595506bb9.mp4
+https://user-images.githubusercontent.com/10563814/233815331-12426b4e-ed70-4889-8fbd-c1d3b002873d.mp4
 
-This repository hosts an experimental version of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j) (ode4j v0.4.1) 3D physics library working on libGDX's GWT backend.  Use at your own risk.  Because a lot of the original ode4j code was modified to compile and run properly on libGDX's GWT backend, I cannot guarantee everything is working properly.  More importantly keeping up to date with ode4j updates will be difficult.
+
+This repository hosts an experimental version of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j) (ode4j v0.4.1) 3D physics library working on libGDX's GWT backend. Because a lot of the original ode4j code was modified to compile and run properly on libGDX's GWT backend, I cannot guarantee everything is working properly.  More importantly keeping up to date with ode4j updates will be difficult.
 
 If you want to use ode4j only on libGDX Desktop/Android/iOS backends then I recommend you use [odej4](https://github.com/tzaeschke/ode4j) directly.  However if you want cross platform support (i.e include GWT support) then you could use this library for all platforms.
 
@@ -52,7 +53,18 @@ In addition ode4j uses double and not float like most of libGDX's math classes.
 
 ## Demos
 
-The built in demo is a modified version of the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in the ode4j [demo package](https://github.com/tzaeschke/ode4j/tree/master/demo/src/main/java/org/ode4j/demo).  This demo is shown on the video at the top of this page.
+I have currently have the following modified od4j demos:
+
+* DemoCrash
+* DemoRagdoll
+
+I am migrating new demos every week.
+
+The demos have been tested on GWT, Desktop and Android.
+
+## GWT Performance
+
+To test performance for yourself, modify the [DemoCrashScreen](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/screens/DemoCrashScreen.java).
 
 It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome based browser.  You can increase the size of the wall, resulting in more boxes by modifying these two constants:
 
@@ -61,13 +73,7 @@ It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome ba
     private static final float WALLHEIGHT = 10;		// height of wall
 ```
 
-For me if when I generate over 200 boxes my fps goes down significantly.  To experiment for yourself, modify the [DemoCrashScreen](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/screens/DemoCrashScreen.java).
-
-The demo was tested on GWT, Desktop and Android.
-
-I have converted the Ragdoll test and it looks like its working.
-
-https://user-images.githubusercontent.com/10563814/233760215-26e2ef8f-5c0f-4a38-a489-596630e0eeaf.mp4
+For me if when I generate over 200 boxes my fps on Chrome goes down significantly.  
 
 ## Repo structure
 
