@@ -217,16 +217,17 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
         }
 
         info = "To drop another object, press:\n" +
-        "   1 for box.\n" +
-        "   2 for sphere.\n" +
-        "   3 for capsule.\n" +
-        "   4 for cylinder.\n" +
-        "   5 for a composite object.\n" +
+
+        "   1 for sphere.\n" +
+        "   2 for box.\n" +
+//        "   3 for capsule.\n" +
+//        "   4 for cylinder.\n" +
+//        "   5 for a composite object.\n" +
 //        "To select an object, press SPACE.\n" +
 //        "To disable the selected object, press -.\n" +
 //        "To enable the selected object, press +.\n" +
-//        "To toggle showing the geom AABBs, press B.\n" +
-//        "To toggle showing the contact points, press C.\n" +
+        "To toggle showing the geom AABBs, press B.\n" +
+        "To toggle showing the contact points, press C.\n" +
         "To toggle dropping from random position/orientation, press R.\n" +
         "F1 to run Demo Crash.\n";
         System.out.println(info);
@@ -438,7 +439,7 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
                 new Material(ColorAttribute.createDiffuse(color)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
             m = new ModelInstance(model);
-            m.transform.set(Ode2GdxMathUtils.getGdxQuaternion(qOde));
+            m.transform.set(Ode2GdxMathUtils.getGdxQuaternion(c.getQuaternion()));
             m.transform.setTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
             modelBatch.render(m);
             //dsDrawCapsule( pos, R, c.getLength(), c.getRadius() );
@@ -548,7 +549,8 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
 //            "   5 for a convex object.\n" +
 //            "   6 for a composite object.\n" +
 
-        if (cmd == '1' || cmd == '2' || cmd == '3' || cmd == '4' || cmd == '5' || cmd == '6') {
+//        if (cmd == '1' || cmd == '2' || cmd == '3' || cmd == '4' || cmd == '5' || cmd == '6') {
+          if (cmd == '1' || cmd == '2') {
             if (num < NUM) {
                 i = num;
                 num++;
@@ -588,13 +590,13 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
             obj[i].body.setRotation (R);
             obj[i].body.setData (i);
 
-            if (cmd == '1') {
+            if (cmd == '2') {
                 m.setBox (DENSITY,sides[0],sides[1],sides[2]);
                 obj[i].geom[0] = OdeHelper.createBox (space,sides[0],sides[1],sides[2]);
-            } else if (cmd == '3') {
-                sides[0] *= 0.5;
-                m.setCapsule (DENSITY,3,sides[0],sides[1]);
-                obj[i].geom[0] = OdeHelper.createCapsule (space,sides[0]/2,sides[0]*3);
+//            } else if (cmd == '3') {
+//                sides[0] *= 0.5;
+//                m.setCapsule (DENSITY,3,sides[0],sides[1]);
+//                obj[i].geom[0] = OdeHelper.createCapsule (space,sides[0]/2,sides[0]*3);
 //            } else if (cmd == '5') {
 //                m.setBox (DENSITY,0.25,0.25,0.25);
 //                obj[i].geom[0] = OdeHelper.createConvex (space,
@@ -603,67 +605,67 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
 //                    ConvexCubeGeom.points,
 //                    ConvexCubeGeom.pointcount,
 //                    ConvexCubeGeom.polygons);
-            } else if (cmd == '4') {
-                sides[1] *= 0.5;
-                m.setCylinder(DENSITY,3,sides[0],sides[1]);
-                obj[i].geom[0] = OdeHelper.createCylinder (space,sides[0],sides[1]);
-            } else if (cmd == '2') {
+//            } else if (cmd == '4') {
+//                sides[1] *= 0.5;
+//                m.setCylinder(DENSITY,3,sides[0],sides[1]);
+//                obj[i].geom[0] = OdeHelper.createCylinder (space,sides[0],sides[1]);
+            } else if (cmd == '1') {
                 sides[0] *= 0.5;
                 m.setSphere (DENSITY,sides[0]);
                 obj[i].geom[0] = OdeHelper.createSphere (space,sides[0]);
-            } else if (cmd == '5') {
-                setBody = true;
-
-                // start accumulating masses for the encapsulated geometries
-                DMass m2 = OdeHelper.createMass();
-                m.setZero ();
-
-                DVector3[] dpos = DVector3.newArray(GPB);	// delta-positions for encapsulated geometries
-                DMatrix3[] drot = DMatrix3.newArray(GPB);
-
-                // set random delta positions
-                for (j=0; j<GPB; j++) {
-                    for (k=0; k<3; k++) {
-                        dpos[j].set(k, dRandReal()*0.3-0.15 );
-                    }
-                }
-
-                for (k=0; k<GPB; k++) {
-                    if (k==0) {
-                        double radius = dRandReal()*0.25+0.05;
-                        obj[i].geom[k] = OdeHelper.createSphere (space,radius);
-                        m2.setSphere (DENSITY,radius);
-                    }
-                    else if (k==1) {
-                        obj[i].geom[k] = OdeHelper.createBox (space,sides[0],sides[1],sides[2]);
-                        m2.setBox (DENSITY,sides[0],sides[1],sides[2]);
-                    }
-                    else {
-                        double radius = dRandReal()*0.1+0.05;
-                        double length = dRandReal()*1.0+0.1;
-                        obj[i].geom[k] = OdeHelper.createCapsule (space,radius,length);
-                        m2.setCapsule (DENSITY,3,radius,length);
-                    }
-
-                    dRFromAxisAndAngle (drot[k],dRandReal()*2.0-1.0,dRandReal()*2.0-1.0,
-                        dRandReal()*2.0-1.0,dRandReal()*10.0-5.0);
-
-                    m2.rotate (drot[k]);
-                    m2.translate (dpos[k]);
-
-                    // add to the total mass
-                    m.add (m2);
-                }
-
-                // move all encapsulated objects so that the center of mass is (0,0,0)
-                DVector3 negC = new DVector3(m.getC()).scale(-1);
-                for (k=0; k<GPB; k++) {
-                    obj[i].geom[k].setBody(obj[i].body);
-                    obj[i].geom[k].setOffsetPosition(dpos[k].reAdd(negC));
-                    obj[i].geom[k].setOffsetRotation(drot[k]);
-                }
-                m.translate(negC);
-                obj[i].body.setMass(m);
+//            } else if (cmd == '5') {
+//                setBody = true;
+//
+//                // start accumulating masses for the encapsulated geometries
+//                DMass m2 = OdeHelper.createMass();
+//                m.setZero ();
+//
+//                DVector3[] dpos = DVector3.newArray(GPB);	// delta-positions for encapsulated geometries
+//                DMatrix3[] drot = DMatrix3.newArray(GPB);
+//
+//                // set random delta positions
+//                for (j=0; j<GPB; j++) {
+//                    for (k=0; k<3; k++) {
+//                        dpos[j].set(k, dRandReal()*0.3-0.15 );
+//                    }
+//                }
+//
+//                for (k=0; k<GPB; k++) {
+//                    if (k==0) {
+//                        double radius = dRandReal()*0.25+0.05;
+//                        obj[i].geom[k] = OdeHelper.createSphere (space,radius);
+//                        m2.setSphere (DENSITY,radius);
+//                    }
+//                    else if (k==1) {
+//                        obj[i].geom[k] = OdeHelper.createBox (space,sides[0],sides[1],sides[2]);
+//                        m2.setBox (DENSITY,sides[0],sides[1],sides[2]);
+//                    }
+//                    else {
+//                        double radius = dRandReal()*0.1+0.05;
+//                        double length = dRandReal()*1.0+0.1;
+//                        obj[i].geom[k] = OdeHelper.createCapsule (space,radius,length);
+//                        m2.setCapsule (DENSITY,3,radius,length);
+//                    }
+//
+//                    dRFromAxisAndAngle (drot[k],dRandReal()*2.0-1.0,dRandReal()*2.0-1.0,
+//                        dRandReal()*2.0-1.0,dRandReal()*10.0-5.0);
+//
+//                    m2.rotate (drot[k]);
+//                    m2.translate (dpos[k]);
+//
+//                    // add to the total mass
+//                    m.add (m2);
+//                }
+//
+//                // move all encapsulated objects so that the center of mass is (0,0,0)
+//                DVector3 negC = new DVector3(m.getC()).scale(-1);
+//                for (k=0; k<GPB; k++) {
+//                    obj[i].geom[k].setBody(obj[i].body);
+//                    obj[i].geom[k].setOffsetPosition(dpos[k].reAdd(negC));
+//                    obj[i].geom[k].setOffsetRotation(drot[k]);
+//                }
+//                m.translate(negC);
+//                obj[i].body.setMass(m);
             }
 
             if (!setBody) {
