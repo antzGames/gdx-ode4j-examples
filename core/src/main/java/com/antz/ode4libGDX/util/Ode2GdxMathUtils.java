@@ -1,7 +1,6 @@
 package com.antz.ode4libGDX.util;
 
 import com.badlogic.gdx.math.Quaternion;
-import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DQuaternionC;
 
 public class Ode2GdxMathUtils {
