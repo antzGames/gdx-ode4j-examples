@@ -158,7 +158,7 @@ public class ErrorHdl {
 			message_function.call (num,msg,ap);
 		} else {
 			//printMessage (num,"ODE Message",msg,ap);
-			Gdx.app.log(ap.getClass().getName(), "ODE Message " + num + ": " + msg);
+			//Gdx.app.log(ap.getClass().getName(), "ODE Message " + num + ": " + msg);
 		}
 	}
 }

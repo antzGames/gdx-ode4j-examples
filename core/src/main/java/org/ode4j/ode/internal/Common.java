@@ -24,6 +24,7 @@
  *************************************************************************/
 package org.ode4j.ode.internal;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.NumberUtils;
 
 import java.io.StringWriter;
@@ -162,6 +163,7 @@ public class Common extends OdeConstants {
 //		new RuntimeException(msg).printStackTrace(new PrintWriter(sw));
 		String msg2 = sw.toString();
 		dMessage (d_ERR_UASSERT, msg2);
+        Gdx.app.log("Message " + d_ERR_UASSERT, msg);
 	}
 
 	/**

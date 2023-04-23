@@ -1,5 +1,6 @@
 package com.antz.ode4libGDX.screens;
 
+import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -130,6 +131,9 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
     @Override
     public void show() {
+        Gdx.input.setCatchKey(Input.Keys.SPACE, true);
+        Gdx.input.setCatchKey(Input.Keys.F1, true);
+
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(this);
         modelBatch = new ModelBatch();
@@ -155,7 +159,8 @@ public class DemoCrashScreen implements Screen, InputProcessor {
             "LEFT-CURSOR to turn the cannon left.\n" +
             "RIGHT-CURSOR to turn the cannon right.\n" +
             "SPACE to shoot from the cannon.\n" +
-            "R to reset simulation.\n";
+            "R to reset simulation.\n" +
+            "F1 to go to RagDoll Demo\n";
 
         System.out.println(info);
 
@@ -194,7 +199,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "Number of Boxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 130);
+        font.draw(batch, info + "Number of Boxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 145);
         batch.end();
     }
 
@@ -403,6 +408,10 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         modelBatch.dispose();
         batch.dispose();
         font.dispose();
+
+        contactgroup.destroy();
+        space.destroy();
+        world.destroy();
     }
 
     @Override
@@ -420,10 +429,12 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                 cannonBodyModelInstance.transform.rotateRad(Vector3.Z, 0.1f);
                 cannon_angle -= 0.1;
                 break;
-            case Input.Keys.SPACE: {
+            case Input.Keys.SPACE:
                 fireCannon();
                 break;
-            }
+            case Input.Keys.F1:
+                Ode4libGDX.game.setScreen(new RagDollScreen());
+                break;
         }
         return false;
     }

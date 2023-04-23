@@ -5,6 +5,7 @@ import static org.ode4j.ode.OdeConstants.dContactBounce;
 import static org.ode4j.ode.OdeConstants.dContactSoftCFM;
 import static org.ode4j.ode.OdeHelper.areConnectedExcluding;
 
+import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -53,7 +54,6 @@ import org.ode4j.ode.OdeHelper;
 import org.ode4j.ode.OdeMath;
 import org.ode4j.ode.internal.Rotation;
 import org.ode4j.ode.internal.ragdoll.DxRagdoll;
-import java.util.ArrayList;
 
 public class RagDollScreen implements Screen, InputProcessor {
 
@@ -109,7 +109,8 @@ public class RagDollScreen implements Screen, InputProcessor {
         }
 
         info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
-            "SPACE to apply some force to the ragdoll.\n";
+            "SPACE to apply some force to the ragdoll.\n" +
+            "F1 for Crash Demo\n";
 
         System.out.println(info);
 
@@ -169,7 +170,7 @@ public class RagDollScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 50);
+        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 70);
         batch.end();
     }
 
@@ -294,15 +295,23 @@ public class RagDollScreen implements Screen, InputProcessor {
         modelBatch.dispose();
         batch.dispose();
         font.dispose();
+
+        // ode cleanup
+        ragdoll.destroy();
+        contactgroup.destroy();
+        space.destroy();
+        world.destroy();
     }
 
     @Override
     public boolean keyDown(int keycode) {
         switch (keycode) {
-            case Input.Keys.SPACE: {
+            case Input.Keys.SPACE:
                 ragdoll.getBones().get(DxDefaultHumanRagdollConfig.PELVIS).getBody().setLinearVel(10, 80, 10);
                 break;
-            }
+            case Input.Keys.F1:
+                Ode4libGDX.game.setScreen(new DemoCrashScreen());
+                break;
         }
         return false;
     }
