@@ -5,6 +5,7 @@ import static org.ode4j.ode.OdeConstants.dContactBounce;
 import static org.ode4j.ode.OdeConstants.dContactSoftCFM;
 import static org.ode4j.ode.OdeHelper.areConnectedExcluding;
 
+import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -202,9 +203,10 @@ public class RagDollScreen implements Screen, InputProcessor {
                 new Material(ColorAttribute.createDiffuse(Color.BLACK)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
             m = new ModelInstance(model);
-            m.transform.setFromEulerAngles((float)cap.getQuaternion().toEulerDegrees().get2(),
-                (float)cap.getQuaternion().toEulerDegrees().get1(),
-                (float)cap.getQuaternion().toEulerDegrees().get0());
+
+            Quaternion q = Ode2GdxMathUtils.getGdxQuaternion(cap.getQuaternion());  // Using new convert util class
+            m.transform.set(q);
+
             m.transform.setToTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
             modelBatch.render(m);
             //dsDrawCapsule (pos, rot, cap.getLength(), cap.getRadius()); // original draw call

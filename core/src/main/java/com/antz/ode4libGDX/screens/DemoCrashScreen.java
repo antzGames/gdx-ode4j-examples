@@ -1,5 +1,6 @@
 package com.antz.ode4libGDX.screens;
 
+import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
@@ -246,11 +248,10 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
                 DVector3 ss = new DVector3();
                 wall_boxes[i].getLengths (ss);
-                wallBoxModelInstances.get(i).transform.setFromEulerAngles((float)wall_boxes[i].getQuaternion().toEulerDegrees().get2(),
-                    (float)wall_boxes[i].getQuaternion().toEulerDegrees().get1(),
-                    (float)wall_boxes[i].getQuaternion().toEulerDegrees().get0());
 
-                wallBoxModelInstances.get(i).transform.setTranslation(new Vector3((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2()));
+                Quaternion q = Ode2GdxMathUtils.getGdxQuaternion(wall_boxes[i].getQuaternion());  // Using new convert util class
+                wallBoxModelInstances.get(i).transform.set(q);
+                wallBoxModelInstances.get(i).transform.setTranslation((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2());
                 modelBatch.render(wallBoxModelInstances.get(i));
                 //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);  //original draw call
             }

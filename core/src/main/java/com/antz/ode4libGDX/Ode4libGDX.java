@@ -8,7 +8,7 @@ import com.badlogic.gdx.Game;
 public class Ode4libGDX extends Game {
     @Override
     public void create() {
-        setScreen(new DemoCrashScreen());
-        //setScreen(new RagDollScreen());
+        //setScreen(new DemoCrashScreen());
+        setScreen(new RagDollScreen());
     }
 }
