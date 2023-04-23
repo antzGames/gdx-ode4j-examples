@@ -37,7 +37,7 @@ Here is a [Youtube video](https://www.youtube.com/watch?v=ENlpu_Jjp3Q) of a list
 
 This is a 3D physics library only.  You will have to implement your own draw calls.  ode4j demos use an unoptimized custom drawing helper classes based on LWJGL.  Even ode4j's documentation says that thier render implementation has poor performance and is not optimized.  Regardless, there was no point migrating the drawing helper classes over because we use libGDX.
 
-Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.  
+Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.  Do not worry though, this repo has a few of the demos migrated over to use libGDX rendering classes.
 
 ## Some headaches
 
