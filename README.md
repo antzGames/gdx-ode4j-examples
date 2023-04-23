@@ -53,7 +53,7 @@ In addition ode4j uses double and not float like most of libGDX's math classes.
 
 ## Demos
 
-I have currently have the following modified od4j demos:
+I currently have the following modified od4j demos:
 
 * DemoCrash
 * DemoRagdoll
