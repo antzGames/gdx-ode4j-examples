@@ -412,6 +412,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         contactgroup.destroy();
         space.destroy();
         world.destroy();
+        OdeHelper.closeODE();
     }
 
     @Override
@@ -433,7 +434,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                 fireCannon();
                 break;
             case Input.Keys.F1:
-                Ode4libGDX.game.setScreen(new RagDollScreen());
+                Ode4libGDX.game.setScreen(new DemoRagDollScreen());
                 break;
         }
         return false;

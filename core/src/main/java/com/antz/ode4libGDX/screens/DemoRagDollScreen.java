@@ -1,10 +1,7 @@
 package com.antz.ode4libGDX.screens;
 
-
-import static org.ode4j.ode.OdeConstants.dContactBounce;
-import static org.ode4j.ode.OdeConstants.dContactSoftCFM;
-import static org.ode4j.ode.OdeHelper.areConnectedExcluding;
-
+import static org.ode4j.ode.OdeHelper.*;
+import static org.ode4j.ode.OdeMath.*;
 import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Application;
@@ -25,19 +22,14 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Matrix3;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.runtime.Mundus;
-import com.sun.org.apache.xpath.internal.operations.Mod;
-
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DMatrix3C;
 import org.ode4j.math.DQuaternion;
-import org.ode4j.math.DQuaternionC;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
 import org.ode4j.ode.DBody;
@@ -55,7 +47,7 @@ import org.ode4j.ode.OdeMath;
 import org.ode4j.ode.internal.Rotation;
 import org.ode4j.ode.internal.ragdoll.DxRagdoll;
 
-public class RagDollScreen implements Screen, InputProcessor {
+public class DemoRagDollScreen implements Screen, InputProcessor {
 
     // My stuff
     private Mundus mundus;
@@ -301,6 +293,7 @@ public class RagDollScreen implements Screen, InputProcessor {
         contactgroup.destroy();
         space.destroy();
         world.destroy();
+        OdeHelper.closeODE();
     }
 
     @Override
@@ -310,7 +303,7 @@ public class RagDollScreen implements Screen, InputProcessor {
                 ragdoll.getBones().get(DxDefaultHumanRagdollConfig.PELVIS).getBody().setLinearVel(10, 80, 10);
                 break;
             case Input.Keys.F1:
-                Ode4libGDX.game.setScreen(new DemoCrashScreen());
+                Ode4libGDX.game.setScreen(new DemoTriMeshScreen());
                 break;
         }
         return false;
