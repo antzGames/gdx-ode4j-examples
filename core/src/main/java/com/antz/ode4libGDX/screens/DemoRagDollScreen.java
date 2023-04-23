@@ -102,7 +102,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
 
         info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
             "SPACE to apply some force to the ragdoll.\n" +
-            "F1 for Crash Demo\n";
+            "F1 for Tri MEsh Demo\n";
 
         System.out.println(info);
 
@@ -200,7 +200,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
             Quaternion q = Ode2GdxMathUtils.getGdxQuaternion(cap.getQuaternion());  // Using new convert util class
             m.transform.set(q);
 
-            m.transform.setToTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
+            m.transform.setTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
             modelBatch.render(m);
             //dsDrawCapsule (pos, rot, cap.getLength(), cap.getRadius()); // original draw call
         }

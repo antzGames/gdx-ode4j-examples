@@ -155,7 +155,7 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
                         VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
                     m = new ModelInstance(model);
                     m.transform.set(new Matrix3(Rotation.toFloatArray()));
-                    m.transform.setToTranslation((float)contact.geom.pos.get0(), (float)contact.geom.pos.get1(), (float)contact.geom.pos.get2());
+                    m.transform.setTranslation((float)contact.geom.pos.get0(), (float)contact.geom.pos.get1(), (float)contact.geom.pos.get2());
                     modelBatch.render(m);
                     //dsDrawSphere(contact.geom.pos, Rotation, (0.01));
 
@@ -170,7 +170,7 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
                     model = modelBuilder.end();
                     m = new ModelInstance(model);
                     m.transform.set(new Matrix3(Rotation.toFloatArray()));
-                    m.transform.setToTranslation((float)contact.geom.pos.get0(), (float)contact.geom.pos.get1(), (float)contact.geom.pos.get2());
+                    m.transform.setTranslation((float)contact.geom.pos.get0(), (float)contact.geom.pos.get1(), (float)contact.geom.pos.get2());
                     modelBatch.render(m);
                     //dsDrawLine(contact.geom.pos, End);
                     continue;
@@ -184,7 +184,7 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
                         VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
                     m = new ModelInstance(model);
                     m.transform.set(new Matrix3(RI.toFloatArray()));
-                    m.transform.setToTranslation((float) contact.geom.pos.get0(), (float) contact.geom.pos.get1(), (float) contact.geom.pos.get2());
+                    m.transform.setTranslation((float) contact.geom.pos.get0(), (float) contact.geom.pos.get1(), (float) contact.geom.pos.get2());
                     modelBatch.render(m);
                     //dsDrawBox (contact.geom.pos,RI,ss);
                 }
@@ -216,17 +216,17 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        info = 	"To drop another object, press:\n" +
+        info = "To drop another object, press:\n" +
         "   1 for box.\n" +
         "   2 for sphere.\n" +
         "   3 for capsule.\n" +
         "   4 for cylinder.\n" +
         "   5 for a composite object.\n" +
-        "To select an object, press SPACE.\n" +
-        "To disable the selected object, press -.\n" +
-        "To enable the selected object, press +.\n" +
-        "To toggle showing the geom AABBs, press B.\n" +
-        "To toggle showing the contact points, press C.\n" +
+//        "To select an object, press SPACE.\n" +
+//        "To disable the selected object, press -.\n" +
+//        "To enable the selected object, press +.\n" +
+//        "To toggle showing the geom AABBs, press B.\n" +
+//        "To toggle showing the contact points, press C.\n" +
         "To toggle dropping from random position/orientation, press R.\n" +
         "F1 to run Demo Crash.\n";
         System.out.println(info);
@@ -320,7 +320,7 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 250);
+        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 160);
         batch.end();
     }
 
@@ -374,9 +374,8 @@ public class DemoTriMeshScreen implements Screen, InputProcessor {
                 model = modelBuilder.end();
                 m = new ModelInstance(model);
                 m.transform.set(Ode2GdxMathUtils.getGdxQuaternion(TriMesh.getQuaternion()));
-                m.transform.setToTranslation((float)Pos.get0(), (float)Pos.get1(), (float)Pos.get2());
+                m.transform.setTranslation((float)Pos.get0(), (float)Pos.get1(), (float)Pos.get2());
                 modelBatch.render(m);
-
                 //dsDrawTriangle(Pos, Rot, Vertices, p0, p1, p2, false);
             }
         }
