@@ -40,11 +40,13 @@ Becasue I did not migrate the draw helper classes, every demo from ode4j will no
 
 ## Some headaches
 
-Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to convert ode4j's versions to libGDX's versions in your render loop.  In addition ode4j uses double and not float like most of libGDX's math classes.
+Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to convert ode4j's versions to libGDX's versions in your render loop.  Be very careful as the signatures for Quanternion's yaw, pitch roll and x,y,x,w are reversed between ode4j and libGDX which added wasted hours of fustration getting demos to work.
 
-## Demo
+In addition ode4j uses double and not float like most of libGDX's math classes.
 
-My demo is a modified version of the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in the ode4j [demo package](https://github.com/tzaeschke/ode4j/tree/master/demo/src/main/java/org/ode4j/demo).  This demo is shown on the video at the top of this page.
+## Demos
+
+The built in demo is a modified version of the [DemoCrash](https://github.com/tzaeschke/ode4j/blob/master/demo/src/main/java/org/ode4j/demo/DemoCrash.java) in the ode4j [demo package](https://github.com/tzaeschke/ode4j/tree/master/demo/src/main/java/org/ode4j/demo).  This demo is shown on the video at the top of this page.
 
 It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome based browser.  You can increase the size of the wall, resulting in more boxes by modifying these two constants:
 
@@ -57,7 +59,9 @@ For me if when I generate over 200 boxes my fps goes down significantly.  To exp
 
 The demo was tested on GWT, Desktop and Android.
 
-I plan to convert more ode4j demos over to libGDX rendering.  Stay tuned.
+I have converted the Ragdoll test and it looks like its working.
+
+https://user-images.githubusercontent.com/10563814/233760215-26e2ef8f-5c0f-4a38-a489-596630e0eeaf.mp4
 
 ## Repo structure
 
