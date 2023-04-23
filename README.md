@@ -39,7 +39,7 @@ This is a 3D physics library only.  You will have to implement your own draw cal
 
 Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.  Do not worry though, this repo has a few of the demos migrated over to use libGDX rendering classes.
 
-## Some headaches
+## Math classes
 
 Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quaternion.
 
