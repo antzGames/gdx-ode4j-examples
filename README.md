@@ -53,7 +53,9 @@ In addition ode4j uses double and not float like most of libGDX's math classes.
 
 ## Demos
 
-I currently have the following modified od4j demos:
+```F1``` key will cycle to the next demo.
+
+The following modified od4j demos are included:
 
 * DemoCrash
 * DemoRagdoll
