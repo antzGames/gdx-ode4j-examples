@@ -43,7 +43,7 @@ Becasue I did not migrate the draw helper classes, every demo from ode4j will no
 
 Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quaternion.
 
-I added a new help math utility class called [Ode2GDXMathUtils](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/util/Ode2GdxMathUtils.java).  You use this method to create the libGDX Quaternion from ode4j's QuanternionC:
+I added a new help math utility class called [Ode2GDXMathUtils](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/util/Ode2GdxMathUtils.java).  Use the following method to create the libGDX Quaternion from ode4j's QuanternionC:
 
 ```java
   Quaternion q = Ode2GdxMathUtils.getGdxQuaternion(odeQuaternion);
