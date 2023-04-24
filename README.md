@@ -13,7 +13,7 @@ I created this repository to play with a 3D physics engine that works on libGDX'
 
 Here is a brief summary of what I had to change to get ode4j to work on libGDX's backend:
 
-![image](https://user-images.githubusercontent.com/10563814/233494464-bbd9f043-2cb9-47a6-955c-a2a539652491.png)
+![image](https://user-images.githubusercontent.com/10563814/234086366-4d4b1e61-31ee-422b-a402-3c885914a510.png)
 
 I also removed most of the cpp (C++) packages and classes.
 
