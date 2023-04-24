@@ -3,7 +3,7 @@
 https://user-images.githubusercontent.com/10563814/233815331-12426b4e-ed70-4889-8fbd-c1d3b002873d.mp4
 
 
-This repository hosts an experimental version of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j) (ode4j v0.4.1) 3D physics library working on libGDX's GWT backend. Because a lot of the original ode4j code was modified to compile and run properly on libGDX's GWT backend, I cannot guarantee everything is working properly.  More importantly keeping up to date with ode4j updates will be difficult.
+This repository hosts an experimental version of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j) (ode4j v0.4.1) 3D physics library working on libGDX's GWT backend. Some of the original ode4j code was modified to compile and run properly on libGDX's GWT backend, therefore I cannot guarantee everything is working properly.  More importantly keeping up to date with ode4j updates will be difficult.
 
 If you want to use ode4j only on libGDX Desktop/Android/iOS backends then I recommend you use [odej4](https://github.com/tzaeschke/ode4j) directly.  However if you want cross platform support (i.e include GWT support) then you could use this library for all platforms.
 
