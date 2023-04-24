@@ -37,13 +37,13 @@ Here is a [Youtube video](https://www.youtube.com/watch?v=ENlpu_Jjp3Q) of a list
 
 This is a 3D physics library only.  You will have to implement your own draw calls.  ode4j demos use an unoptimized custom drawing helper classes based on LWJGL.  Even ode4j's documentation says that thier render implementation has poor performance and is not optimized.  Regardless, there was no point migrating the drawing helper classes over because we use libGDX.
 
-Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.  
+Becasue I did not migrate the draw helper classes, every demo from ode4j will not work.  Do not worry though, this repo has a few of the demos migrated over to use libGDX rendering classes.
 
-## Some headaches
+## Math classes
 
-Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quaternion.  You will have to get to know them and learn how to convert ode4j's versions to libGDX's versions in your render loop.  Be very careful as the signatures for Quanternion's yaw, pitch roll and x,y,x,w are reversed between ode4j and libGDX which added wasted hours of fustration getting demos to work.
+Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, and Quaternion.
 
-I added a new help math utility class called [Ode2GDXMathUtils](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/util/Ode2GdxMathUtils.java).  You use ths method to create the libGDX Quaternion from ode4j's QuanternionC:
+I added a new help math utility class called [Ode2GDXMathUtils](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/util/Ode2GdxMathUtils.java).  Use the following method to create the libGDX Quaternion from ode4j's QuanternionC:
 
 ```java
   Quaternion q = Ode2GdxMathUtils.getGdxQuaternion(odeQuaternion);
@@ -53,7 +53,9 @@ In addition ode4j uses double and not float like most of libGDX's math classes.
 
 ## Demos
 
-I have currently have the following modified od4j demos:
+```F1``` key will cycle to the next demo.
+
+The following modified od4j demos are included:
 
 * DemoCrash
 * DemoRagdoll
