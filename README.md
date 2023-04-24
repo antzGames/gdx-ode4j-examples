@@ -59,6 +59,7 @@ The following modified od4j demos are included:
 
 * DemoCrash
 * DemoRagdoll
+* DemoTriMesh
 
 I am migrating new demos every week.
 
