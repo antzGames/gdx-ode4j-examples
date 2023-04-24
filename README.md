@@ -64,6 +64,8 @@ The following modified od4j demos are included:
 
 I am migrating new demos every week.
 
+FYI, the original ode4j demos have Z UP which is a pain.  During demo migration I either rotated the camera `camera.up.set(Vector.Z)` or reconfiged the simuation (gravity, positions, rotations) to have Y UP.  Both worked but eventaully its best to implement the second option.
+
 The demos have been tested on GWT, Desktop and Android.
 
 ## GWT Performance
