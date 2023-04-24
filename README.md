@@ -57,9 +57,10 @@ In addition ode4j uses double and not float like most of libGDX's math classes.
 
 The following modified od4j demos are included:
 
-* DemoCrash
-* DemoRagdoll
-* DemoTriMesh
+* `DemoCrash` - destroy a wall of cubes with a cannon.
+* `DemoRagdoll` - Rigid bodies and joints that you can apply to a humanoid character, to simulate behaviour such as impact collisions
+ and character death.
+* `DemoTrimeshHeightfield` - apply a terrain mesh and see objects roll off the terrain.
 
 I am migrating new demos every week.
 
