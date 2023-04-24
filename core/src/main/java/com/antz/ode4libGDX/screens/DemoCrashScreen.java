@@ -324,7 +324,6 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         boxes = 0;
         spheres = 0;
         wb = 0;
-        IrContainer ir = new IrContainer();
         if (WALL) {//#ifdef WALL
             boolean offset = false;
             for (double y = WBOXSIZE/2.0; y <= WALLHEIGHT; y+=WBOXSIZE) {
@@ -543,10 +542,6 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                 c.attach (o1.getBody(), o2.getBody());
             }
         }
-    }
-
-    private static class IrContainer {
-        int bodyIr, jointIr, boxIr, sphereIr;
     }
 
     private void shutdownSimulation() {

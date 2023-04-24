@@ -65,7 +65,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
     private Model model;
     private InputMultiplexer inputMultiplexer;
     private FirstPersonCameraController controller;
-    private ModelInstance m;
+    private ModelInstance[] m = new ModelInstance[32];
 
     // **** ode4j Ragdoll Stuff
     private static final int  MAX_CONTACTS = 64;		// maximum number of contact points per body
@@ -177,12 +177,13 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
         }
         contactgroup.empty();
         // now we draw everything
+        int i=0;
         for (DGeom g : space.getGeoms()) {
-            drawGeom(g, modelBatch);
+            drawGeom(g, modelBatch, i++);
         }
     }
 
-    private void drawGeom(DGeom g, ModelBatch modelBatch) {
+    private void drawGeom(DGeom g, ModelBatch modelBatch, int i) {
         if (g instanceof DCapsule) {
             DVector3C pos = g.getPosition();
             DMatrix3C rot = g.getRotation();
@@ -192,16 +193,17 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
             double x = cap.getLength();
             if (cap.getLength() < 2 * cap.getRadius()) x = cap.getRadius() * 2.01d;
 
-            model = modelBuilder.createCapsule((float) cap.getRadius(), (float) x, 5, GL20.GL_LINES,
-                new Material(ColorAttribute.createDiffuse(Color.BLACK)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-            m = new ModelInstance(model);
-
+            if (m[i] == null) {
+                model = modelBuilder.createCapsule((float) cap.getRadius(), (float) x, 5, GL20.GL_LINES,
+                    new Material(ColorAttribute.createDiffuse(Color.BLACK)),
+                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+                m[i] = new ModelInstance(model);
+            }
             Quaternion q = Ode2GdxMathUtils.getGdxQuaternion(cap.getQuaternion());  // Using new convert util class
-            m.transform.set(q);
+            m[i].transform.set(q);
 
-            m.transform.setTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
-            modelBatch.render(m);
+            m[i].transform.setTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
+            modelBatch.render(m[i]);
             //dsDrawCapsule (pos, rot, cap.getLength(), cap.getRadius()); // original draw call
         }
     }
@@ -303,7 +305,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
                 ragdoll.getBones().get(DxDefaultHumanRagdollConfig.PELVIS).getBody().setLinearVel(10, 80, 10);
                 break;
             case Input.Keys.F1:
-                Ode4libGDX.game.setScreen(new DemoTriMeshScreen());
+                Ode4libGDX.game.setScreen(new DemoTriMeshHeightFieldScreen());
                 break;
         }
         return false;
@@ -364,10 +366,5 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
             // Update our game state
             gameState = GameState.RENDER;
         }
-    }
-
-
-    private static class IrContainer {
-        int bodyIr, jointIr, boxIr, sphereIr;
     }
 }
