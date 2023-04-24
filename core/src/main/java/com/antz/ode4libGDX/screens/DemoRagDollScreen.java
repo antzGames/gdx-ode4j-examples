@@ -102,7 +102,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
 
         info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
             "SPACE to apply some force to the ragdoll.\n" +
-            "F1 for Tri MEsh Demo\n";
+            "F1 for Trimesh Heightfield Demo\n";
 
         System.out.println(info);
 
