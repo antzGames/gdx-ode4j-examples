@@ -79,11 +79,13 @@ It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome ba
     private static final float WALLHEIGHT = 10;		// height of wall
 ```
 
-For me if when I generate over 200 boxes my fps on Chrome goes down significantly.  
+For me if when I generate over 200 boxes my fps on Chrome goes down significantly.  Please note I removed threading ode4jsupport for all platforms.
 
 ## Repo structure
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff).
+
+Use IntelliJ or Android Studio as your IDE for minimal issues building.  You may have to your tweak the gradle version/plugin.  I usued Gradle Version 7.6 and Android Gradle Plugin Version 7.0.4
 
 This project was generated with a template including simple application launchers and a main class extending `Game` that sets the first screen.
 
