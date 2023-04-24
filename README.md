@@ -79,7 +79,7 @@ It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome ba
     private static final float WALLHEIGHT = 10;		// height of wall
 ```
 
-For me if when I generate over 200 boxes my fps on Chrome goes down significantly.  Please note I removed threading ode4jsupport for all platforms.
+For me if when I generate over 200 boxes my fps on Chrome goes down significantly.  Please note I removed ode4j's threading support for all platforms.
 
 ## Repo structure
 
