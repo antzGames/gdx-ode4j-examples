@@ -204,7 +204,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
 
   private void initODE(){
       num = 0;		    // number of objects in simulation
-      nextobj=0;		// next object to recycle if num==NUM
+      nextobj = 0;		// next object to recycle if num==NUM
 
       // create world
       OdeHelper.initODE2(0);
@@ -233,11 +233,11 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
           HFIELD_WIDTH, HFIELD_DEPTH, HFIELD_WSTEP, HFIELD_DSTEP,
           1.0, 0.0, 0.0, false );
       //height.setBounds( ( -4.0 ), ( +6.0 ) );
-      gheight = new DxTrimeshHeightfield(space, height, true);// OdeHelper.createHeightfield( space, height, true );
+      gheight = new DxTrimeshHeightfield(space, height, true);
       DVector3 pos = new DVector3();
 
       // Place it.
-      gheight.setPosition( pos.get0()+10, pos.get1(), pos.get2()+10 ); // because of stupid DHEIGHTFIELD_CORNER_ORIGIN mode = false;
+      gheight.setPosition( pos.get0()+10, pos.get1(), pos.get2()+10 ); // because of DHEIGHTFIELD_CORNER_ORIGIN mode = false;
 
       // drop some spheres
       doDropSphere();
