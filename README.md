@@ -3,7 +3,7 @@
 https://user-images.githubusercontent.com/10563814/233815331-12426b4e-ed70-4889-8fbd-c1d3b002873d.mp4
 
 
-This repository hosts an experimental version of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j) (ode4j v0.4.1) 3D physics library working on libGDX's GWT backend. Because a lot of the original ode4j code was modified to compile and run properly on libGDX's GWT backend, I cannot guarantee everything is working properly.  More importantly keeping up to date with ode4j updates will be difficult.
+This repository hosts an experimental version of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j) (ode4j v0.4.1) 3D physics library working on libGDX's GWT backend. Some of the original ode4j code was modified to compile and run properly on libGDX's GWT backend, therefore I cannot guarantee everything is working properly.  More importantly keeping up to date with ode4j updates will be difficult.
 
 If you want to use ode4j only on libGDX Desktop/Android/iOS backends then I recommend you use [odej4](https://github.com/tzaeschke/ode4j) directly.  However if you want cross platform support (i.e include GWT support) then you could use this library for all platforms.
 
@@ -13,7 +13,7 @@ I created this repository to play with a 3D physics engine that works on libGDX'
 
 Here is a brief summary of what I had to change to get ode4j to work on libGDX's backend:
 
-![image](https://user-images.githubusercontent.com/10563814/233494464-bbd9f043-2cb9-47a6-955c-a2a539652491.png)
+![image](https://user-images.githubusercontent.com/10563814/234086366-4d4b1e61-31ee-422b-a402-3c885914a510.png)
 
 I also removed most of the cpp (C++) packages and classes.
 
@@ -57,11 +57,14 @@ In addition ode4j uses double and not float like most of libGDX's math classes.
 
 The following modified od4j demos are included:
 
-* DemoCrash
-* DemoRagdoll
-* DemoTriMesh
+* `DemoCrash` - destroy a wall of cubes with a cannon.
+* `DemoRagdoll` - Rigid bodies and joints that you can apply to a humanoid character, to simulate behaviour such as impact collisions
+ and character death.
+* `DemoTrimeshHeightfield` - apply a terrain mesh and see objects roll off the terrain.
 
 I am migrating new demos every week.
+
+FYI, the original ode4j demos have Z UP which is a pain.  During demo migration I either rotated the camera `camera.up.set(Vector.Z)` or reconfiged the simuation (gravity, positions, rotations) to have Y UP.  Both worked but eventaully its best to implement the second option.
 
 The demos have been tested on GWT, Desktop and Android.
 
@@ -76,11 +79,13 @@ It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome ba
     private static final float WALLHEIGHT = 10;		// height of wall
 ```
 
-For me if when I generate over 200 boxes my fps on Chrome goes down significantly.  
+For me if when I generate over 200 boxes my fps on Chrome goes down significantly.  Please note I removed ode4j's threading support for all platforms.
 
 ## Repo structure
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff).
+
+Use IntelliJ or Android Studio as your IDE for minimal issues building.  You may have to your tweak the gradle version/plugin.  I usued Gradle Version 7.6 and Android Gradle Plugin Version 7.0.4
 
 This project was generated with a template including simple application launchers and a main class extending `Game` that sets the first screen.
 
