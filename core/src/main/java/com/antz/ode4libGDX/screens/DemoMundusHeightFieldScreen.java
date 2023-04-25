@@ -82,10 +82,10 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
     private DGeom gheight;
 
     // Heightfield dimensions
-    private static final int HFIELD_WSTEP =			40;			// Mundus terrain is 20x20 bit I doubled
+    private static final int HFIELD_WSTEP =			40;			// Mundus terrain is 20x20 but I doubled
     private static final int HFIELD_DSTEP =			40;         // the count for better resolution.
 
-    private static final float HFIELD_WIDTH =		20f;        // this is teh actual width of the mesh
+    private static final float HFIELD_WIDTH =		20f;        // this is the actual width of the mesh
     private static final float HFIELD_DEPTH =		20f;        // which is 20x20
 
     private static final float HFIELD_WSAMP =		( HFIELD_WIDTH / ( HFIELD_WSTEP-1 ) );
