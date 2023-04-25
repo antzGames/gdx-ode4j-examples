@@ -61,6 +61,7 @@ The following modified od4j demos are included:
 * `DemoRagdoll` - Rigid bodies and joints that you can apply to a humanoid character, to simulate behaviour such as impact collisions
  and character death.
 * `DemoTrimeshHeightfield` - apply a terrain mesh and see objects roll off the terrain.
+* `MundusHeightField` - same demo as above but uses [Mundus](https://github.com/JamesTKhan/Mundus) terrain.
 
 I am migrating new demos every week.
 
@@ -85,7 +86,7 @@ For me if when I generate over 200 boxes my fps on Chrome goes down significantl
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff).
 
-Use IntelliJ or Android Studio as your IDE for minimal issues building.  You may have to your tweak the gradle version/plugin.  I usued Gradle Version 7.6 and Android Gradle Plugin Version 7.0.4
+Use IntelliJ or Android Studio as your IDE for minimal issues building.  You may have to your tweak the gradle version/plugin.  I used Gradle Version 7.6 and Android Gradle Plugin Version 7.0.4
 
 This project was generated with a template including simple application launchers and a main class extending `Game` that sets the first screen.
 
