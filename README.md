@@ -21,6 +21,8 @@ I also removed most of the cpp (C++) packages and classes.
 
 ODE official manual: http://ode.org/wiki/index.php/Manual
 
+By far the most useful part is the [HOWTO](http://ode.org/wiki/index.php/HOWTO) section
+
 ode4j discord channel : https://discord.gg/UFXJcXv2P8 ode4j/Java
 
 ode4j contains also some features that are not present in ODE, such as a ragdoll and heightfields with holes. See ode4j's [Wiki](https://github.com/tzaeschke/ode4j/wiki/Functionality-beyond-ODE).
