@@ -21,6 +21,8 @@ I also removed most of the cpp (C++) packages and classes.
 
 ODE official manual: http://ode.org/wiki/index.php/Manual
 
+By far the most useful part is the [HOWTO](http://ode.org/wiki/index.php/HOWTO) section
+
 ode4j discord channel : https://discord.gg/UFXJcXv2P8 ode4j/Java
 
 ode4j contains also some features that are not present in ODE, such as a ragdoll and heightfields with holes. See ode4j's [Wiki](https://github.com/tzaeschke/ode4j/wiki/Functionality-beyond-ODE).
@@ -129,3 +131,28 @@ This library is free software; you can redistribute it and/or modify it under th
 This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the files LICENSE.TXT, ODE-LICENSE-BSD.TXT, GIMPACT-LICENSE-BSD.TXT, GIMPACT-LICENSE-LGPL.TXT, ODE4J-LICENSE-BSD.TXT and LIBCCD_BSD-LICENSE for more details.
 
 The LICENSE.TXT, ODE-LICENSE-BSD.TXT, GIMPACT-LICENSE-BSD.TXT, GIMPACT-LICENSE-LGPL.TXT, LIBCCD_BSD-LICENSE and ODE4J-LICENSE-BSD.TXT files are available in the source code.
+
+## Legal
+
+ode4j:
+Copyright (c) 2009-2017 Tilmann Zäschke ode4j@gmx.de.
+All rights reserved.
+
+Like the original ODE, ode4j is licensed under LGPL v2.1 and BSD 3-clause. Choose whichever license suits your needs. 
+
+### ode4j contains Java ports of the following software
+
+[ODE/OpenDE](http://www.ode.org/):
+Copyright  (c) 2001,2002 Russell L. Smith
+All rights reserved.
+
+GIMPACT (part of ODE/OpenDE):
+Copyright of GIMPACT (c) 2006 Francisco Leon. C.C. 80087371.
+email: projectileman(AT)yahoo.com
+
+[LIBCCD](https://github.com/danfis/libccd):
+Copyright (c) 2010 Daniel Fiser <danfis(AT)danfis.cz>;
+3-clause BSD License
+
+[Turbulenz Engine](https://github.com/turbulenz/turbulenz_engine):
+Copyright (c) 2009-2014 Turbulenz Limited; MIT License
