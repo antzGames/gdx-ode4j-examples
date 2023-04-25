@@ -61,6 +61,7 @@ The following modified od4j demos are included:
 * `DemoRagdoll` - Rigid bodies and joints that you can apply to a humanoid character, to simulate behaviour such as impact collisions
  and character death.
 * `DemoTrimeshHeightfield` - apply a terrain mesh and see objects roll off the terrain.
+* `MundusHeightField` - same demo as above but uses [Mundus](https://github.com/JamesTKhan/Mundus) terrain.
 
 I am migrating new demos every week.
 
