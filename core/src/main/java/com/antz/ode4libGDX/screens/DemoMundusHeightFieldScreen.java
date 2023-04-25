@@ -465,7 +465,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
 
         if (!setBody) {
             for (k=0; k < GPB; k++) {
-                if (obj[i].geom[k]!=null) {
+                if (obj[i].geom[k] != null) {
                     obj[i].geom[k].setBody(obj[i].body);
                 }
             }
