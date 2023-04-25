@@ -310,8 +310,6 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
         if (pos==null) pos = g.getPosition();
         if (R==null) R = g.getRotation();
 
-        DQuaternionC qOde = g.getQuaternion();
-
         if (g instanceof DBox) {
             DVector3C sides = ((DBox)g).getLengths();
             if (obj[objInstance].modelInstance == null) {
@@ -320,7 +318,7 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
                     VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
                 obj[objInstance].modelInstance = new ModelInstance(model);
             }
-            obj[objInstance].modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(qOde));
+            obj[objInstance].modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(g.getQuaternion()));
             obj[objInstance].modelInstance.transform.setTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
             modelBatch.render(obj[objInstance].modelInstance);
             //dsDrawBox (pos,R,sides);
@@ -332,7 +330,7 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
                     VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
                 obj[objInstance].modelInstance = new ModelInstance(model);
             }
-            obj[objInstance].modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(qOde));
+            obj[objInstance].modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(g.getQuaternion()));
             obj[objInstance].modelInstance.transform.setTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
             modelBatch.render(obj[objInstance].modelInstance);
             //dsDrawSphere( pos,R, ((DSphere)g).getRadius() );
@@ -380,7 +378,7 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
                 }
                 model = modelBuilder.end();
                 heightMI = new ModelInstance(model);
-                heightMI.transform.set(Ode2GdxMathUtils.getGdxQuaternion(qOde));
+                heightMI.transform.set(Ode2GdxMathUtils.getGdxQuaternion(g.getQuaternion()));
                 heightMI.transform.setTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
             }
             modelBatch.render(heightMI);

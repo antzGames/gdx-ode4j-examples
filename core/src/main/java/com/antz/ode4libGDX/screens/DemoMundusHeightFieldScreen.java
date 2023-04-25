@@ -161,7 +161,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
             DMatrix3 RI = new DMatrix3();
             RI.setIdentity();
             for (int i=0; i<numc; i++) {
-                DJoint c = OdeHelper.createContactJoint (world,contactgroup,contacts.get(i));
+                DJoint c = OdeHelper.createContactJoint(world,contactgroup,contacts.get(i));
                 c.attach (b1,b2);
             }
         }
@@ -271,7 +271,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 110);
+        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 95);
         batch.end();
     }
 

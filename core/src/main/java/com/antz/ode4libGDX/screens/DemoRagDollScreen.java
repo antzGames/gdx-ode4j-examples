@@ -151,9 +151,9 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
     }
 
     private void draw() {
-        controller.update(); // camera controller
-        scene.sceneGraph.update(); // update Mundus
-        scene.render(); // render Mundus scene
+        controller.update();        // camera controller
+        scene.sceneGraph.update();  // update Mundus
+        scene.render();             // render Mundus scene
 
         // 3D models drawing
         modelBatch.begin(scene.cam);

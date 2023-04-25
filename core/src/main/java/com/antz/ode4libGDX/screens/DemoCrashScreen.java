@@ -73,19 +73,19 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     // **** ode4j DemoCrash original stuff below
 
     // some constants
-    private static final float RADIUS = 0.5f;	    // canon ball radius
-    private static final float WALLMASS = 1	;	    // wall box mass
-    private static final float FMAX = 25;			// max force
-    private static final int   ITERS = 20;		    // number of iterations
-    private static final float WBOXSIZE = 1.0f;		// size of wall boxes
-    private static final float WALLWIDTH = 12;		// width of wall
-    private static final float WALLHEIGHT = 10;		// height of wall
+    private static final float RADIUS = 0.5f;	            // canon ball radius
+    private static final float WALLMASS = 1	;	            // wall box mass
+    private static final float FMAX = 25;			        // max force
+    private static final int   ITERS = 20;		            // number of iterations
+    private static final float WBOXSIZE = 1.0f;		        // size of wall boxes
+    private static final float WALLWIDTH = 12;		        // width of wall
+    private static final float WALLHEIGHT = 10;		        // height of wall
     private static final float DISABLE_THRESHOLD = 0.008f;	// maximum velocity (squared) a body can have and be disabled
-    private static final float DISABLE_STEPS = 10;	// number of steps a box has to have been disable-able before it will be disabled
-    private static final float CANNON_X = 100;		// x position of cannon
-    private static final float CANNON_Z = 90;	    // y position of cannon
-    private static final float CANNON_BALL_MASS = 10;	// mass of the cannon ball
-    private static final float CANNON_BALL_RADIUS = 0.5f;  // cannon ball radius
+    private static final float DISABLE_STEPS = 10;	        // number of steps a box has to have been disable-able before it will be disabled
+    private static final float CANNON_X = 100;		        // x position of cannon
+    private static final float CANNON_Z = 90;	            // y position of cannon
+    private static final float CANNON_BALL_MASS = 10;	    // mass of the cannon ball
+    private static final float CANNON_BALL_RADIUS = 0.5f;   // cannon ball radius
 
     private static boolean WALL = true;
     private static boolean CANNON = true;
@@ -108,10 +108,6 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     private static DJointGroup contactgroup;
 
     //private static DGeom ground;
-    private static DBox[] box =new DBox[1000];
-    private static int boxes;
-    private static DSphere[] sphere = new DSphere[1000];
-    private static int spheres;
     private static DBox[] wall_boxes = new DBox[1000];
     private static DBody[] wall_bodies = new DBody[1000];
     private static int[] wb_stepsdis = new int[1000];
@@ -166,8 +162,6 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         bodies = 0;
         joints = 0;
-        boxes = 0;
-        spheres = 0;
         OdeHelper.initODE2(0);
         setupSimulation();
     }
@@ -254,8 +248,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                 DVector3 ss = new DVector3();
                 wall_boxes[i].getLengths (ss);
 
-                Quaternion q = Ode2GdxMathUtils.getGdxQuaternion(wall_boxes[i].getQuaternion());  // Using new convert util class
-                wallBoxModelInstances.get(i).transform.set(q);
+                wallBoxModelInstances.get(i).transform.set(Ode2GdxMathUtils.getGdxQuaternion(wall_boxes[i].getQuaternion()));
                 wallBoxModelInstances.get(i).transform.setTranslation((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2());
                 modelBatch.render(wallBoxModelInstances.get(i));
                 //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);  //original draw call
@@ -266,22 +259,10 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
                 DVector3 ss = new DVector3();
                 wall_boxes[i].getLengths (ss);
-                wallBoxModelInstances.get(i).transform.setTranslation(new Vector3((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2()));
+                wallBoxModelInstances.get(i).transform.setTranslation((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2());
                 modelBatch.render(wallBoxModelInstances.get(i));
                 //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);  //original draw call
             }
-        }
-
-        for (i = 0; i < boxes; i++) {
-            boxesModelInstances.get(i).transform.setTranslation(new Vector3((float)box[i].getPosition().get0(), (float)box[i].getPosition().get1(), (float)box[i].getPosition().get2()));
-            modelBatch.render(boxesModelInstances.get(i));
-            //dsDrawBox (box[i].getPosition(),box[i].getRotation(),sides); //original draw call
-        }
-
-        for (i=0; i< spheres; i++){
-            sphereModelInstances.get(i).transform.setTranslation(new Vector3((float)sphere[i].getPosition().get0(), (float)sphere[i].getPosition().get1(), (float)sphere[i].getPosition().get2()));
-            modelBatch.render(sphereModelInstances.get(i));
-            //dsDrawSphere (sphere[i].getPosition(), sphere[i].getRotation(),RADIUS); //original draw call
         }
 
         // draw the cannon
@@ -321,9 +302,8 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         OdeHelper.createPlane (space,0,1,0,0);
         bodies = 0;
         joints = 0;
-        boxes = 0;
-        spheres = 0;
         wb = 0;
+
         if (WALL) {//#ifdef WALL
             boolean offset = false;
             for (double y = WBOXSIZE/2.0; y <= WALLHEIGHT; y+=WBOXSIZE) {
