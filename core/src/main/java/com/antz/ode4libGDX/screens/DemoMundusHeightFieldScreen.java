@@ -76,7 +76,6 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
     private Color color;
 
     // ODE stuff
-    private static final float DEGTORAD = 0.01745329251994329577f	; //!< PI / 180.0, convert degrees to radians
 
     // Our heightfield geom
     private DGeom gheight;
@@ -104,8 +103,8 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
         ModelInstance modelInstance;        // libGDX model instance
     };
 
-    private static int num = 0;		    // number of objects in simulation
-    private static int nextobj=0;		// next object to recycle if num==NUM
+    private static int num = 0;		        // number of objects in simulation
+    private static int nextobj = 0;		    // next object to recycle if num==NUM
     private static DWorld world;
     private static DSpace space;
     private MyObject[] obj = new MyObject[NUM];
@@ -120,17 +119,16 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
         }
     };
 
-    // This is basically where the magic happens. ode4j calls this method to get the height of the terrain map,
+    // This is basically where the magic happens. ode4j calls this method to get the height of the heightfield,
     // which then calls Mundus' runtime terrain object to get the height of the terrain
     private double heightfield_callback( Object pUserData, int x, int z ) {
         float fx = x/2f; // because we have 40 samples on a 20x20 mesh, we divide by 2
         float fz = z/2f; // because we have 40 samples on a 20x20 mesh, we divide by 2
 
         double h = ((TerrainComponent) scene.sceneGraph.getGameObjects().get(0).findComponentByType(Component.Type.TERRAIN)).
-            getHeightAtWorldCoord(fx, fz);
+            getHeightAtWorldCoord(fx, fz);  // I only have 1 GameObject (the terrain) in this Mundus scene so I know its at get(0)
 
-        return h + 0.2f; // *3 because I scaled the Y terrain x3 in the Mundus editor (issue#153), +0.2f to increase thickness of mesh
-        //Mundus PR >>> https://github.com/JamesTKhan/Mundus/pull/153  remove *3f once fixed
+        return h + 0.2f; // +0.2f to increase height of the mesh so we can see it if showTerrainMesh = true
     }
 
     private DGeom.DNearCallback nearCallback = new DGeom.DNearCallback() {
@@ -193,14 +191,13 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
         }
 
         info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
-        "SPACE to drop sphere.\n" +
-        "M to show/hide Mesh.\n" +
-        "F1 to run Demo Crash.\n";
+            "SPACE to drop sphere.\n" +
+            "M to show/hide Mesh.\n" +
+            "F1 to run Demo Crash.\n";
         System.out.println(info);
 
         initODE();
   }
-
 
   private void initODE(){
       num = 0;		    // number of objects in simulation
@@ -237,7 +234,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
       DVector3 pos = new DVector3();
 
       // Place it.
-      gheight.setPosition( pos.get0()+10, pos.get1(), pos.get2()+10 ); // because of DHEIGHTFIELD_CORNER_ORIGIN mode = false;
+      gheight.setPosition(pos.get0()+HFIELD_WIDTH/2, pos.get1(),pos.get2()+HFIELD_DEPTH/2); // because of DHEIGHTFIELD_CORNER_ORIGIN mode = false;
 
       // drop some spheres
       doDropSphere();
@@ -300,9 +297,9 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
 
     // draw a geom
     private void drawGeom (DGeom g, int objInstance,DVector3C pos,  DMatrix3C R) {
-        if (g==null) return;
-        if (pos==null) pos = g.getPosition();
-        if (R==null) R = g.getRotation();
+        if (g == null) return;
+        if (pos == null) pos = g.getPosition();
+        if (R == null) R = g.getRotation();  // not needed I use Quaternions
 
         DQuaternionC qOde = g.getQuaternion();
 
@@ -321,14 +318,16 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
         } else if (g instanceof DHeightfield) {
             if (!showTerrainMesh) return;
 
-            // Set ox and oz to zero for DHEIGHTFIELD_CORNER_ORIGIN mode.  //TODO look into this
-            int ox = (int) (-HFIELD_WIDTH / 2);
-            int oz = (int) (-HFIELD_DEPTH / 2);
             if (heightMI == null) {
+                // Set ox and oz to zero for DHEIGHTFIELD_CORNER_ORIGIN mode.  //TODO look into this, as this mode is easier for games
+                int ox = (int) (-HFIELD_WIDTH / 2);
+                int oz = (int) (-HFIELD_DEPTH / 2);
+
                 modelBuilder.begin();
                 MeshPartBuilder meshPartBuilder = modelBuilder.part("line", 1, 3, new Material());
                 meshPartBuilder.setColor(Color.CYAN);
 
+                // draw 2 triangles per ABCD box: ABC and BCD
                 for (int i = 0; i < HFIELD_WSTEP - 1; ++i) {
                     for (int j = 0; j < HFIELD_DSTEP - 1; ++j) {
                         float[] a = new float[3], b = new float[3];
@@ -407,27 +406,9 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
         OdeHelper.closeODE();
     }
 
-    @Override
-    public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.F1) Ode4libGDX.game.setScreen(new DemoCrashScreen());
-        else if (keycode == Input.Keys.M) showTerrainMesh = !showTerrainMesh;
-        else if (keycode == Input.Keys.SPACE) doDropSphere();
-        return false;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char cmd) {
-        return false;
-    }
-
     private void doDropSphere(){
         int i ,k;
-        double[] sides= new double[3];
+        double[] sides = new double[3];
         DMass m = OdeHelper.createMass();
         boolean setBody = false;
 
@@ -452,7 +433,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
             obj[i] = new MyObject();
         }
 
-        obj[i].body = OdeHelper.createBody (world);
+        obj[i].body = OdeHelper.createBody(world);
         for (k=0; k<3; k++) sides[k] = dRandReal()*0.5+0.1;
 
         DMatrix3 R = new DMatrix3();
@@ -462,7 +443,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
                 dRandReal() + 10,
                 (dRandReal()+0.5)*HFIELD_DEPTH*0.5);
 
-            dRFromAxisAndAngle (R,dRandReal()*2.0-1.0,dRandReal()*2.0-1.0,
+            dRFromAxisAndAngle(R,dRandReal()*2.0-1.0,dRandReal()*2.0-1.0,
                 dRandReal()*2.0-1.0,dRandReal()*10.0-5.0);
         } else {
             double maxheight = 0;
@@ -472,10 +453,10 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
 
             }
             obj[i].body.setPosition(0,maxheight+1,0);
-            dRFromAxisAndAngle (R,0,0,1,dRandReal()*10.0-5.0);
+            dRFromAxisAndAngle(R,0,0,1,dRandReal()*10.0-5.0);
         }
-        obj[i].body.setRotation (R);
-        obj[i].body.setData (i);
+        obj[i].body.setRotation(R);
+        obj[i].body.setData(i);
 
         sides[0] *= 0.75;
         m.setSphere(DENSITY, sides[0]);
@@ -484,11 +465,29 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
         if (!setBody) {
             for (k=0; k < GPB; k++) {
                 if (obj[i].geom[k]!=null) {
-                    obj[i].geom[k].setBody (obj[i].body);
+                    obj[i].geom[k].setBody(obj[i].body);
                 }
             }
-            obj[i].body.setMass (m);
+            obj[i].body.setMass(m);
         }
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        if (keycode == Input.Keys.F1) Ode4libGDX.game.setScreen(new DemoCrashScreen());
+        else if (keycode == Input.Keys.M) showTerrainMesh = !showTerrainMesh;
+        else if (keycode == Input.Keys.SPACE) doDropSphere();
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char cmd) {
+        return false;
     }
 
     @Override
@@ -516,7 +515,6 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
     public boolean scrolled(float amountX, float amountY) {
         return false;
     }
-
 
     private void continueLoading() {
         if (mundus.continueLoading()) {
