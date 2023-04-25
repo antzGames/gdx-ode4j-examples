@@ -2,6 +2,7 @@ package com.antz.ode4libGDX.screens;
 
 import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -23,20 +24,21 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
+import com.mbrlabs.mundus.commons.scene3d.components.Component;
+import com.mbrlabs.mundus.commons.scene3d.components.TerrainComponent;
 import com.mbrlabs.mundus.runtime.Mundus;
-import net.mgsx.gltf.scene3d.attributes.FogAttribute;
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DMatrix3C;
 import org.ode4j.math.DQuaternionC;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
 import org.ode4j.ode.DBody;
-import org.ode4j.ode.DBox;
 import org.ode4j.ode.DContact;
 import org.ode4j.ode.DContactBuffer;
 import org.ode4j.ode.DContactJoint;
 import org.ode4j.ode.DGeom;
 import org.ode4j.ode.DHeightfield;
+import org.ode4j.ode.DHeightfieldData;
 import org.ode4j.ode.DJoint;
 import org.ode4j.ode.DJointGroup;
 import org.ode4j.ode.DMass;
@@ -44,19 +46,22 @@ import org.ode4j.ode.DSpace;
 import org.ode4j.ode.DSphere;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.OdeHelper;
-import org.ode4j.ode.DHeightfieldData;
-import static org.ode4j.ode.OdeHelper.areConnectedExcluding;
-import static org.ode4j.ode.OdeMath.*;
 import org.ode4j.ode.internal.DxTrimeshHeightfield;
+import static org.ode4j.ode.OdeHelper.areConnectedExcluding;
+import static org.ode4j.ode.OdeMath.dContactBounce;
+import static org.ode4j.ode.OdeMath.dContactSoftCFM;
+import static org.ode4j.ode.OdeMath.dInfinity;
+import static org.ode4j.ode.OdeMath.dRFromAxisAndAngle;
+import static org.ode4j.ode.OdeMath.dRandReal;
 
-public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
+public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
 
     // My stuff
     private Mundus mundus;
     private Scene scene;
     enum GameState {
         LOADING,
-        RENDER
+        DRAW
     }
     private GameState gameState = GameState.LOADING;
     private SpriteBatch batch;
@@ -77,18 +82,18 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
     private DGeom gheight;
 
     // Heightfield dimensions
-    private static final int HFIELD_WSTEP =			15;			// Vertex count along edge >= 2
-    private static final int HFIELD_DSTEP =			31;
+    private static final int HFIELD_WSTEP =			40;			// Mundus terrain is 20x20 bit I doubled
+    private static final int HFIELD_DSTEP =			40;         // the count for better resolution.
 
-    private static final float HFIELD_WIDTH =		4.0f;
-    private static final float HFIELD_DEPTH =		8.0f;
+    private static final float HFIELD_WIDTH =		20f;        // this is teh actual width of the mesh
+    private static final float HFIELD_DEPTH =		20f;        // which is 20x20
 
     private static final float HFIELD_WSAMP =		( HFIELD_WIDTH / ( HFIELD_WSTEP-1 ) );
     private static final float HFIELD_DSAMP =		( HFIELD_DEPTH / ( HFIELD_DSTEP-1 ) );
 
     // some constants
     private static final int NUM = 5;			    // max number of objects
-    private static final float DENSITY = 5.0f;	    // density of all objects
+    private static final float DENSITY = 5.0f	;	// density of all objects
     private static final int  GPB = 3;			    // maximum number of geometries per body
     private static final int  MAX_CONTACTS = 64;	// maximum number of contact points per body
 
@@ -105,8 +110,8 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
     private static DSpace space;
     private MyObject[] obj = new MyObject[NUM];
     private static DJointGroup contactgroup;
-    private static int selected = -1;	        // selected object
-    private static boolean random_pos = true;	// drop objects from random position?
+    private static boolean showTerrainMesh = false;
+    private static boolean random_pos = true;	// drop objects from random position
 
     private DHeightfield.DHeightfieldGetHeight heightfield_callback = new DHeightfield.DHeightfieldGetHeight(){
         @Override
@@ -115,14 +120,17 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
         }
     };
 
+    // This is basically where the magic happens. ode4j calls this method to get the height of the terrain map,
+    // which then calls Mundus' runtime terrain object to get the height of the terrain
     private double heightfield_callback( Object pUserData, int x, int z ) {
-        double fx = ( ((double)x) - ( HFIELD_WSTEP-1 )/2 ) / ( HFIELD_WSTEP-1 );
-        double fz = ( ((double)z) - ( HFIELD_DSTEP-1 )/2 ) / ( HFIELD_DSTEP-1 );
+        float fx = x/2f; // because we have 40 samples on a 20x20 mesh, we divide by 2
+        float fz = z/2f; // because we have 40 samples on a 20x20 mesh, we divide by 2
 
-        // Create an interesting 'hump' shape
-        double h = ( 1.0 ) + ( ( -16.0 ) * ( fx*fx*fx + fz*fz*fz ) );
+        double h = ((TerrainComponent) scene.sceneGraph.getGameObjects().get(0).findComponentByType(Component.Type.TERRAIN)).
+            getHeightAtWorldCoord(fx, fz);
 
-        return h;
+        return h + 0.2f; // *3 because I scaled the Y terrain x3 in the Mundus editor (issue#153), +0.2f to increase thickness of mesh
+        //Mundus PR >>> https://github.com/JamesTKhan/Mundus/pull/153  remove *3f once fixed
     }
 
     private DGeom.DNearCallback nearCallback = new DGeom.DNearCallback() {
@@ -135,8 +143,6 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
     // this is called by dSpaceCollide when two objects in space are
     // potentially colliding.
     private void nearCallback (Object data, DGeom o1, DGeom o2)	{
-        // if (o1->body && o2->body) return;
-
         // exit without doing anything if the two bodies are connected by a joint
         DBody b1 = o1.getBody();
         DBody b2 = o2.getBody();
@@ -152,11 +158,10 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
             contact.surface.bounce_vel = 0.1;
             contact.surface.soft_cfm = 0.01;
         }
-        int numc = OdeHelper.collide (o1,o2,MAX_CONTACTS,contacts.getGeomBuffer());
+        int numc = OdeHelper.collide(o1,o2,MAX_CONTACTS,contacts.getGeomBuffer());
         if (numc != 0) {
             DMatrix3 RI = new DMatrix3();
             RI.setIdentity();
-            final DVector3 ss = new DVector3(0.02,0.02,0.02);
             for (int i=0; i<numc; i++) {
                 DJoint c = OdeHelper.createContactJoint (world,contactgroup,contacts.get(i));
                 c.attach (b1,b2);
@@ -188,10 +193,9 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
         }
 
         info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
-        "To drop another object, press:\n" +
-        "   1 for sphere.\n" +
-        "   2 for box.\n" +
-        "F1 to run Mundus Terrain Integration\n";
+        "SPACE to drop sphere.\n" +
+        "M to show/hide Mesh.\n" +
+        "F1 to run Demo Crash.\n";
         System.out.println(info);
 
         initODE();
@@ -199,48 +203,48 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
 
 
   private void initODE(){
-      num = 0;		// number of objects in simulation
+      num = 0;		    // number of objects in simulation
       nextobj=0;		// next object to recycle if num==NUM
-      selected = -1;
 
       // create world
       OdeHelper.initODE2(0);
-      world = OdeHelper.createWorld ();
-      space = OdeHelper.createHashSpace (null);
-      contactgroup = OdeHelper.createJointGroup ();
-      world.setGravity (0,0,-0.05);
-      world.setCFM (1e-5);
-      world.setAutoDisableFlag (true);
-      world.setContactMaxCorrectingVel (0.1);
-      world.setContactSurfaceLayer (0.001);
+      world = OdeHelper.createWorld();
+      space = OdeHelper.createHashSpace(null);
+      contactgroup = OdeHelper.createJointGroup();
+      world.setGravity(0,-0.5,0);
+      world.setCFM(1e-5);
+      world.setAutoDisableFlag(true);
+      world.setContactMaxCorrectingVel(0.1);
+      world.setContactSurfaceLayer(0.001);
       for (int i = 0; i < obj.length; i++) {
           obj[i] = new MyObject();
       }
 
-      world.setAutoDisableAverageSamplesCount( 1 );
+      world.setAutoDisableAverageSamplesCount(1);
 
       // base plane to catch overspill
-      //OdeHelper.createPlane( space, 0, 0, 1, 0 );
+      //OdeHelper.createPlane( space, 0, 0, 1, 0 );  // not needed it looks better when the balls fall off the terrain into the abyss
 
       // our heightfield floor
       DHeightfieldData height = OdeHelper.createHeightfieldData();
 
       // Create an finite heightfield.
-      height.buildCallback( null, heightfield_callback,
+      height.buildCallback( null, heightfield_callback,   // <<<<---- notice the heightfield_callback
           HFIELD_WIDTH, HFIELD_DEPTH, HFIELD_WSTEP, HFIELD_DSTEP,
           1.0, 0.0, 0.0, false );
-      height.setBounds( ( -4.0 ), ( +6.0 ) );
+      //height.setBounds( ( -4.0 ), ( +6.0 ) );
       gheight = new DxTrimeshHeightfield(space, height, true);// OdeHelper.createHeightfield( space, height, true );
       DVector3 pos = new DVector3();
 
-      // Rotate so Z is up, not Y (which is the default orientation)
-      DMatrix3 R = new DMatrix3();
-      R.setIdentity();
-      dRFromAxisAndAngle( R, 1, 0, 0, DEGTORAD * 90 );
-
       // Place it.
-      gheight.setRotation( R );
-      gheight.setPosition( pos );
+      gheight.setPosition( pos.get0()+10, pos.get1(), pos.get2()+10 ); // because of stupid DHEIGHTFIELD_CORNER_ORIGIN mode = false;
+
+      // drop some spheres
+      doDropSphere();
+      doDropSphere();
+      doDropSphere();
+      doDropSphere();
+      doDropSphere();
   }
 
     @Override
@@ -252,7 +256,7 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
             case LOADING:
                 continueLoading();
                 break;
-            case RENDER:
+            case DRAW:
                 draw();
                 break;
         }
@@ -260,8 +264,8 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
 
     private void draw() {
         controller.update(); // camera controller
-//        scene.sceneGraph.update(); // update Mundus
-//        scene.render(); // render Mundus scene
+        scene.sceneGraph.update(); // update Mundus
+        scene.render(); // render Mundus scene
 
         // 3D models drawing
         modelBatch.begin(scene.cam);
@@ -277,28 +281,18 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
 
     public void doStep (boolean pause) {
         space.collide (null,nearCallback);
-        if (!pause) {
-            world.quickStep (0.05);
-        }
+        if (!pause)  world.quickStep (0.05);
+
         // remove all contact joints
         contactgroup.empty();
 
-        // Draw Heightfield
+        // Draw Heightfield mesh
         drawGeom(gheight, -1,null, null);
 
-        color.set(0.5f,1,0.5f,0.5f);
+        // draw all remaining objects
+        color.set(Color.YELLOW);
         for (int i=0; i<num; i++) {
             for (int j=0; j < GPB; j++) {
-                if (i==selected) {
-                    color.set(0,0.7f,1,1);
-                    //dsSetColor (0f,0.7f,1f);
-                } else if (!obj[i].body.isEnabled ()) {
-                    color.set(1,0.8f,0,1);
-                    //dsSetColor (1,0,0);
-                } else {
-                    color.set(Color.YELLOW);
-                    //dsSetColor (1,1,0);
-                }
                 drawGeom (obj[i].geom[j], i,null, null);
             }
         }
@@ -312,19 +306,7 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
 
         DQuaternionC qOde = g.getQuaternion();
 
-        if (g instanceof DBox) {
-            DVector3C sides = ((DBox)g).getLengths();
-            if (obj[objInstance].modelInstance == null) {
-                model = modelBuilder.createBox((float) sides.get0(), (float) sides.get1(), (float) sides.get2(), GL20.GL_LINES,
-                    new Material(ColorAttribute.createDiffuse(color)),
-                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-                obj[objInstance].modelInstance = new ModelInstance(model);
-            }
-            obj[objInstance].modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(qOde));
-            obj[objInstance].modelInstance.transform.setTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
-            modelBatch.render(obj[objInstance].modelInstance);
-            //dsDrawBox (pos,R,sides);
-        } else if (g instanceof DSphere) {
+        if (g instanceof DSphere) {
             if (obj[objInstance].modelInstance == null) {
                 model = modelBuilder.createSphere((float) ((DSphere) g).getRadius() * 2, (float) ((DSphere) g).getRadius() * 2, (float) ((DSphere) g).getRadius() * 2,
                     15, 15, GL20.GL_LINES,
@@ -337,10 +319,11 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
             modelBatch.render(obj[objInstance].modelInstance);
             //dsDrawSphere( pos,R, ((DSphere)g).getRadius() );
         } else if (g instanceof DHeightfield) {
-            // Set ox and oz to zero for DHEIGHTFIELD_CORNER_ORIGIN mode.
+            if (!showTerrainMesh) return;
+
+            // Set ox and oz to zero for DHEIGHTFIELD_CORNER_ORIGIN mode.  //TODO look into this
             int ox = (int) (-HFIELD_WIDTH / 2);
             int oz = (int) (-HFIELD_DEPTH / 2);
-            color.set(0.5f, 1, 0.5f, 0.5f);
             if (heightMI == null) {
                 modelBuilder.begin();
                 MeshPartBuilder meshPartBuilder = modelBuilder.part("line", 1, 3, new Material());
@@ -417,19 +400,20 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
         font.dispose();
 
         // ode cleanup
-        contactgroup.destroy ();
-        space.destroy ();
-        world.destroy ();
+        contactgroup.destroy();
+        space.destroy();
         gheight.destroy();
+        world.destroy();
         OdeHelper.closeODE();
     }
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.F1) Ode4libGDX.game.setScreen(new DemoMundusHeightFieldScreen());
+        if (keycode == Input.Keys.F1) Ode4libGDX.game.setScreen(new DemoCrashScreen());
+        else if (keycode == Input.Keys.M) showTerrainMesh = !showTerrainMesh;
+        else if (keycode == Input.Keys.SPACE) doDropSphere();
         return false;
     }
-
 
     @Override
     public boolean keyUp(int keycode) {
@@ -438,81 +422,78 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyTyped(char cmd) {
-        int i,j,k;
+        return false;
+    }
+
+    private void doDropSphere(){
+        int i ,k;
         double[] sides= new double[3];
         DMass m = OdeHelper.createMass();
         boolean setBody = false;
 
-        if (cmd == '1' || cmd == '2') {
-            if (num < NUM) {
-                i = num;
-                num++;
-            }  else {
-                i = nextobj;
-                nextobj++;
-                nextobj %= num;
+        if (num < NUM) {
+            i = num;
+            num++;
+        }  else {
+            i = nextobj;
+            nextobj++;
+            nextobj %= num;
 
-                // destroy the body and geoms for slot i
-                obj[i].body.destroy();
-                obj[i].body = null;
+            // destroy the body and geoms for slot i
+            obj[i].body.destroy();
+            obj[i].body = null;
 
-                for (k=0; k < GPB; k++)	{
-                    if (obj[i].geom[k]!=null) {
-                        obj[i].geom[k].destroy();
-                        obj[i].geom[k] = null;
-                    }
+            for (k=0; k < GPB; k++)	{
+                if (obj[i].geom[k]!=null) {
+                    obj[i].geom[k].destroy();
+                    obj[i].geom[k] = null;
                 }
-                obj[i] = new MyObject();
             }
-
-            obj[i].body = OdeHelper.createBody (world);
-            for (k=0; k<3; k++) sides[k] = dRandReal()*0.5+0.1;
-
-            DMatrix3 R = new DMatrix3();
-            if (random_pos) {
-                obj[i].body.setPosition(
-                    (dRandReal()-0.5)*HFIELD_WIDTH*0.75,
-                    (dRandReal()-0.5)*HFIELD_DEPTH*0.75,
-                    dRandReal() + 2 );
-                dRFromAxisAndAngle (R,dRandReal()*2.0-1.0,dRandReal()*2.0-1.0,
-                    dRandReal()*2.0-1.0,dRandReal()*10.0-5.0);
-            } else {
-                double maxheight = 0;
-                for (k=0; k<num; k++) {
-                    DVector3C pos = obj[k].body.getPosition ();
-                    if (pos.get2() > maxheight) maxheight = pos.get2();
-
-                }
-                obj[i].body.setPosition(0,maxheight+1,0);
-                dRFromAxisAndAngle (R,0,0,1,dRandReal()*10.0-5.0);
-            }
-            obj[i].body.setRotation (R);
-            obj[i].body.setData (i);
-
-            if (cmd == '2') {
-                m.setBox (DENSITY,sides[0],sides[1],sides[2]);
-                obj[i].geom[0] = OdeHelper.createBox (space,sides[0],sides[1],sides[2]);
-            } else if (cmd == '1') {
-                sides[0] *= 0.5;
-                m.setSphere(DENSITY, sides[0]);
-                obj[i].geom[0] = OdeHelper.createSphere(space, sides[0]);
-            }
-
-            if (!setBody) {
-                for (k=0; k < GPB; k++) {
-                    if (obj[i].geom[k]!=null) {
-                        obj[i].geom[k].setBody (obj[i].body);
-                    }
-                }
-                obj[i].body.setMass (m);
-            }
+            obj[i] = new MyObject();
         }
-        return false;
+
+        obj[i].body = OdeHelper.createBody (world);
+        for (k=0; k<3; k++) sides[k] = dRandReal()*0.5+0.1;
+
+        DMatrix3 R = new DMatrix3();
+        if (random_pos) {
+            obj[i].body.setPosition(
+                (dRandReal()+0.5)*HFIELD_WIDTH*0.5,
+                dRandReal() + 10,
+                (dRandReal()+0.5)*HFIELD_DEPTH*0.5);
+
+            dRFromAxisAndAngle (R,dRandReal()*2.0-1.0,dRandReal()*2.0-1.0,
+                dRandReal()*2.0-1.0,dRandReal()*10.0-5.0);
+        } else {
+            double maxheight = 0;
+            for (k=0; k<num; k++) {
+                DVector3C pos = obj[k].body.getPosition ();
+                if (pos.get2() > maxheight) maxheight = pos.get2();
+
+            }
+            obj[i].body.setPosition(0,maxheight+1,0);
+            dRFromAxisAndAngle (R,0,0,1,dRandReal()*10.0-5.0);
+        }
+        obj[i].body.setRotation (R);
+        obj[i].body.setData (i);
+
+        sides[0] *= 0.75;
+        m.setSphere(DENSITY, sides[0]);
+        obj[i].geom[0] = OdeHelper.createSphere(space, sides[0]);
+
+        if (!setBody) {
+            for (k=0; k < GPB; k++) {
+                if (obj[i].geom[k]!=null) {
+                    obj[i].geom[k].setBody (obj[i].body);
+                }
+            }
+            obj[i].body.setMass (m);
+        }
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-//        if (Gdx.app.getType().equals(Application.ApplicationType.Android))
+        if (Gdx.app.getType().equals(Application.ApplicationType.Android)) doDropSphere();;
         return false;
     }
 
@@ -540,24 +521,20 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
     private void continueLoading() {
         if (mundus.continueLoading()) {
             // Loading complete, load a scene.
-            scene = mundus.loadScene("Main Scene.mundus");
-            scene.cam.position.set(0, 6, 6);
-            scene.cam.lookAt(0,0,0);
-            scene.cam.up.set(Vector3.Z);
+            scene = mundus.loadScene("ode.mundus");
+            scene.cam.position.set(10, 15, 20);
+            scene.cam.lookAt(10,5,10);
+            scene.cam.up.set(Vector3.Y);
             scene.cam.update();
-
-            // Remove fog
-            FogAttribute fogAttribute = (FogAttribute) scene.environment.get(FogAttribute.FogEquation);
-            fogAttribute.value.x = 2000f; // Near plane
-            fogAttribute.value.y = 2500f; // Far plane
 
             // setup input
             controller = new FirstPersonCameraController(scene.cam);
             controller.setVelocity(10f);
             inputMultiplexer.addProcessor(controller);
             Gdx.input.setInputProcessor(inputMultiplexer);
+
             // Update our game state
-            gameState = GameState.RENDER;
+            gameState = GameState.DRAW;
         }
     }
 }
