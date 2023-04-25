@@ -260,9 +260,9 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
     }
 
     private void draw() {
-        controller.update(); // camera controller
-        scene.sceneGraph.update(); // update Mundus
-        scene.render(); // render Mundus scene
+        controller.update();        // camera controller
+        scene.sceneGraph.update();  // update Mundus
+        scene.render();             // render Mundus scene
 
         // 3D models drawing
         modelBatch.begin(scene.cam);
@@ -277,8 +277,9 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
 
 
     public void doStep (boolean pause) {
-        space.collide (null,nearCallback);
-        if (!pause)  world.quickStep (0.05);
+        space.collide (null, nearCallback);
+
+        if (!pause) world.quickStep(0.05);
 
         // remove all contact joints
         contactgroup.empty();
