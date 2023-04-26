@@ -2,9 +2,9 @@ package com.antz.ode4libGDX.screens;
 
 import com.antz.ode4libGDX.controllers.camera.CameraController;
 import com.antz.ode4libGDX.controllers.camera.FirstPersonCameraController;
-import com.badlogic.gdx.Game;
+import com.antz.ode4libGDX.util.OdeEntity;
+import com.antz.ode4libGDX.util.OdePhysicsSystem;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -26,12 +26,15 @@ import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.ConeShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+
+import org.ode4j.math.DMatrix3;
+import org.ode4j.math.DVector3;
+import org.ode4j.ode.DAABBC;
 
 
 /**
@@ -45,26 +48,23 @@ public class BaseScreen extends ScreenAdapter {
     protected CameraController cameraController;
     protected ModelBatch modelBatch;
     protected ModelBatch shadowBatch;
+
+    protected Model model;
+    protected ModelInstance modelInstance;
+    protected ModelBuilder modelBuilder = new ModelBuilder();
+
     protected Array<ModelInstance> renderInstances;
     protected Environment environment;
     protected DirectionalShadowLight shadowLight;
-    protected BulletPhysicsSystem bulletPhysicsSystem;
-    protected Game game;
+    protected OdePhysicsSystem odePhysicsSystem = new OdePhysicsSystem();;
 
     private final Array<Color> colors;
-
-    private final Stage stage;
-    private final VisLabel fpsLabel;
 
     final float GRID_MIN = -100f;
     final float GRID_MAX = 100f;
     final float GRID_STEP = 10f;
 
-    public BaseScreen(Game game) {
-
-        this.game = game;
-        bulletPhysicsSystem = new BulletPhysicsSystem();
-
+    public BaseScreen() {
         camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 1f;
         camera.far = 500;
@@ -74,7 +74,6 @@ public class BaseScreen extends ScreenAdapter {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add((shadowLight = new DirectionalShadowLight(2048, 2048, 30f, 30f, 1f, 100f)).set(0.8f, 0.8f, 0.8f, -.4f, -.4f, -.4f));
         environment.shadowMap = shadowLight;
-
 
         modelBatch = new ModelBatch();
         shadowBatch = new ModelBatch(new DepthShaderProvider());
@@ -96,11 +95,11 @@ public class BaseScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
-            drawDebug = !drawDebug;
-        }
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
+//            drawDebug = !drawDebug;
+//        }
 
-        //bulletPhysicsSystem.update(delta); // TODO
+        odePhysicsSystem.update(delta);
         cameraController.update(delta);
 
         ScreenUtils.clear(Color.BLACK, true);
@@ -115,10 +114,22 @@ public class BaseScreen extends ScreenAdapter {
         modelBatch.render(renderInstances, environment);
         modelBatch.end();
 
-//        if (drawDebug) {
-//            bulletPhysicsSystem.render(camera);
-//        }
+        modelBatch.begin(camera);
+        for (OdeEntity o: odePhysicsSystem.obj){
+            if (o.geom[0] == null) continue;
+            DAABBC aabb = o.geom[0].getAABB();
+            DVector3 bbpos = aabb.getCenter();
+            DVector3 bbsides = aabb.getLengths();
 
+            model = modelBuilder.createBox((float)bbsides.get0(), (float)bbsides.get1(), (float)bbsides.get2(), GL20.GL_LINES,
+                new Material(ColorAttribute.createDiffuse(Color.RED)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+            modelInstance = new ModelInstance(model);
+            modelInstance.transform.set(new Matrix3().idt());
+            modelInstance.transform.setTranslation((float)bbpos.get0(), (float)bbpos.get1(), (float)bbpos.get2());
+            modelBatch.render(modelInstance);
+        }
+        modelBatch.end();
     }
 
     public void setCameraController(CameraController cameraController) {
@@ -132,19 +143,19 @@ public class BaseScreen extends ScreenAdapter {
         MeshPartBuilder meshBuilder = modelBuilder.part("floor", GL20.GL_TRIANGLES, VertexAttribute.Position().usage |VertexAttribute.Normal().usage | VertexAttribute.TexCoords(0).usage, new Material());
 
         BoxShapeBuilder.build(meshBuilder, width, height, depth);
-        btBoxShape btBoxShape = new btBoxShape(new Vector3(width/2f, height/2f, depth/2f));
+        //btBoxShape btBoxShape = new btBoxShape(new Vector3(width/2f, height/2f, depth/2f));
         Model floor = modelBuilder.end();
 
         ModelInstance floorInstance = new ModelInstance(floor);
         floorInstance.transform.trn(0, -0.5f, 0f);
 
-        btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(0, null, btBoxShape, Vector3.Zero);
-        btRigidBody body = new btRigidBody(info);
-
-        body.setWorldTransform(floorInstance.transform);
+//        btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(0, null, btBoxShape, Vector3.Zero);
+//        btRigidBody body = new btRigidBody(info);
+//
+//        body.setWorldTransform(floorInstance.transform);
 
         renderInstances.add(floorInstance);
-        bulletPhysicsSystem.addBody(body);
+//        bulletPhysicsSystem.addBody(body);
     }
 
     void createAxes() {
@@ -179,26 +190,26 @@ public class BaseScreen extends ScreenAdapter {
                 material.set(ColorAttribute.createDiffuse(getRandomColor()));
                 MeshPartBuilder builder = modelBuilder.part("box", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material);
 
-                btCollisionShape shape;
+                //btCollisionShape shape;
 
                 int random = MathUtils.random(1, 4);
                 switch (random) {
                     case 1:
                         BoxShapeBuilder.build(builder, 0, 0, 0, 1f, 1f, 1f);
-                        shape = new btBoxShape(new Vector3(0.5f, 0.5f, 0.5f));
+                        //shape = new btBoxShape(new Vector3(0.5f, 0.5f, 0.5f));
                         break;
                     case 2:
                         ConeShapeBuilder.build(builder, 1, 1, 1, 8);
-                        shape = new btConeShape(0.5f, 1f);
+                        //shape = new btConeShape(0.5f, 1f);
                         break;
                     case 3:
                         SphereShapeBuilder.build(builder, 1, 1, 1, 8, 8);
-                        shape = new btSphereShape(0.5f);
+                        //shape = new btSphereShape(0.5f);
                         break;
                     case 4:
                     default:
                         CylinderShapeBuilder.build(builder, 1, 1, 1, 8);
-                        shape = new btCylinderShape(new Vector3(0.5f, 0.5f, 0.5f));
+                        //shape = new btCylinderShape(new Vector3(0.5f, 0.5f, 0.5f));
                         break;
                 }
 
@@ -206,19 +217,18 @@ public class BaseScreen extends ScreenAdapter {
                 box.transform.setToTranslation(i, MathUtils.random(10, 20), j);
                 box.transform.rotate(new Quaternion(Vector3.Z, MathUtils.random(0f, 270f)));
 
-                float mass = 1f;
 
                 Vector3 localInertia = new Vector3();
-                shape.calculateLocalInertia(mass, localInertia);
+                //shape.calculateLocalInertia(mass, localInertia);
 
-                btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(mass, null, shape, localInertia);
-                btRigidBody body = new btRigidBody(info);
+                //btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(mass, null, shape, localInertia);
+                //btRigidBody body = new btRigidBody(info);
 
-                MotionState motionState = new MotionState(box.transform);
-                body.setMotionState(motionState);
+                //MotionState motionState = new MotionState(box.transform);
+                //body.setMotionState(motionState);
 
                 renderInstances.add(box);
-                bulletPhysicsSystem.addBody(body);
+                //bulletPhysicsSystem.addBody(body);
             }
         }
     }
