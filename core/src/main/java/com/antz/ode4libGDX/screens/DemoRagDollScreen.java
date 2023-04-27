@@ -72,8 +72,6 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
     private DWorld world;
     private DSpace space;
     private DxRagdoll ragdoll;
-    private static double[] xyz = {4.3966, -2.0614, 3.4300};
-    private static double[] hpr = {153.5, -14.5, 0};
     private DJointGroup contactgroup;
     private boolean show_contacts = false;	// show contact points?
 
@@ -100,7 +98,8 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
+        info = "DemoRagDoll\n\n" +
+            "WASD to move camera, click-drag mouse to rotate camera.\n" +
             "SPACE to apply some force to the ragdoll.\n" +
             "F1 for Trimesh Heightfield Demo\n";
 
@@ -162,7 +161,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 70);
+        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 105);
         batch.end();
     }
 

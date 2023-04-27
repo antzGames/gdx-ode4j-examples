@@ -20,7 +20,6 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
@@ -151,7 +150,8 @@ public class DemoCrashScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
+        info = "DemoCrash\n\n" +
+            "WASD to move camera, click-drag mouse to rotate camera.\n" +
             "LEFT-CURSOR to turn the cannon left.\n" +
             "RIGHT-CURSOR to turn the cannon right.\n" +
             "SPACE to shoot from the cannon.\n" +
@@ -193,7 +193,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "Number of Boxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 145);
+        font.draw(batch, info + "Number of Boxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 180);
         batch.end();
     }
 
@@ -276,7 +276,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         //dsDrawCylinder (cpos,R4,3f,0.5f); //original draw call
 
         // draw the cannon ball
-        cannonBallModelInstance.transform.setTranslation(new Vector3((float)cannon_ball_body.getPosition().get0(),(float)cannon_ball_body.getPosition().get1(),(float)cannon_ball_body.getPosition().get2()));
+        cannonBallModelInstance.transform.setTranslation((float)cannon_ball_body.getPosition().get0(),(float)cannon_ball_body.getPosition().get1(),(float)cannon_ball_body.getPosition().get2());
         modelBatch.render(cannonBallModelInstance);
         //dsDrawSphere (cannon_ball_body.getPosition(),cannon_ball_body.getRotation(), CANNON_BALL_RADIUS); //original draw call
     }

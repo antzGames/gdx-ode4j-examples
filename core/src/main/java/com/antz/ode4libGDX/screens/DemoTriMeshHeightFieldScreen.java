@@ -187,11 +187,12 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
-        "To drop another object, press:\n" +
-        "   1 for sphere.\n" +
-        "   2 for box.\n" +
-        "F1 to run Mundus Terrain Integration\n";
+        info = "DemoTriMesh HeightField\n\n" +
+            "WASD to move camera, click-drag mouse to rotate camera.\n" +
+            "To drop another object, press:\n" +
+            "   1 for sphere.\n" +
+            "   2 for box.\n" +
+            "F1 to run Mundus Terrain Integration\n";
         System.out.println(info);
 
         initODE();
@@ -270,7 +271,7 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 110);
+        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 140);
         batch.end();
     }
 
