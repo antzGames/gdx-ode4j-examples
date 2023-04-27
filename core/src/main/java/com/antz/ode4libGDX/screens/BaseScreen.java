@@ -106,25 +106,25 @@ public class BaseScreen extends ScreenAdapter {
 
         modelBatch.begin(camera);
         modelBatch.render(renderInstances, environment);
-        modelBatch.render(odePhysicsSystem.obj.get(2).modelInstance, environment);
+        //modelBatch.render(odePhysicsSystem.obj.get(2).modelInstance, environment);
         modelBatch.end();
 
-        modelBatch.begin(camera);
-        for (OdeEntity o: odePhysicsSystem.obj){
-            if (o.geom[0] == null) continue;
-            DAABBC aabb = o.geom[0].getAABB();
-            DVector3 bbpos = aabb.getCenter();
-            DVector3 bbsides = aabb.getLengths();
-
-            model = modelBuilder.createBox((float)bbsides.get0(), (float)bbsides.get1(), (float)bbsides.get2(), GL20.GL_LINES,
-                new Material(ColorAttribute.createDiffuse(Color.RED)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-            modelInstance = new ModelInstance(model);
-            modelInstance.transform.set(new Matrix3().idt());
-            modelInstance.transform.setTranslation((float)bbpos.get0(), (float)bbpos.get1(), (float)bbpos.get2());
-            modelBatch.render(modelInstance);
-        }
-        modelBatch.end();
+//        modelBatch.begin(camera);
+//        for (OdeEntity o: odePhysicsSystem.obj){
+//            if (o.geom[0] == null) continue;
+//            DAABBC aabb = o.geom[0].getAABB();
+//            DVector3 bbpos = aabb.getCenter();
+//            DVector3 bbsides = aabb.getLengths();
+//
+//            model = modelBuilder.createBox((float)bbsides.get0(), (float)bbsides.get1(), (float)bbsides.get2(), GL20.GL_LINES,
+//                new Material(ColorAttribute.createDiffuse(Color.RED)),
+//                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+//            modelInstance = new ModelInstance(model);
+//            modelInstance.transform.set(new Matrix3().idt());
+//            modelInstance.transform.setTranslation((float)bbpos.get0(), (float)bbpos.get1(), (float)bbpos.get2());
+//            modelBatch.render(modelInstance);
+//        }
+//        modelBatch.end();
     }
 
     public void setCameraController(CameraController cameraController) {

@@ -101,7 +101,6 @@ public class DynamicCharacterScreen extends BaseScreen {
         dRFromAxisAndAngle(Rotation1, 0, 1, 0, M_PI / 2);
         //sceneTriMesh.setRotation(Rotation1);
 
-
         scene.id = "scene";
         scene.body = OdeHelper.createBody(odePhysicsSystem.world);
         scene.body.setRotation(Rotation1);
@@ -114,7 +113,7 @@ public class DynamicCharacterScreen extends BaseScreen {
 //        }
 
         // add to view and physics system
-        renderInstances.add(Utils3D.getModelFromVerticesIndices(vertices, indices));
+        //renderInstances.add(Utils3D.getModelFromVerticesIndices(vertices, indices));
         odePhysicsSystem.obj.add(scene);
         renderInstances.add(scene.modelInstance);
         return scene;
@@ -166,7 +165,7 @@ public class DynamicCharacterScreen extends BaseScreen {
     }
 
     private OdeEntity createRay() {
-        DRay ray = OdeHelper.createRay(OdePhysicsSystem.space, 0);
+        DRay ray = OdeHelper.createRay(OdePhysicsSystem.space, 1.4);
 //        ray.setBody(OdePhysicsSystem.obj.get(1).body);
         OdeEntity rayEntity = new OdeEntity();
         rayEntity.geom[0] = ray;
