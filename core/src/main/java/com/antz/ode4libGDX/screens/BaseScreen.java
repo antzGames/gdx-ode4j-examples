@@ -31,8 +31,6 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
-import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DVector3;
 import org.ode4j.ode.DAABBC;
 
@@ -53,10 +51,10 @@ public class BaseScreen extends ScreenAdapter {
     protected ModelInstance modelInstance;
     protected ModelBuilder modelBuilder = new ModelBuilder();
 
-    protected Array<ModelInstance> renderInstances;
+    public static Array<ModelInstance> renderInstances;
     protected Environment environment;
     protected DirectionalShadowLight shadowLight;
-    protected OdePhysicsSystem odePhysicsSystem = new OdePhysicsSystem();;
+    protected OdePhysicsSystem odePhysicsSystem;
 
     private final Array<Color> colors;
 
@@ -65,6 +63,7 @@ public class BaseScreen extends ScreenAdapter {
     final float GRID_STEP = 10f;
 
     public BaseScreen() {
+        odePhysicsSystem = new OdePhysicsSystem();
         camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 1f;
         camera.far = 500;
@@ -94,11 +93,6 @@ public class BaseScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
-//            drawDebug = !drawDebug;
-//        }
-
         odePhysicsSystem.update(delta);
         cameraController.update(delta);
 
@@ -112,6 +106,7 @@ public class BaseScreen extends ScreenAdapter {
 
         modelBatch.begin(camera);
         modelBatch.render(renderInstances, environment);
+        modelBatch.render(odePhysicsSystem.obj.get(2).modelInstance, environment);
         modelBatch.end();
 
         modelBatch.begin(camera);

@@ -276,7 +276,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         //dsDrawCylinder (cpos,R4,3f,0.5f); //original draw call
 
         // draw the cannon ball
-        cannonBallModelInstance.transform.setTranslation(new Vector3((float)cannon_ball_body.getPosition().get0(),(float)cannon_ball_body.getPosition().get1(),(float)cannon_ball_body.getPosition().get2()));
+        cannonBallModelInstance.transform.setTranslation((float)cannon_ball_body.getPosition().get0(),(float)cannon_ball_body.getPosition().get1(),(float)cannon_ball_body.getPosition().get2());
         modelBatch.render(cannonBallModelInstance);
         //dsDrawSphere (cannon_ball_body.getPosition(),cannon_ball_body.getRotation(), CANNON_BALL_RADIUS); //original draw call
     }

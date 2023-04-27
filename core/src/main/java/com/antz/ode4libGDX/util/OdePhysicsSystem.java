@@ -1,5 +1,6 @@
 package com.antz.ode4libGDX.util;
 
+import com.antz.ode4libGDX.screens.DemoMundusHeightFieldScreen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -31,17 +32,12 @@ public class OdePhysicsSystem implements Disposable {
     public static DWorld world;
     public static DSpace space;
     public static DJointGroup contactgroup;
-
-    public Array<OdeEntity> obj = new Array<>(); // use this variable so ode code migration is easier;
+    public static Array<OdeEntity> obj = new Array<>(); // use this variable so ode code migration is easier;
 
     // some constants
-    public static final float DENSITY = 5.0f	;	// density of all objects
+    public static final float DENSITY = 1.0f	;	// density of all objects
     public static final int GPB = 3;			    // maximum number of geometries per body
-    public static final int MAX_CONTACTS = 64;	    // maximum number of contact points per body
-
-    // Debug drawing ray casts
-    private final Vector3 lastRayFrom = new Vector3();
-    private final Vector3 lastRayTo = new Vector3();
+    public static final int MAX_CONTACTS = 32;	    // maximum number of contact points per body
 
     public OdePhysicsSystem() {
         initODE();
@@ -52,9 +48,11 @@ public class OdePhysicsSystem implements Disposable {
      * @param delta deltaTime since last frame
      */
     public void update(float delta) {
+
         // performs collision detection and physics simulation
         space.collide(null, nearCallback);
-        world.quickStep(0.05);
+        world.quickStep(1/60f);
+        //world.step(0.05);
 
         // remove all contact joints
         contactgroup.empty();
@@ -66,6 +64,7 @@ public class OdePhysicsSystem implements Disposable {
                 (float) o.geom[0].getPosition().get0(),
                 (float) o.geom[0].getPosition().get1(),
                 (float) o.geom[0].getPosition().get2());
+            } else if (o.id.equals("scene")){
 
             }
         }
@@ -134,14 +133,15 @@ public class OdePhysicsSystem implements Disposable {
         // create world
         OdeHelper.initODE2(0);
         world = OdeHelper.createWorld();
-        world.setGravity(0, -0.5, 0);
-        world.setCFM(1e-5);
-        world.setAutoDisableFlag(true);
+        world.setGravity(0, -9.8, 0);
+        world.setCFM(1e-4);
+        world.setERP(0.95);
+        world.setAutoDisableFlag(false);
         world.setContactMaxCorrectingVel(0.1);
-        world.setContactSurfaceLayer(0.001);
+        world.setContactSurfaceLayer(0.01);
         world.setAutoDisableAverageSamplesCount(1);
 
-        space = OdeHelper.createHashSpace();
+        space = OdeHelper.createHashSpace(null);
         contactgroup = OdeHelper.createJointGroup();
     }
 }

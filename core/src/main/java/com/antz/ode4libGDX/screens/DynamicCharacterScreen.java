@@ -3,6 +3,7 @@ package com.antz.ode4libGDX.screens;
 import com.antz.ode4libGDX.controllers.camera.ThirdPersonCameraController;
 import com.antz.ode4libGDX.controllers.character.DynamicCharacterController;
 import com.antz.ode4libGDX.util.OdeEntity;
+import com.antz.ode4libGDX.util.OdePhysicsSystem;
 import com.antz.ode4libGDX.util.Utils3D;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.utils.Array;
 import org.ode4j.math.DMatrix3;
 import org.ode4j.ode.DGeom;
 import org.ode4j.ode.DMass;
+import org.ode4j.ode.DRay;
 import org.ode4j.ode.DTriMeshData;
 import org.ode4j.ode.OdeHelper;
 
@@ -35,14 +37,17 @@ public class DynamicCharacterScreen extends BaseScreen {
         // create scene floor
         createScene();
 
-        // Create objects
-        createObjects();
-
         // Create Player
         OdeEntity player = createPlayer();
 
+        // Create Ray
+        createRay();
+
+        // Create objects
+        createObjects();
+
         // player controller
-        controller = new DynamicCharacterController(player, odePhysicsSystem);
+        controller = new DynamicCharacterController();
 
         // camera stuff
         setCameraController(new ThirdPersonCameraController(camera, player.getModelInstance()));
@@ -106,61 +111,55 @@ public class DynamicCharacterScreen extends BaseScreen {
 
     private OdeEntity createPlayer() {
         OdeEntity entity = new OdeEntity();
-
         ModelInstance playerModelInstance = new ModelInstance(Utils3D.buildCapsuleCharacter());
 
         // Calculate dimension
         BoundingBox boundingBox = new BoundingBox();
         playerModelInstance.calculateBoundingBox(boundingBox);
-
         Vector3 dimensions = new Vector3();
         boundingBox.getDimensions(dimensions);
 
         // Scale for half extents
         dimensions.scl(0.5f);
 
-        //MotionState motionState = new MotionState(playerModelInstance.transform);
-        //btCapsuleShape capsuleShape = new btCapsuleShape(dimensions.len() / 2.5f, dimensions.y);
-
         DMass m = OdeHelper.createMass();
-        m.setZero();
         m.setCapsule(odePhysicsSystem.DENSITY,2,dimensions.len()/2.5f, dimensions.y);
 
         entity.id = "player";
         entity.body = OdeHelper.createBody(odePhysicsSystem.world);
         entity.geom[0] = OdeHelper.createCapsule(odePhysicsSystem.space,dimensions.len()/2.5f, dimensions.y);
+        DMatrix3 R = new DMatrix3();
+        dRFromAxisAndAngle(R, 0, 1, 0, M_PI / 2);
+        entity.body.setRotation(R);
+        entity.body.setData(1);
 
-        entity.modelInstance = playerModelInstance;
-        renderInstances.add(playerModelInstance);
+        // Move him up above the ground
+        Vector3 v = new Vector3();
+        playerModelInstance.transform.setToTranslation(0,4,0);
+        playerModelInstance.transform.getTranslation(v);
+        entity.body.setPosition(v.x, v.y, v.z);
+        entity.body.setMass(m);
+        entity.body.setMaxAngularSpeed(0);
 
         for (int k = 0; k < odePhysicsSystem.GPB; k++) {
             if (entity.geom[k] != null) {
                 entity.geom[k].setBody(entity.body);
             }
         }
-        entity.body.setMass(m);
-        entity.body.setMaxAngularSpeed(0);
+
+        entity.modelInstance = playerModelInstance;
+        renderInstances.add(playerModelInstance);
         odePhysicsSystem.obj.add(entity);
-
-        // Move him up above the ground
-        playerModelInstance.transform.setToTranslation(0,4,0);
-        Vector3 v = new Vector3();
-        playerModelInstance.transform.getTranslation(v);
-        entity.geom[0].setPosition(v.x, v.y, v.z);
-
-        //btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(mass, motionState, capsuleShape, intertia);
-        //btRigidBody body = new btRigidBody(info);
-
-        // Prevent body from falling over
-        //body.setAngularFactor(Vector3.Y);
-
-        // Prevent the body from sleeping
-        //body.setActivationState(Collision.DISABLE_DEACTIVATION);
-
-        // Add damping so we dont slide forever!
-        //body.setDamping(0.75f, 0.99f);
-
         return entity;
-        //return new BulletEntity(body, playerModelInstance);
+    }
+
+    private OdeEntity createRay() {
+        DRay ray = OdeHelper.createRay(OdePhysicsSystem.space, 0);
+//        ray.setBody(OdePhysicsSystem.obj.get(1).body);
+        OdeEntity rayEntity = new OdeEntity();
+        rayEntity.geom[0] = ray;
+        rayEntity.id = "ray";
+        odePhysicsSystem.obj.add(rayEntity);
+        return rayEntity;
     }
 }
