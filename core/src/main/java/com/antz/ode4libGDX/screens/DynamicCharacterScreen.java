@@ -1,12 +1,15 @@
 package com.antz.ode4libGDX.screens;
 
+import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.controllers.camera.ThirdPersonCameraController;
 import com.antz.ode4libGDX.controllers.character.DynamicCharacterController;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.antz.ode4libGDX.util.OdeEntity;
 import com.antz.ode4libGDX.util.OdePhysicsSystem;
 import com.antz.ode4libGDX.util.Utils3D;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -69,10 +72,17 @@ public class DynamicCharacterScreen extends BaseScreen {
         setCameraController(new ThirdPersonCameraController(camera, player.getModelInstance()));
         camera.position.set(new Vector3(0, 10, -10));
         camera.lookAt(Vector3.Zero);
+
+        info =  "WASD to move player, mouse wheel camera zoom.\n" +
+                "SPACE to jump.\n" +
+                "F1 to run Demo Crash.\n";
+        System.out.println(info);
     }
 
     @Override
     public void render(float delta) {
+        if (Gdx.input.isKeyPressed(Input.Keys.F1)) Ode4libGDX.game.setScreen(new DemoCrashScreen());
+
         controller.update(delta);
         super.render(delta);
     }

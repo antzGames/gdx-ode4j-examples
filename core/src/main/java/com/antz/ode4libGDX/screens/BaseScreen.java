@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -37,11 +39,10 @@ import org.ode4j.ode.DAABBC;
  * April 27, 2023
  */
 public class BaseScreen extends ScreenAdapter {
-    private static boolean drawDebug = false;
-
     protected PerspectiveCamera camera;
     protected CameraController cameraController;
     protected ModelBatch modelBatch;
+    protected SpriteBatch batch2D;
     protected ModelBatch shadowBatch;
 
     protected Model model;
@@ -54,6 +55,9 @@ public class BaseScreen extends ScreenAdapter {
     protected OdePhysicsSystem odePhysicsSystem;
 
     private final Array<Color> colors;
+    protected BitmapFont font = new BitmapFont();
+    protected String info;
+
 
     public BaseScreen() {
         odePhysicsSystem = new OdePhysicsSystem();
@@ -70,6 +74,7 @@ public class BaseScreen extends ScreenAdapter {
         modelBatch = new ModelBatch();
         modelBuilder = new ModelBuilder();
         shadowBatch = new ModelBatch(new DepthShaderProvider());
+        batch2D = new SpriteBatch();
         renderInstances = new Array<>();
 
         colors = new Array<>();
@@ -100,10 +105,15 @@ public class BaseScreen extends ScreenAdapter {
 
         //render AABB boxes
         //renderAABB();
+
+        // 2D stuff for info text
+        batch2D.begin();
+        font.draw(batch2D, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 90);
+        batch2D.end();
     }
 
     public void renderAABB() {
-                modelBatch.begin(camera);
+        modelBatch.begin(camera);
         for (OdeEntity o: odePhysicsSystem.obj){
             if (o.geom[0] == null) continue;
             DAABBC aabb = o.geom[0].getAABB();
@@ -128,5 +138,18 @@ public class BaseScreen extends ScreenAdapter {
 
     protected Color getRandomColor(){
         return colors.get(MathUtils.random(0, colors.size-1));
+    }
+
+    @Override
+    public void dispose() {
+        // Destroy screen's assets here.
+        model.dispose();
+        modelBatch.dispose();
+        shadowBatch.dispose();
+        batch2D.dispose();
+        font.dispose();
+
+        // ode cleanup
+        odePhysicsSystem.dispose();
     }
 }

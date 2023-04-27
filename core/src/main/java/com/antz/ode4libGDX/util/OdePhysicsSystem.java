@@ -17,25 +17,29 @@ import org.ode4j.ode.DSpace;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.OdeHelper;
 import static org.ode4j.ode.OdeMath.*;
-import static org.ode4j.ode.OdeConstants.dContactSoftCFM;
 import static org.ode4j.ode.OdeConstants.dInfinity;
 import static org.ode4j.ode.OdeHelper.areConnectedExcluding;
 
 /**
+ * Original code from: https://github.com/JamesTKhan/libgdx-bullet-tutorials
  * @author JamesTKhan
- * @version September 29, 2022
+ * @version October 04, 2022
+ *
+ * modified to work on odej4 by:
+ * Antz
+ * April 27, 2023
  */
 public class OdePhysicsSystem implements Disposable {
 
-    // Ode objects
+    // Ode4j objects
     public static DWorld world;
     public static DSpace space;
     public static DJointGroup contactgroup;
-    public static Array<OdeEntity> obj = new Array<>(); // use this variable so ode code migration is easier;
+    public static Array<OdeEntity> obj = new Array<>(); // used this variable so ode4j code migration is easier;
 
     // some constants
     public static final float DENSITY = 1.0f	;	// density of all objects
-    public static final int GPB = 3;			    // maximum number of geometries per body
+    public static final int GPB = 1;			    // maximum number of geometries per body
     public static final int MAX_CONTACTS = 32;	    // maximum number of contact points per body
 
     public OdePhysicsSystem() {
@@ -47,11 +51,9 @@ public class OdePhysicsSystem implements Disposable {
      * @param delta deltaTime since last frame
      */
     public void update(float delta) {
-
         // performs collision detection and physics simulation
         space.collide(null, nearCallback);
         world.quickStep(1/30f);
-        //world.step(0.05);
 
         // remove all contact joints
         contactgroup.empty();
@@ -73,25 +75,13 @@ public class OdePhysicsSystem implements Disposable {
         }
     }
 
-    /**
-     * Debug draw the physics world
-     * @param camera camera to render to
-     */
-    public void render(Camera camera) {
-//        debugDrawer.begin(camera);
-//        debugDrawer.drawLine(lastRayFrom, lastRayTo, rayColor);
-//        dynamicsWorld.debugDrawWorld();
-//        debugDrawer.end();
-    }
-
-
     @Override
     public void dispose() {
-//        collisionConfig.dispose();
-//        dispatcher.dispose();
-//        broadphase.dispose();
-//        constraintSolver.dispose();
-//        dynamicsWorld.dispose();
+        // ode cleanup
+        contactgroup.destroy();
+        space.destroy();
+        world.destroy();
+        OdeHelper.closeODE();
     }
 
 
@@ -107,7 +97,6 @@ public class OdePhysicsSystem implements Disposable {
         // exit without doing anything if the two bodies are connected by a joint
         DBody b1 = o1.getBody();
         DBody b2 = o2.getBody();
-
         if (b1!=null && b2!=null && areConnectedExcluding(b1,b2, DContactJoint.class)) return;
 
         DContactBuffer contacts = new DContactBuffer(MAX_CONTACTS);   // up to MAX_CONTACTS contacts per box-box
