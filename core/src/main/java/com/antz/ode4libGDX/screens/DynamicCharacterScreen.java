@@ -8,26 +8,40 @@ import com.antz.ode4libGDX.util.OdePhysicsSystem;
 import com.antz.ode4libGDX.util.Utils3D;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import org.ode4j.math.DMatrix3;
+import org.ode4j.math.DQuaternion;
 import org.ode4j.ode.DGeom;
 import org.ode4j.ode.DMass;
 import org.ode4j.ode.DRay;
 import org.ode4j.ode.DTriMeshData;
 import org.ode4j.ode.OdeHelper;
-
 import static org.ode4j.ode.internal.Common.M_PI;
 import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
 
 /**
+ * Original code from: https://github.com/JamesTKhan/libgdx-bullet-tutorials
  * @author JamesTKhan
- * @version October 02, 2022
+ * @version October 04, 2022
+ *
+ * modified to work on odej4 by:
+ * Antz
+ * April 27, 2023
  */
 public class DynamicCharacterScreen extends BaseScreen {
 
@@ -106,14 +120,7 @@ public class DynamicCharacterScreen extends BaseScreen {
         scene.body.setRotation(Rotation1);
         scene.geom[0] = sceneTriMesh;
 
-//        for (int k = 0; k < odePhysicsSystem.GPB; k++) {
-//            if (scene.geom[k] != null) {
-//                scene.geom[k].setBody(scene.body);
-//            }
-//        }
-
         // add to view and physics system
-        //renderInstances.add(Utils3D.getModelFromVerticesIndices(vertices, indices));
         odePhysicsSystem.obj.add(scene);
         renderInstances.add(scene.modelInstance);
         return scene;
@@ -172,5 +179,73 @@ public class DynamicCharacterScreen extends BaseScreen {
         rayEntity.id = "ray";
         odePhysicsSystem.obj.add(rayEntity);
         return rayEntity;
+    }
+
+    protected void createObjects() {
+        // Create some random shapes
+        for (int i = -6; i < 6; i+=2) {
+            for (int j = -6; j < 6; j+=2) {
+                ModelBuilder modelBuilder = new ModelBuilder();
+                modelBuilder.begin();
+                Material material = new Material();
+                material.set(ColorAttribute.createDiffuse(getRandomColor()));
+                MeshPartBuilder builder = modelBuilder.part("box", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material);
+
+                OdeEntity entity = new OdeEntity();
+                DMass m = OdeHelper.createMass();
+                entity.id = "objects";
+
+                int random = MathUtils.random(1, 3);
+                switch (random) {
+                    case 1:
+                        BoxShapeBuilder.build(builder, 0, 0, 0, 1f, 1f, 1f);
+                        entity.body = OdeHelper.createBody(OdePhysicsSystem.world);
+                        entity.geom[0] = OdeHelper.createBox(OdePhysicsSystem.space, 1,1,1);
+                        //shape = new btBoxShape(new Vector3(0.5f, 0.5f, 0.5f));
+                        break;
+                    case 2:
+                        SphereShapeBuilder.build(builder, 1, 1, 1, 12, 12);
+                        entity.body = OdeHelper.createBody(OdePhysicsSystem.world);
+                        entity.geom[0] = OdeHelper.createSphere(OdePhysicsSystem.space, 0.5);
+                        //shape = new btSphereShape(0.5f);
+                        break;
+                    case 3:
+                    default:
+                        CylinderShapeBuilder.build(builder, 1, 1, 1, 12);
+                        entity.body = OdeHelper.createBody(OdePhysicsSystem.world);
+                        entity.geom[0] = OdeHelper.createCylinder(OdePhysicsSystem.space, 0.5, 1.0);
+                        //shape = new btCylinderShape(new Vector3(0.5f, 0.5f, 0.5f));
+                        break;
+                }
+
+                m.setBox(odePhysicsSystem.DENSITY/10, 1,1,1);
+                entity.body.setMass(m);
+                entity.modelInstance = new ModelInstance(modelBuilder.end());
+                entity.modelInstance.transform.setToTranslation(i, MathUtils.random(10, 20), j);
+                entity.modelInstance.transform.rotate(new Quaternion(Vector3.X, MathUtils.random(0f, 270f)));
+
+                Vector3 pos = new Vector3();
+                Quaternion q = new Quaternion();
+                entity.modelInstance.transform.getTranslation(pos);
+                entity.modelInstance.transform.getRotation(q);
+
+                DQuaternion qq = new DQuaternion();
+                qq.set(q.w, q.x, q.y, q.z);
+                entity.geom[0].setQuaternion(qq);
+                entity.geom[0].setPosition(pos.x, pos.y, pos.z);
+                entity.body.setPosition(pos.x, pos.y, pos.z);
+                entity.body.setQuaternion(qq);
+
+                for (int k=0; k < odePhysicsSystem.GPB; k++) {
+                    if (entity.geom[k] != null) {
+                        entity.geom[k].setBody(entity.body);
+                    }
+                }
+
+                renderInstances.add(entity.modelInstance);
+                odePhysicsSystem.obj.add(entity);
+                //bulletPhysicsSystem.addBody(body);
+            }
+        }
     }
 }

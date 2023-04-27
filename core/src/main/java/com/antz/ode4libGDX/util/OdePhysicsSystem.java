@@ -60,11 +60,15 @@ public class OdePhysicsSystem implements Disposable {
             if (o.id.equals("player")) {
                 //o.modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(o.geom[0].getQuaternion()));
                 o.modelInstance.transform.setTranslation(
-                (float) o.geom[0].getPosition().get0(),
-                (float) o.geom[0].getPosition().get1(),
-                (float) o.geom[0].getPosition().get2());
-            } else if (o.id.equals("scene")){
-
+                    (float) o.geom[0].getPosition().get0(),
+                    (float) o.geom[0].getPosition().get1(),
+                    (float) o.geom[0].getPosition().get2());
+            } else if (o.id.equals("objects")){
+                o.modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(o.geom[0].getQuaternion()));
+                o.modelInstance.transform.setTranslation(
+                    (float) o.geom[0].getPosition().get0(),
+                    (float) o.geom[0].getPosition().get1(),
+                    (float) o.geom[0].getPosition().get2());
             }
         }
     }

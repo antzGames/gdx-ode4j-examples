@@ -1,6 +1,5 @@
 package com.antz.ode4libGDX;
 
-import com.antz.ode4libGDX.screens.DemoCrashScreen;
 import com.antz.ode4libGDX.screens.DynamicCharacterScreen;
 import com.badlogic.gdx.Game;
 

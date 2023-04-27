@@ -1,36 +1,25 @@
 package com.antz.ode4libGDX.controllers.character;
 
-import com.antz.ode4libGDX.screens.DynamicCharacterScreen;
-import com.antz.ode4libGDX.util.OdeEntity;
 import com.antz.ode4libGDX.util.OdePhysicsSystem;
 import com.antz.ode4libGDX.util.Utils3D;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.Ray;
-
 import org.ode4j.math.DMatrix3;
-import org.ode4j.math.DVector3;
-import org.ode4j.math.DVector3C;
 import org.ode4j.ode.DContactGeomBuffer;
 import org.ode4j.ode.DRay;
 import org.ode4j.ode.OdeHelper;
-import org.ode4j.ode.internal.DxRay;
-
-import static org.ode4j.ode.internal.Common.M_PI;
 import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
 
 /**
+ * Original code from: https://github.com/JamesTKhan/libgdx-bullet-tutorials
  * @author JamesTKhan
- * @version October 10, 2022
+ * @version October 04, 2022
+ *
+ * modified to work on odej4 by:
+ * Antz
+ * April 27, 2023
  */
 public class DynamicCharacterController {
     private final float MOVE_SPEED = 15f;
@@ -44,32 +33,12 @@ public class DynamicCharacterController {
     private final Vector3 angularVelocity = new Vector3();
 
     public DynamicCharacterController() {
-
     }
 
     public void update(float delta) {
-
         Utils3D.getDirection(OdePhysicsSystem.obj.get(1).getModelInstance().transform, currentDirection);
         resetVelocity();
-        boolean isOnGround = isGrounded();
-
-        // A slightly hacky work around to allow climbing up and preventing sliding down slopes
-        if (isOnGround) {
-            //callback.getHitNormalWorld(normal);
-
-            // dot product returns 1 if same direction, -1 if opposite direction, zero if perpendicular
-            // so we get the dot product of the normal and the Up (Y) vector.
-            float dot = normal.dot(Vector3.Y);
-
-            // If the dot product is NOT 1, meaning the ground is not flat, then we disable gravity
-          if (dot != 1.0) {
-              //OdePhysicsSystem.obj.get(1).body.setGravityMode(false);
-                //body.setGravity(Vector3.Zero);
-            }
-        } else {
-            //OdePhysicsSystem.obj.get(1).body.setGravityMode(true);
-            //body.setGravity(BulletPhysicsSystem.DEFAULT_GRAVITY);
-        }
+        isGrounded();
 
         // Forward movement
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -86,18 +55,17 @@ public class DynamicCharacterController {
             OdePhysicsSystem.obj.get(1).getModelInstance().transform.getRotation(q);
             dRFromAxisAndAngle(R, 0, 1, 0, q.getYawRad());
             OdePhysicsSystem.obj.get(1).body.setRotation(R);
-            isOnGround = isGrounded();
+            isGrounded();
         } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             OdePhysicsSystem.obj.get(1).getModelInstance().transform.rotate(Vector3.Y, -delta*60f);
             OdePhysicsSystem.obj.get(1).getModelInstance().transform.getRotation(q);
             dRFromAxisAndAngle(R, 0, 1, 0, q.getYawRad());
             OdePhysicsSystem.obj.get(1).body.setRotation(R);
-            isOnGround = isGrounded();
+            isGrounded();
         }
 
         // Jump
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-//            OdePhysicsSystem.obj.get(1).body.setGravityMode(true);
             linearVelocity.y += JUMP_FACTOR;
         }
 
@@ -105,14 +73,6 @@ public class DynamicCharacterController {
             OdePhysicsSystem.obj.get(1).body.addLinearVel(linearVelocity.x, linearVelocity.y, linearVelocity.z);
             OdePhysicsSystem.obj.get(1).body.addForce(linearVelocity.x, linearVelocity.y, linearVelocity.z);
         }
-
-//        if (!angularVelocity.isZero()) {
-//            OdePhysicsSystem.obj.get(1).body.setAngularVel(angularVelocity.x, angularVelocity.y, angularVelocity.z);
-//            //body.setAngularVelocity(angularVelocity);
-//        }
-
-        //System.out.println("dir: " + currentDirection + "  G: " +OdePhysicsSystem.obj.get(1).body.getGravityMode() + "   isGround: " + isOnGround + "  lv: " + linearVelocity + "  av: " + angularVelocity);
-
     }
 
     /**
@@ -126,23 +86,9 @@ public class DynamicCharacterController {
         tmpPosition.set(position).sub(0, 1.4f, 0);
         Vector3 direction = new Vector3(0,-1,0);
 
-        // TODO I am creating the ray each time insteadof just reusing one
-        //DRay ray = OdeHelper.createRay(OdePhysicsSystem.space, 1.4);
         OdePhysicsSystem.obj.get(2).geom[0].setBody(OdePhysicsSystem.obj.get(1).body);
         ((DRay)OdePhysicsSystem.obj.get(2).geom[0]).set(position.x, position.y, position.z, direction.x, direction.y, direction.z);
         ((DRay)OdePhysicsSystem.obj.get(2).geom[0]).setFirstContact(true);
-
-//        Model model;
-//        ModelBuilder modelBuilder = new ModelBuilder();
-//        modelBuilder.begin();
-//        MeshPartBuilder meshPartBuilder = modelBuilder.part("line", 1, 3, new Material());
-//        meshPartBuilder.setColor(Color.CYAN);
-//        meshPartBuilder.line(position.x, position.y, position.z, tmpPosition.x, tmpPosition.y, tmpPosition.z);
-//        model = modelBuilder.end();
-
-        // update the obj
-        //OdePhysicsSystem.obj.get(2).modelInstance = new ModelInstance(model);
-        //OdePhysicsSystem.obj.get(2).geom[0] = ray;
 
         DContactGeomBuffer contacts = new DContactGeomBuffer(OdePhysicsSystem.MAX_CONTACTS);
         if (OdeHelper.collide(OdePhysicsSystem.obj.get(2).geom[0], OdePhysicsSystem.obj.get(0).geom[0], 1, contacts) != 0) {
@@ -152,7 +98,6 @@ public class DynamicCharacterController {
         }
         return false;
     }
-
 
     private void resetVelocity() {
         angularVelocity.set(0,0,0);
