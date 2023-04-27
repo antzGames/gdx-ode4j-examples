@@ -73,7 +73,8 @@ public class DynamicCharacterScreen extends BaseScreen {
         camera.position.set(new Vector3(0, 10, -10));
         camera.lookAt(Vector3.Zero);
 
-        info =  "WASD to move player, mouse wheel camera zoom.\n" +
+        info =  "JTK's jBullet tutorial migrated to ode4j\n\n" +
+                "WASD to move player, mouse wheel camera zoom.\n" +
                 "SPACE to jump.\n" +
                 "F1 to run Demo Crash.\n";
         System.out.println(info);

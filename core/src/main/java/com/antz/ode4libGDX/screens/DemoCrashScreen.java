@@ -150,7 +150,8 @@ public class DemoCrashScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
+        info = "DemoCrash\n\n" +
+            "WASD to move camera, click-drag mouse to rotate camera.\n" +
             "LEFT-CURSOR to turn the cannon left.\n" +
             "RIGHT-CURSOR to turn the cannon right.\n" +
             "SPACE to shoot from the cannon.\n" +
@@ -192,7 +193,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "Number of Boxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 145);
+        font.draw(batch, info + "Number of Boxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 180);
         batch.end();
     }
 

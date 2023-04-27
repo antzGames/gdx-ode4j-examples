@@ -108,7 +108,7 @@ public class BaseScreen extends ScreenAdapter {
 
         // 2D stuff for info text
         batch2D.begin();
-        font.draw(batch2D, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 90);
+        font.draw(batch2D, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 115);
         batch2D.end();
     }
 

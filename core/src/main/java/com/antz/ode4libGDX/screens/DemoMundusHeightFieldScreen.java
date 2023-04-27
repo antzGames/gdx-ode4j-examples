@@ -190,7 +190,8 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        info = "WASD to move camera, click-drag mouse to rotate camera.\n" +
+        info = "MUNDUS terrain height field inetegration\n\n" +
+            "WASD to move camera, click-drag mouse to rotate camera.\n" +
             "SPACE to drop sphere.\n" +
             "M to show/hide Mesh.\n" +
             "F1 to run Demo Crash.\n";
@@ -271,7 +272,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
 
         // 2D stuff for info text
         batch.begin();
-        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 95);
+        font.draw(batch, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 125);
         batch.end();
     }
 
