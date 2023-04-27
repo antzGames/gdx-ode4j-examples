@@ -34,7 +34,7 @@ import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
  */
 public class DynamicCharacterController {
     private final float MOVE_SPEED = 45f;
-    private final float JUMP_FACTOR = 15f;
+    private final float JUMP_FACTOR = 7.5f;
 
     private final Vector3 position = new Vector3();
     private final Vector3 normal = new Vector3();
@@ -126,7 +126,7 @@ public class DynamicCharacterController {
         Utils3D.getPosition(OdePhysicsSystem.obj.get(1).getModelInstance().transform, position);
 
         // The position we are casting a ray to, slightly below the players current position.
-        tmpPosition.set(position).sub(0, 2.4f, 0);
+        tmpPosition.set(position).sub(0, 1.4f, 0);
         Vector3 direction = new Vector3(0,-1,0);
 
         // TODO I am creating the ray each time insteadof just reusing one

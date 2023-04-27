@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
@@ -75,12 +76,12 @@ public class DynamicCharacterScreen extends BaseScreen {
         scene.modelInstance.materials.get(1).set(ColorAttribute.createDiffuse(Color.TEAL));
         scene.modelInstance.materials.get(2).set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
         scene.modelInstance.materials.get(3).set(ColorAttribute.createDiffuse(Color.TAN));
-        renderInstances.add(scene.modelInstance);
 
         // Get vertices and indices for scene
         Array<Float> vertOut = new Array<>();
         Array<Integer> indexOut =  new Array<>();
 
+        scene.modelInstance.transform.set(new Quaternion().setFromAxis(Vector3.Y, 90));
         Utils3D.getVerticesIndicesFromModel(scene.modelInstance, vertOut, indexOut,0); // Thanks JTK for this method
 
         float[] vertices = new float[vertOut.size];
@@ -94,19 +95,28 @@ public class DynamicCharacterScreen extends BaseScreen {
 
         // create the geom
         sceneTriMesh = OdeHelper.createTriMesh(odePhysicsSystem.space, sceneTriMeshData, null,null,null);
-        sceneTriMesh.setData(sceneTriMeshData);
+        //sceneTriMesh.setData(sceneTriMeshData);
         sceneTriMesh.setPosition(0,0,0);
         DMatrix3 Rotation1 = new DMatrix3();
         dRFromAxisAndAngle(Rotation1, 0, 1, 0, M_PI / 2);
-        sceneTriMesh.setRotation(Rotation1);
+        //sceneTriMesh.setRotation(Rotation1);
+
 
         scene.id = "scene";
         scene.body = OdeHelper.createBody(odePhysicsSystem.world);
+        scene.body.setRotation(Rotation1);
         scene.geom[0] = sceneTriMesh;
+
+//        for (int k = 0; k < odePhysicsSystem.GPB; k++) {
+//            if (scene.geom[k] != null) {
+//                scene.geom[k].setBody(scene.body);
+//            }
+//        }
 
         // add to view and physics system
         renderInstances.add(Utils3D.getModelFromVerticesIndices(vertices, indices));
         odePhysicsSystem.obj.add(scene);
+        renderInstances.add(scene.modelInstance);
         return scene;
     }
 
