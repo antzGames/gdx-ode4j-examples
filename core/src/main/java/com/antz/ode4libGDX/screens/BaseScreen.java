@@ -4,6 +4,7 @@ import com.antz.ode4libGDX.controllers.camera.CameraController;
 import com.antz.ode4libGDX.util.OdeEntity;
 import com.antz.ode4libGDX.util.OdePhysicsSystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -60,6 +61,8 @@ public class BaseScreen extends ScreenAdapter {
 
 
     public BaseScreen() {
+        Gdx.input.setCatchKey(Input.Keys.SPACE, true);
+        Gdx.input.setCatchKey(Input.Keys.F1, true);
         odePhysicsSystem = new OdePhysicsSystem();
         camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 1f;
