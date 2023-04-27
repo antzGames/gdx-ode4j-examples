@@ -16,8 +16,7 @@ import org.ode4j.ode.DJointGroup;
 import org.ode4j.ode.DSpace;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.OdeHelper;
-
-import static org.ode4j.ode.OdeConstants.dContactBounce;
+import static org.ode4j.ode.OdeMath.*;
 import static org.ode4j.ode.OdeConstants.dContactSoftCFM;
 import static org.ode4j.ode.OdeConstants.dInfinity;
 import static org.ode4j.ode.OdeHelper.areConnectedExcluding;
@@ -51,7 +50,7 @@ public class OdePhysicsSystem implements Disposable {
 
         // performs collision detection and physics simulation
         space.collide(null, nearCallback);
-        world.quickStep(1/60f);
+        world.quickStep(1/30f);
         //world.step(0.05);
 
         // remove all contact joints
@@ -59,7 +58,7 @@ public class OdePhysicsSystem implements Disposable {
 
         for (OdeEntity o: obj) {
             if (o.id.equals("player")) {
-                o.modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(o.geom[0].getQuaternion()));
+                //o.modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(o.geom[0].getQuaternion()));
                 o.modelInstance.transform.setTranslation(
                 (float) o.geom[0].getPosition().get0(),
                 (float) o.geom[0].getPosition().get1(),
@@ -110,11 +109,11 @@ public class OdePhysicsSystem implements Disposable {
         DContactBuffer contacts = new DContactBuffer(MAX_CONTACTS);   // up to MAX_CONTACTS contacts per box-box
         for (int i=0; i<MAX_CONTACTS; i++) {
             DContact contact = contacts.get(i);
-            contact.surface.mode = dContactBounce | dContactSoftCFM;
-            contact.surface.mu = dInfinity;
-            contact.surface.mu2 = 0;
-            contact.surface.bounce = 0.1;
-            contact.surface.bounce_vel = 0.1;
+            contact.surface.mode = dContactSlip1 | dContactSlip2 | dContactSoftERP | dContactSoftCFM | dContactApprox1;
+            contact.surface.mu = 0.5;
+            contact.surface.slip1 = 0.0;
+            contact.surface.slip2 = 0.0;
+            contact.surface.soft_erp = 0.8;
             contact.surface.soft_cfm = 0.01;
         }
 
@@ -134,12 +133,13 @@ public class OdePhysicsSystem implements Disposable {
         OdeHelper.initODE2(0);
         world = OdeHelper.createWorld();
         world.setGravity(0, -9.8, 0);
-        world.setCFM(1e-4);
-        world.setERP(0.95);
-        world.setAutoDisableFlag(false);
+        world.setCFM(1e-5);
+        //world.setERP(0.8);
+        world.setAutoDisableFlag(true);
         world.setContactMaxCorrectingVel(0.1);
         world.setContactSurfaceLayer(0.01);
         world.setAutoDisableAverageSamplesCount(1);
+        //world.setQuickStepNumIterations(20);
 
         space = OdeHelper.createHashSpace(null);
         contactgroup = OdeHelper.createJointGroup();

@@ -28,7 +28,7 @@ public class Utils3D {
     private static final Vector3 tmpVec = new Vector3();
 
     /**
-     * Gets the urrent facing direction of transform, assuming the default forward is Z vector.
+     * Gets the current facing direction of transform, assuming the default forward is Z vector.
      *
      * @param transform modelInstance transform
      * @param out       out vector to be populated with direction

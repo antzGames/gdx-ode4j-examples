@@ -2,6 +2,7 @@ package com.antz.ode4libGDX.screens;
 
 import com.antz.ode4libGDX.controllers.camera.ThirdPersonCameraController;
 import com.antz.ode4libGDX.controllers.character.DynamicCharacterController;
+import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.antz.ode4libGDX.util.OdeEntity;
 import com.antz.ode4libGDX.util.OdePhysicsSystem;
 import com.antz.ode4libGDX.util.Utils3D;
@@ -96,7 +97,7 @@ public class DynamicCharacterScreen extends BaseScreen {
         sceneTriMesh.setData(sceneTriMeshData);
         sceneTriMesh.setPosition(0,0,0);
         DMatrix3 Rotation1 = new DMatrix3();
-        dRFromAxisAndAngle(Rotation1, 1, 0, 0, M_PI / 2);
+        dRFromAxisAndAngle(Rotation1, 0, 1, 0, M_PI / 2);
         sceneTriMesh.setRotation(Rotation1);
 
         scene.id = "scene";
@@ -137,6 +138,7 @@ public class DynamicCharacterScreen extends BaseScreen {
         Vector3 v = new Vector3();
         playerModelInstance.transform.setToTranslation(0,4,0);
         playerModelInstance.transform.getTranslation(v);
+        playerModelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(entity.body.getQuaternion()));
         entity.body.setPosition(v.x, v.y, v.z);
         entity.body.setMass(m);
         entity.body.setMaxAngularSpeed(0);
