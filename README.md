@@ -2,6 +2,8 @@
 
 https://user-images.githubusercontent.com/10563814/234369007-e2f0699a-a9a5-4551-a006-426dc7d285e8.mp4
 
+You can test the demos on your browser [here](https://antzgames.itch.io/physics-in-a-browser).
+
 This repository hosts an experimental version of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j) (ode4j v0.4.1) 3D physics library working on libGDX's GWT backend. Some of the original ode4j code was modified to compile and run properly on libGDX's GWT backend, therefore I cannot guarantee everything is working properly.  More importantly keeping up to date with ode4j updates will be difficult.
 
 If you want to use ode4j only on libGDX Desktop/Android/iOS backends then I recommend you use [odej4](https://github.com/tzaeschke/ode4j) directly.  However if you want cross platform support (i.e include GWT support) then you could use this library for all platforms.
@@ -54,10 +56,13 @@ In addition ode4j uses double and not float like most of libGDX's math classes.
 
 ## Demos
 
+You can test the demos on your browser [here](https://antzgames.itch.io/physics-in-a-browser).
+
 ```F1``` key will cycle to the next demo.
 
 The following modified od4j demos are included:
 
+* `jBullet migration` - [JamesTKhan's libGDX jBullet tuturial example](https://www.youtube.com/watch?v=O0Deshj2-KU), but using this library.
 * `DemoCrash` - destroy a wall of cubes with a cannon.
 * `DemoRagdoll` - Rigid bodies and joints that you can apply to a humanoid character, to simulate behaviour such as impact collisions
  and character death.
