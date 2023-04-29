@@ -26,7 +26,6 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import org.ode4j.math.DVector3;
 import org.ode4j.ode.DAABBC;
 
