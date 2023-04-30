@@ -1,7 +1,6 @@
 package com.antz.ode4libGDX.screens;
 
 import com.antz.ode4libGDX.Ode4libGDX;
-import com.antz.ode4libGDX.controllers.camera.CameraController;
 import com.antz.ode4libGDX.controllers.camera.ThirdPersonCameraController;
 import com.antz.ode4libGDX.controllers.character.DynamicCharacterController;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
@@ -62,7 +61,7 @@ import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
 public class DynamicCharacterScreen implements Screen, InputProcessor {
 
     protected PerspectiveCamera camera;
-    protected CameraController cameraController;
+    protected ThirdPersonCameraController cameraController;
     protected ModelBatch modelBatch;
     protected SpriteBatch batch2D;
     protected ModelBatch shadowBatch;
@@ -78,11 +77,12 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
 
     private Array<Color> colors;
     protected BitmapFont font = new BitmapFont();
-    protected String info, info2;
+    protected String info;
     private DynamicCharacterController controller;
 
     @Override
     public void show() {
+        //Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode()); // uncomment for full screen desktop
         Gdx.input.setCatchKey(Input.Keys.SPACE, true);
         Gdx.input.setCatchKey(Input.Keys.F1, true);
 
@@ -432,6 +432,7 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
+        cameraController.cameraDistance += amountY;
         return false;
     }
 

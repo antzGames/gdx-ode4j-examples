@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector3;
  * @author JamesTKhan
  * @version October 04, 2022
  */
-public class ThirdPersonCameraController extends CameraController {
+public class ThirdPersonCameraController {
     private final Vector3 position = new Vector3();
     private final Vector3 newPosition = new Vector3();
     private final Vector3 direction = new Vector3();
@@ -22,14 +22,13 @@ public class ThirdPersonCameraController extends CameraController {
 
     private float interpolationSpeed = 2f;
     private float heightAdjustment = 5f;
-    private float cameraDistance = 8f;
+    public float cameraDistance = 8f;
 
     public ThirdPersonCameraController(Camera camera, ModelInstance followTarget) {
         this.camera = camera;
         this.followTarget = followTarget;
     }
 
-    @Override
     public void update(float delta) {
         //Get direction and position
         Utils3D.getDirection(followTarget.transform, direction);
@@ -62,9 +61,4 @@ public class ThirdPersonCameraController extends CameraController {
         this.followTarget = followTarget;
     }
 
-    @Override
-    public boolean scrolled(float amountX, float amountY) {
-        cameraDistance += amountY;
-        return true;
-    }
 }
