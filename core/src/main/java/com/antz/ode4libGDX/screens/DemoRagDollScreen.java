@@ -105,7 +105,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
 
         System.out.println(info);
 
-        OdeHelper.initODE();
+        OdeHelper.initODE2(0);
         world = OdeHelper.createWorld();
         world.setGravity(0,-9.8,0);
         world.setDamping(1e-4, 1e-5);
@@ -289,6 +289,10 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
         batch.dispose();
         font.dispose();
 
+        odeDispose();
+    }
+
+    private void odeDispose() {
         // ode cleanup
         ragdoll.destroy();
         contactgroup.destroy();
@@ -304,6 +308,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
                 ragdoll.getBones().get(DxDefaultHumanRagdollConfig.PELVIS).getBody().setLinearVel(10, 80, 10);
                 break;
             case Input.Keys.F1:
+                odeDispose();
                 Ode4libGDX.game.setScreen(new DemoTriMeshHeightFieldScreen());
                 break;
         }

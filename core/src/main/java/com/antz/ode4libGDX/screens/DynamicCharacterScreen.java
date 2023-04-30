@@ -1,34 +1,47 @@
 package com.antz.ode4libGDX.screens;
 
 import com.antz.ode4libGDX.Ode4libGDX;
+import com.antz.ode4libGDX.controllers.camera.CameraController;
 import com.antz.ode4libGDX.controllers.camera.ThirdPersonCameraController;
 import com.antz.ode4libGDX.controllers.character.DynamicCharacterController;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.antz.ode4libGDX.util.OdeEntity;
 import com.antz.ode4libGDX.util.OdePhysicsSystem;
 import com.antz.ode4libGDX.util.Utils3D;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
+import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ScreenUtils;
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DQuaternion;
+import org.ode4j.math.DVector3;
+import org.ode4j.ode.DAABBC;
 import org.ode4j.ode.DGeom;
 import org.ode4j.ode.DMass;
 import org.ode4j.ode.DRay;
@@ -46,12 +59,59 @@ import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
  * Antz
  * April 27, 2023
  */
-public class DynamicCharacterScreen extends BaseScreen {
+public class DynamicCharacterScreen implements Screen, InputProcessor {
 
-    private final DynamicCharacterController controller;
+    protected PerspectiveCamera camera;
+    protected CameraController cameraController;
+    protected ModelBatch modelBatch;
+    protected SpriteBatch batch2D;
+    protected ModelBatch shadowBatch;
 
-    public DynamicCharacterScreen() {
-        super();
+    protected Model model;
+    protected ModelInstance modelInstance;
+    protected ModelBuilder modelBuilder;
+
+    public static Array<ModelInstance> renderInstances;
+    protected Environment environment;
+    protected DirectionalShadowLight shadowLight;
+    protected OdePhysicsSystem odePhysicsSystem;
+
+    private Array<Color> colors;
+    protected BitmapFont font = new BitmapFont();
+    protected String info, info2;
+    private DynamicCharacterController controller;
+
+    @Override
+    public void show() {
+        Gdx.input.setCatchKey(Input.Keys.SPACE, true);
+        Gdx.input.setCatchKey(Input.Keys.F1, true);
+
+        camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.near = 1f;
+        camera.far = 500;
+        camera.position.set(0,10, 50f);
+
+        environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+        environment.add((shadowLight = new DirectionalShadowLight(2048, 2048, 30f, 30f, 1f, 100f)).set(0.8f, 0.8f, 0.8f, -.4f, -.4f, -.4f));
+        environment.shadowMap = shadowLight;
+
+        model = new Model();
+        modelBatch = new ModelBatch();
+        modelBuilder = new ModelBuilder();
+        shadowBatch = new ModelBatch(new DepthShaderProvider());
+        batch2D = new SpriteBatch();
+        renderInstances = new Array<>();
+
+        colors = new Array<>();
+        colors.add(Color.PURPLE);
+        colors.add(Color.BLUE);
+        colors.add(Color.TEAL);
+        colors.add(Color.BROWN);
+        colors.add(Color.FIREBRICK);
+
+        odePhysicsSystem = new OdePhysicsSystem();
+        odePhysicsSystem.initODE();
 
         // create scene floor
         createScene();
@@ -69,23 +129,70 @@ public class DynamicCharacterScreen extends BaseScreen {
         controller = new DynamicCharacterController();
 
         // camera stuff
-        setCameraController(new ThirdPersonCameraController(camera, player.getModelInstance()));
+        cameraController = new ThirdPersonCameraController(camera, player.getModelInstance());
         camera.position.set(new Vector3(0, 10, -10));
         camera.lookAt(Vector3.Zero);
 
         info =  "JTK's jBullet tutorial migrated to ode4j\n\n" +
-                "WASD to move player, mouse wheel camera zoom.\n" +
-                "SPACE to jump.\n" +
-                "F1 to run Demo Crash.\n";
+            "WASD to move player, mouse wheel camera zoom.\n" +
+            "SPACE to jump.\n" +
+            "R to reset player position.\n" +
+            "Gravity set to Moon: 1.62 m/s\n" +
+            "F1 to run Demo Crash.\n";
         System.out.println(info);
+
+        Gdx.input.setInputProcessor(this);
     }
 
     @Override
     public void render(float delta) {
-        if (Gdx.input.isKeyPressed(Input.Keys.F1)) Ode4libGDX.game.setScreen(new DemoCrashScreen());
-
         controller.update(delta);
-        super.render(delta);
+        odePhysicsSystem.update(delta);
+        cameraController.update(delta);
+
+        ScreenUtils.clear(Color.BLACK, true);
+
+        shadowLight.begin(Vector3.Zero, camera.direction);
+        shadowBatch.begin(shadowLight.getCamera());
+        shadowBatch.render(renderInstances);
+        shadowBatch.end();
+        shadowLight.end();
+
+        modelBatch.begin(camera);
+        modelBatch.render(renderInstances, environment);
+        //modelBatch.render(odePhysicsSystem.obj.get(2).modelInstance, environment);
+        modelBatch.end();
+
+        //render AABB boxes
+        //renderAABB();
+
+        // 2D stuff for info text
+        batch2D.begin();
+        font.draw(batch2D, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 145);
+        batch2D.end();
+    }
+
+    public void renderAABB() {
+        modelBatch.begin(camera);
+        for (OdeEntity o: odePhysicsSystem.obj){
+            if (o.geom[0] == null) continue;
+            DAABBC aabb = o.geom[0].getAABB();
+            DVector3 bbpos = aabb.getCenter();
+            DVector3 bbsides = aabb.getLengths();
+
+            model = modelBuilder.createBox((float)bbsides.get0(), (float)bbsides.get1(), (float)bbsides.get2(), GL20.GL_LINES,
+                new Material(ColorAttribute.createDiffuse(Color.RED)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+            modelInstance = new ModelInstance(model);
+            modelInstance.transform.set(new Matrix3().idt());
+            modelInstance.transform.setTranslation((float)bbpos.get0(), (float)bbpos.get1(), (float)bbpos.get2());
+            modelBatch.render(modelInstance);
+        }
+        modelBatch.end();
+    }
+
+    protected Color getRandomColor(){
+        return colors.get(MathUtils.random(0, colors.size-1));
     }
 
     private OdeEntity createScene(){
@@ -120,7 +227,6 @@ public class DynamicCharacterScreen extends BaseScreen {
 
         // create the geom
         sceneTriMesh = OdeHelper.createTriMesh(odePhysicsSystem.space, sceneTriMeshData, null,null,null);
-        //sceneTriMesh.setData(sceneTriMeshData);
         sceneTriMesh.setPosition(0,0,0);
         DMatrix3 Rotation1 = new DMatrix3();
         dRFromAxisAndAngle(Rotation1, 0, 1, 0, M_PI / 2);
@@ -163,9 +269,9 @@ public class DynamicCharacterScreen extends BaseScreen {
 
         // Move him up above the ground
         Vector3 v = new Vector3();
-        playerModelInstance.transform.setToTranslation(0,4,0);
+        playerModelInstance.transform.setToTranslation(0,8,0);
         playerModelInstance.transform.getTranslation(v);
-        playerModelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(entity.body.getQuaternion()));
+        playerModelInstance.transform.rotate(Ode2GdxMathUtils.getGdxQuaternion(entity.body.getQuaternion()));
         entity.body.setPosition(v.x, v.y, v.z);
         entity.body.setMass(m);
         entity.body.setMaxAngularSpeed(0);
@@ -204,7 +310,6 @@ public class DynamicCharacterScreen extends BaseScreen {
 
                 OdeEntity entity = new OdeEntity();
                 DMass m = OdeHelper.createMass();
-                entity.id = "objects";
 
                 int random = MathUtils.random(1, 3);
                 switch (random) {
@@ -212,12 +317,14 @@ public class DynamicCharacterScreen extends BaseScreen {
                         BoxShapeBuilder.build(builder, 0, 0, 0, 1f, 1f, 1f);
                         entity.body = OdeHelper.createBody(OdePhysicsSystem.world);
                         entity.geom[0] = OdeHelper.createBox(OdePhysicsSystem.space, 1,1,1);
+                        m.setBox(odePhysicsSystem.DENSITY/5, 1,1,1);
                         //shape = new btBoxShape(new Vector3(0.5f, 0.5f, 0.5f));
                         break;
                     case 2:
                         SphereShapeBuilder.build(builder, 1, 1, 1, 12, 12);
                         entity.body = OdeHelper.createBody(OdePhysicsSystem.world);
                         entity.geom[0] = OdeHelper.createSphere(OdePhysicsSystem.space, 0.5);
+                        m.setSphere(odePhysicsSystem.DENSITY/5, 0.5);
                         //shape = new btSphereShape(0.5f);
                         break;
                     case 3:
@@ -225,20 +332,20 @@ public class DynamicCharacterScreen extends BaseScreen {
                         CylinderShapeBuilder.build(builder, 1, 1, 1, 12);
                         entity.body = OdeHelper.createBody(OdePhysicsSystem.world);
                         entity.geom[0] = OdeHelper.createCylinder(OdePhysicsSystem.space, 0.5, 1.0);
+                        m.setCylinder(odePhysicsSystem.DENSITY/5, 2, 0.5,1);
                         //shape = new btCylinderShape(new Vector3(0.5f, 0.5f, 0.5f));
                         break;
                 }
 
-                m.setBox(odePhysicsSystem.DENSITY/10, 1,1,1);
+                entity.id = "objects";
                 entity.body.setMass(m);
-                entity.modelInstance = new ModelInstance(modelBuilder.end());
-                entity.modelInstance.transform.setToTranslation(i, MathUtils.random(10, 20), j);
-                entity.modelInstance.transform.rotate(new Quaternion(Vector3.X, MathUtils.random(0f, 270f)));
 
-                Vector3 pos = new Vector3();
-                Quaternion q = new Quaternion();
-                entity.modelInstance.transform.getTranslation(pos);
-                entity.modelInstance.transform.getRotation(q);
+                Vector3 pos = new Vector3(i, MathUtils.random(10, 20), j);
+                Quaternion q = new Quaternion(Vector3.X, MathUtils.random(0f, 270f));
+
+                entity.modelInstance = new ModelInstance(modelBuilder.end());
+                entity.modelInstance.transform.setToTranslation(pos);
+                entity.modelInstance.transform.rotate(q);
 
                 DQuaternion qq = new DQuaternion();
                 qq.set(q.w, q.x, q.y, q.z);
@@ -246,6 +353,9 @@ public class DynamicCharacterScreen extends BaseScreen {
                 entity.geom[0].setPosition(pos.x, pos.y, pos.z);
                 entity.body.setPosition(pos.x, pos.y, pos.z);
                 entity.body.setQuaternion(qq);
+
+                //DMatrix3C mat3 = entity.geom[0].getRotation();
+                //System.out.println("libGdxQ:" + q + "   odeQ:" + qq +"   odeMat32GdxQ:" + Ode2GdxMathUtils.getGdxQuaternion(mat3));
 
                 for (int k=0; k < odePhysicsSystem.GPB; k++) {
                     if (entity.geom[k] != null) {
@@ -258,5 +368,86 @@ public class DynamicCharacterScreen extends BaseScreen {
                 //bulletPhysicsSystem.addBody(body);
             }
         }
+    }
+
+    @Override
+    public void dispose() {
+        // Destroy screen's assets here.
+        model.dispose();
+        modelBatch.dispose();
+        shadowBatch.dispose();
+        batch2D.dispose();
+        font.dispose();
+
+        // ode cleanup
+        odePhysicsSystem.dispose();
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        if (keycode == Input.Keys.F1) {
+            odePhysicsSystem.dispose();
+            Ode4libGDX.game.setScreen(new DemoCrashScreen());
+        } else if (keycode == Input.Keys.R) {
+            Vector3 v = new Vector3();
+            odePhysicsSystem.obj.get(1).modelInstance.transform.setToTranslation(0, 8, 0);
+            odePhysicsSystem.obj.get(1).modelInstance.transform.getTranslation(v);
+            odePhysicsSystem.obj.get(1).modelInstance.transform.rotate(Ode2GdxMathUtils.getGdxQuaternion(odePhysicsSystem.obj.get(1).body.getQuaternion()));
+            odePhysicsSystem.obj.get(1).body.setPosition(v.x, v.y, v.z);
+            odePhysicsSystem.obj.get(1).body.setLinearVel(0,0,0);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
+    }
+
+    @Override
+    public void resize(int width, int height) {
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
     }
 }

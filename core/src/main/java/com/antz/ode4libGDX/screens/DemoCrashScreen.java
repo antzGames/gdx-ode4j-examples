@@ -413,6 +413,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                 fireCannon();
                 break;
             case Input.Keys.F1:
+                shutdownSimulation();
                 Ode4libGDX.game.setScreen(new DemoRagDollScreen());
                 break;
         }

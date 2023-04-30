@@ -22,8 +22,8 @@ import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
  * April 27, 2023
  */
 public class DynamicCharacterController {
-    private final float MOVE_SPEED = 15f;
-    private final float JUMP_FACTOR = 5f;
+    private final float MOVE_SPEED = 3f;
+    private final float JUMP_FACTOR = 2f;
 
     private final Vector3 position = new Vector3();
     private final Vector3 normal = new Vector3();

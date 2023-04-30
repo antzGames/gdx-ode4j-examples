@@ -400,10 +400,14 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
         batch.dispose();
         font.dispose();
 
+        odeDispose();
+}
+
+    private void odeDispose() {
         // ode cleanup
+        gheight.destroy();
         contactgroup.destroy();
         space.destroy();
-        gheight.destroy();
         world.destroy();
         OdeHelper.closeODE();
     }
@@ -476,8 +480,10 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.F1) Ode4libGDX.game.setScreen(new DemoCrashScreen());
-        else if (keycode == Input.Keys.M) showTerrainMesh = !showTerrainMesh;
+        if (keycode == Input.Keys.F1) {
+            odeDispose();
+            Ode4libGDX.game.setScreen(new DynamicCharacterScreen());
+        } else if (keycode == Input.Keys.M) showTerrainMesh = !showTerrainMesh;
         else if (keycode == Input.Keys.SPACE) doDropSphere();
         return false;
     }

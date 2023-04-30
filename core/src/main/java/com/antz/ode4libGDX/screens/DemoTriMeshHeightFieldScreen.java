@@ -415,6 +415,10 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
         batch.dispose();
         font.dispose();
 
+        odeDispose();
+    }
+
+    private void odeDispose(){
         // ode cleanup
         contactgroup.destroy ();
         space.destroy ();
@@ -425,7 +429,10 @@ public class DemoTriMeshHeightFieldScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.F1) Ode4libGDX.game.setScreen(new DemoMundusHeightFieldScreen());
+        if (keycode == Input.Keys.F1) {
+            odeDispose();
+            Ode4libGDX.game.setScreen(new DemoMundusHeightFieldScreen());
+        }
         return false;
     }
 

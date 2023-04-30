@@ -35,7 +35,7 @@ public class OdePhysicsSystem implements Disposable {
     public static DWorld world;
     public static DSpace space;
     public static DJointGroup contactgroup;
-    public static Array<OdeEntity> obj = new Array<>(); // used this variable so ode4j code migration is easier;
+    public static Array<OdeEntity> obj; // used this variable so ode4j code migration is easier;
 
     // some constants
     public static final float DENSITY = 1.0f	;	// density of all objects
@@ -105,8 +105,8 @@ public class OdePhysicsSystem implements Disposable {
             contact.surface.mode = dContactBounce;
             contact.surface.mu = dInfinity;
             contact.surface.mu2 = 0;
-            contact.surface.bounce = 0.1;
-            contact.surface.bounce_vel = 0.1;
+            contact.surface.bounce = 0.3;
+            contact.surface.bounce_vel = 0.3;
         }
 
         int numc = OdeHelper.collide(o1,o2,MAX_CONTACTS,contacts.getGeomBuffer());
@@ -120,18 +120,19 @@ public class OdePhysicsSystem implements Disposable {
         }
     }
 
-    private void initODE() {
+    public void initODE() {
         // create world
+        obj = new Array<>();
         OdeHelper.initODE2(0);
         world = OdeHelper.createWorld();
-        world.setGravity(0, -9.8, 0);
+        world.setGravity(0, -1.62, 0); // moon gravity
         world.setCFM(1e-5);
-        //world.setERP(0.8);
+        world.setERP(0.8);
         world.setAutoDisableFlag(true);
         world.setContactMaxCorrectingVel(0.1);
         world.setContactSurfaceLayer(0.001);
         world.setAutoDisableAverageSamplesCount(0);
-        //world.setQuickStepNumIterations(20);
+        world.setQuickStepNumIterations(20);
 
         space = OdeHelper.createHashSpace(null);
         contactgroup = OdeHelper.createJointGroup();
