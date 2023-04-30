@@ -62,7 +62,7 @@ You can test the demos on your browser [here](https://antzgames.itch.io/physics-
 
 The following modified od4j demos are included:
 
-* `jBullet migration` - [JamesTKhan's libGDX jBullet tuturial example](https://www.youtube.com/watch?v=O0Deshj2-KU), but using this library.
+* `jBullet migration` - [JamesTKhan's libGDX jBullet tuturial example](https://www.youtube.com/watch?v=O0Deshj2-KU), but using odej4 library. (Picture below)
 * `DemoCrash` - destroy a wall of cubes with a cannon.
 * `DemoRagdoll` - Rigid bodies and joints that you can apply to a humanoid character, to simulate behaviour such as impact collisions
  and character death.
@@ -74,6 +74,9 @@ I am migrating new demos every week.
 FYI, the original ode4j demos have Z UP which is a pain.  During demo migration I either rotated the camera `camera.up.set(Vector.Z)` or reconfiged the simuation (gravity, positions, rotations) to have Y UP.  Both worked but eventaully its best to implement the second option.
 
 The demos have been tested on GWT, Desktop and Android.
+
+![odeGif](https://user-images.githubusercontent.com/10563814/235331595-2bffb58e-b429-44d8-b7fb-d3e5d89c0bca.gif)
+
 
 ## GWT Performance
 
