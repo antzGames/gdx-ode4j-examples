@@ -102,11 +102,15 @@ public class OdePhysicsSystem implements Disposable {
         DContactBuffer contacts = new DContactBuffer(MAX_CONTACTS);   // up to MAX_CONTACTS contacts per box-box
         for (int i=0; i<MAX_CONTACTS; i++) {
             DContact contact = contacts.get(i);
-            contact.surface.mode = dContactBounce;
-            contact.surface.mu = dInfinity;
-            contact.surface.mu2 = 0;
+            contact.surface.mode = dContactBounce | dContactSlip1 | dContactSlip2 | dContactSoftERP | dContactSoftCFM | dContactApprox1;
             contact.surface.bounce = 0.3;
             contact.surface.bounce_vel = 0.3;
+            contact.surface.mu = 0.4;
+            contact.surface.mu2 = 0.1;
+            contact.surface.slip1 = 0.1;
+            contact.surface.slip2 = 0.1;
+            contact.surface.soft_erp = 0.4;
+            contact.surface.soft_cfm = 0.01;
         }
 
         int numc = OdeHelper.collide(o1,o2,MAX_CONTACTS,contacts.getGeomBuffer());

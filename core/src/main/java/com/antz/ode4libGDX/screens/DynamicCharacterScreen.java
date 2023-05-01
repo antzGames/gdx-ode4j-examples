@@ -351,8 +351,8 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
                 qq.set(q.w, q.x, q.y, q.z);
                 entity.geom[0].setQuaternion(qq);
                 entity.geom[0].setPosition(pos.x, pos.y, pos.z);
-                entity.body.setPosition(pos.x, pos.y, pos.z);
                 entity.body.setQuaternion(qq);
+                entity.body.setPosition(pos.x, pos.y, pos.z);
 
                 //DMatrix3C mat3 = entity.geom[0].getRotation();
                 //System.out.println("libGdxQ:" + q + "   odeQ:" + qq +"   odeMat32GdxQ:" + Ode2GdxMathUtils.getGdxQuaternion(mat3));
