@@ -62,7 +62,7 @@ You can test the demos on your browser [here](https://antzgames.itch.io/physics-
 
 The following modified od4j demos are included:
 
-* `jBullet migration` - [JamesTKhan's libGDX jBullet tuturial example](https://www.youtube.com/watch?v=O0Deshj2-KU), but using odej4 library. (Picture below)
+* `jBullet migration` - [JamesTKhan's libGDX jBullet tutorial example](https://www.youtube.com/watch?v=O0Deshj2-KU), but using odej4 library. (Picture below)
 * `DemoCrash` - destroy a wall of cubes with a cannon.
 * `DemoRagdoll` - Rigid bodies and joints that you can apply to a humanoid character, to simulate behaviour such as impact collisions
  and character death.
