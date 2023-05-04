@@ -68,7 +68,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
     private ModelInstance[] m = new ModelInstance[32];
 
     // **** ode4j Ragdoll Stuff
-    private static final int  MAX_CONTACTS = 64;		// maximum number of contact points per body
+    private static final int MAX_CONTACTS = 64;		// maximum number of contact points per body
     private DWorld world;
     private DSpace space;
     private DxRagdoll ragdoll;
@@ -113,6 +113,9 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
         space = OdeHelper.createSimpleSpace();
         contactgroup = OdeHelper.createJointGroup ();
         OdeHelper.createPlane( space, 0, 1, 0, 0 );
+
+        world.setCFM(1e-5);
+        world.setERP(0.2);
 
         ragdoll = new DxRagdoll(world, space, new DxDefaultHumanRagdollConfig());
         ragdoll.setAngularDamping(0.1);
@@ -193,13 +196,14 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
             if (cap.getLength() < 2 * cap.getRadius()) x = cap.getRadius() * 2.01d;
 
             if (m[i] == null) {
-                model = modelBuilder.createCapsule((float) cap.getRadius(), (float) x, 5, GL20.GL_LINES,
+                model = modelBuilder.createCapsule((float) cap.getRadius(), (float) x, 5, GL20.GL_TRIANGLES,
                     new Material(ColorAttribute.createDiffuse(Color.BLACK)),
                     VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
                 m[i] = new ModelInstance(model);
             }
-            Quaternion q = Ode2GdxMathUtils.getGdxQuaternion(cap.getQuaternion());  // Using new convert util class
-            m[i].transform.set(q);
+
+            m[i].transform.set(Ode2GdxMathUtils.getGdxQuaternion(cap.getQuaternion()));
+            m[i].transform.rotate(Vector3.X, 90);
 
             m[i].transform.setTranslation((float) pos.get0(), (float) pos.get1(), (float) pos.get2());
             modelBatch.render(m[i]);
