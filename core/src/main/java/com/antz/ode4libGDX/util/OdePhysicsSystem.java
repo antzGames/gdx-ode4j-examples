@@ -1,7 +1,5 @@
 package com.antz.ode4libGDX.util;
 
-import com.antz.ode4libGDX.screens.DemoMundusHeightFieldScreen;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -67,6 +65,7 @@ public class OdePhysicsSystem implements Disposable {
                     (float) o.geom[0].getPosition().get2());
             } else if (o.id.equals("objects")){
                 o.modelInstance.transform.set(Ode2GdxMathUtils.getGdxQuaternion(o.geom[0].getQuaternion()));
+                o.modelInstance.transform.rotate(Vector3.X, 90); // for libGDX cylinders
                 o.modelInstance.transform.setTranslation(
                     (float) o.geom[0].getPosition().get0(),
                     (float) o.geom[0].getPosition().get1(),
@@ -103,10 +102,10 @@ public class OdePhysicsSystem implements Disposable {
         for (int i=0; i<MAX_CONTACTS; i++) {
             DContact contact = contacts.get(i);
             contact.surface.mode = dContactBounce | dContactSlip1 | dContactSlip2 | dContactSoftERP | dContactSoftCFM | dContactApprox1;
-            contact.surface.bounce = 0.3;
-            contact.surface.bounce_vel = 0.3;
+            contact.surface.bounce = 0.5;
+            contact.surface.bounce_vel = 0.1;
             contact.surface.mu = 0.4;
-            contact.surface.mu2 = 0.1;
+            //contact.surface.mu2 = 0.1;
             contact.surface.slip1 = 0.1;
             contact.surface.slip2 = 0.1;
             contact.surface.soft_erp = 0.4;

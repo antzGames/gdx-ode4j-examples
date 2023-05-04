@@ -6,11 +6,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import org.ode4j.math.DMatrix3;
 import org.ode4j.ode.DContactGeomBuffer;
 import org.ode4j.ode.DRay;
 import org.ode4j.ode.OdeHelper;
-import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
 
 /**
  * Original code from: https://github.com/JamesTKhan/libgdx-bullet-tutorials
@@ -26,7 +24,7 @@ public class DynamicCharacterController {
     private final float JUMP_FACTOR = 2f;
 
     private final Vector3 position = new Vector3();
-    private final Vector3 normal = new Vector3();
+    private final Vector3 normal = new Vector3();  // not using this, but placed it just in case you need
     private final Vector3 tmpPosition = new Vector3();
     private final Vector3 currentDirection = new Vector3();
     private final Vector3 linearVelocity = new Vector3();
@@ -49,19 +47,12 @@ public class DynamicCharacterController {
 
         // Turning
         Quaternion q = new Quaternion();
-        DMatrix3 R = new DMatrix3().setIdentity();
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             OdePhysicsSystem.obj.get(1).getModelInstance().transform.rotate(Vector3.Y, delta*60f);
             OdePhysicsSystem.obj.get(1).getModelInstance().transform.getRotation(q);
-            dRFromAxisAndAngle(R, 0, 1, 0, q.getYawRad());
-            OdePhysicsSystem.obj.get(1).body.setRotation(R);
-            isGrounded();
         } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             OdePhysicsSystem.obj.get(1).getModelInstance().transform.rotate(Vector3.Y, -delta*60f);
             OdePhysicsSystem.obj.get(1).getModelInstance().transform.getRotation(q);
-            dRFromAxisAndAngle(R, 0, 1, 0, q.getYawRad());
-            OdePhysicsSystem.obj.get(1).body.setRotation(R);
-            isGrounded();
         }
 
         // Jump
@@ -71,7 +62,7 @@ public class DynamicCharacterController {
 
         if (!linearVelocity.isZero()) {
             OdePhysicsSystem.obj.get(1).body.addLinearVel(linearVelocity.x, linearVelocity.y, linearVelocity.z);
-            OdePhysicsSystem.obj.get(1).body.addForce(linearVelocity.x, linearVelocity.y, linearVelocity.z);
+            //OdePhysicsSystem.obj.get(1).body.addForce(linearVelocity.x, linearVelocity.y, linearVelocity.z);
         }
     }
 

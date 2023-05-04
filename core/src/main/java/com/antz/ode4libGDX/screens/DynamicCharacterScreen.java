@@ -79,10 +79,11 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
     protected BitmapFont font = new BitmapFont();
     protected String info;
     private DynamicCharacterController controller;
+    protected boolean showAABB;
 
     @Override
     public void show() {
-        //Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode()); // uncomment for full screen desktop
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode()); // uncomment for full screen desktop/html
         Gdx.input.setCatchKey(Input.Keys.SPACE, true);
         Gdx.input.setCatchKey(Input.Keys.F1, true);
 
@@ -102,6 +103,7 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
         shadowBatch = new ModelBatch(new DepthShaderProvider());
         batch2D = new SpriteBatch();
         renderInstances = new Array<>();
+        showAABB = false;
 
         colors = new Array<>();
         colors.add(Color.PURPLE);
@@ -111,7 +113,6 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
         colors.add(Color.FIREBRICK);
 
         odePhysicsSystem = new OdePhysicsSystem();
-        odePhysicsSystem.initODE();
 
         // create scene floor
         createScene();
@@ -136,7 +137,8 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
         info =  "JTK's jBullet tutorial migrated to ode4j\n\n" +
             "WASD to move player, mouse wheel camera zoom.\n" +
             "SPACE to jump.\n" +
-            "R to reset player position.\n" +
+            "R to reset simulation.\n" +
+            "B to toggle AABB rendering.\n" +
             "Gravity set to Moon: 1.62 m/s\n" +
             "F1 to run Demo Crash.\n";
         System.out.println(info);
@@ -146,9 +148,9 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
 
     @Override
     public void render(float delta) {
-        controller.update(delta);
-        odePhysicsSystem.update(delta);
         cameraController.update(delta);
+        odePhysicsSystem.update(delta);
+        controller.update(delta);
 
         ScreenUtils.clear(Color.BLACK, true);
 
@@ -160,15 +162,14 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
 
         modelBatch.begin(camera);
         modelBatch.render(renderInstances, environment);
-        //modelBatch.render(odePhysicsSystem.obj.get(2).modelInstance, environment);
         modelBatch.end();
 
         //render AABB boxes
-        //renderAABB();
+        if (showAABB) renderAABB();
 
         // 2D stuff for info text
         batch2D.begin();
-        font.draw(batch2D, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 145);
+        font.draw(batch2D, info + "FPS:" + Gdx.graphics.getFramesPerSecond(), 10, 160);
         batch2D.end();
     }
 
@@ -257,13 +258,14 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
         dimensions.scl(0.5f);
 
         DMass m = OdeHelper.createMass();
-        m.setCapsule(odePhysicsSystem.DENSITY,2,dimensions.len()/2.5f, dimensions.y);
+        m.setCapsule(odePhysicsSystem.DENSITY,3,dimensions.len()/2.5f, dimensions.y);
 
         entity.id = "player";
         entity.body = OdeHelper.createBody(odePhysicsSystem.world);
         entity.geom[0] = OdeHelper.createCapsule(odePhysicsSystem.space,dimensions.len()/2.5f, dimensions.y);
         DMatrix3 R = new DMatrix3();
-        dRFromAxisAndAngle(R, 0, 1, 0, M_PI / 2);
+        dRFromAxisAndAngle(R, 1, 0, 0, M_PI / 2);
+        entity.geom[0].setRotation(R);
         entity.body.setRotation(R);
         entity.body.setData(1);
 
@@ -271,7 +273,7 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
         Vector3 v = new Vector3();
         playerModelInstance.transform.setToTranslation(0,8,0);
         playerModelInstance.transform.getTranslation(v);
-        playerModelInstance.transform.rotate(Ode2GdxMathUtils.getGdxQuaternion(entity.body.getQuaternion()));
+        //playerModelInstance.transform.rotate(Ode2GdxMathUtils.getGdxQuaternion(entity.body.getQuaternion()));
         entity.body.setPosition(v.x, v.y, v.z);
         entity.body.setMass(m);
         entity.body.setMaxAngularSpeed(0);
@@ -332,20 +334,17 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
                         CylinderShapeBuilder.build(builder, 1, 1, 1, 12);
                         entity.body = OdeHelper.createBody(OdePhysicsSystem.world);
                         entity.geom[0] = OdeHelper.createCylinder(OdePhysicsSystem.space, 0.5, 1.0);
-                        m.setCylinder(odePhysicsSystem.DENSITY/5, 2, 0.5,1);
+                        m.setCylinder(odePhysicsSystem.DENSITY/5, 3, 0.5,1);
                         //shape = new btCylinderShape(new Vector3(0.5f, 0.5f, 0.5f));
                         break;
                 }
-
+                entity.modelInstance = new ModelInstance(modelBuilder.end());
                 entity.id = "objects";
                 entity.body.setMass(m);
 
+                // random positions and rotations
                 Vector3 pos = new Vector3(i, MathUtils.random(10, 20), j);
                 Quaternion q = new Quaternion(Vector3.X, MathUtils.random(0f, 270f));
-
-                entity.modelInstance = new ModelInstance(modelBuilder.end());
-                entity.modelInstance.transform.setToTranslation(pos);
-                entity.modelInstance.transform.rotate(q);
 
                 DQuaternion qq = new DQuaternion();
                 qq.set(q.w, q.x, q.y, q.z);
@@ -354,15 +353,13 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
                 entity.body.setQuaternion(qq);
                 entity.body.setPosition(pos.x, pos.y, pos.z);
 
-                //DMatrix3C mat3 = entity.geom[0].getRotation();
-                //System.out.println("libGdxQ:" + q + "   odeQ:" + qq +"   odeMat32GdxQ:" + Ode2GdxMathUtils.getGdxQuaternion(mat3));
-
                 for (int k=0; k < odePhysicsSystem.GPB; k++) {
                     if (entity.geom[k] != null) {
                         entity.geom[k].setBody(entity.body);
                     }
                 }
 
+                // add physics and render objects
                 renderInstances.add(entity.modelInstance);
                 odePhysicsSystem.obj.add(entity);
                 //bulletPhysicsSystem.addBody(body);
@@ -389,14 +386,10 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
             odePhysicsSystem.dispose();
             Ode4libGDX.game.setScreen(new DemoCrashScreen());
         } else if (keycode == Input.Keys.R) {
-            Vector3 v = new Vector3();
-            odePhysicsSystem.obj.get(1).modelInstance.transform.setToTranslation(0, 8, 0);
-            odePhysicsSystem.obj.get(1).modelInstance.transform.getTranslation(v);
-            odePhysicsSystem.obj.get(1).modelInstance.transform.rotate(Ode2GdxMathUtils.getGdxQuaternion(odePhysicsSystem.obj.get(1).body.getQuaternion()));
-            odePhysicsSystem.obj.get(1).body.setPosition(v.x, v.y, v.z);
-            odePhysicsSystem.obj.get(1).body.setLinearVel(0,0,0);
+            Ode4libGDX.game.setScreen(new DynamicCharacterScreen());
+        } else if (keycode == Input.Keys.B) {
+            showAABB = !showAABB;
         }
-
         return false;
     }
 
