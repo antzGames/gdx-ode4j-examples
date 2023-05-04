@@ -46,10 +46,11 @@ Becasue I did not migrate the draw helper classes, every demo from ode4j will no
 
 Ode4j has its own math classes similar to libGDX's Vector3, Matrix3, Matrix4, and Quaternion.
 
-I added a new help math utility class called [Ode2GDXMathUtils](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/util/Ode2GdxMathUtils.java).  Use the following method to create the libGDX Quaternion from ode4j's QuanternionC:
+I added a math utility class called [Ode2GDXMathUtils](https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/blob/master/core/src/main/java/com/antz/ode4libGDX/util/Ode2GdxMathUtils.java).  Use the following methods to create the libGDX Quaternion from ode4j's QuanternionC or DMatrix3C:
 
 ```java
-  Quaternion q = Ode2GdxMathUtils.getGdxQuaternion(odeQuaternion);
+  Quaternion q1 = Ode2GdxMathUtils.getGdxQuaternion(odeQuaternion);
+  Quaternion q2 = Ode2GdxMathUtils.getGdxQuaternion(odeMat3);
   ```
 
 In addition ode4j uses double and not float like most of libGDX's math classes.
@@ -71,7 +72,7 @@ The following modified od4j demos are included:
 
 I am migrating new demos every week.
 
-FYI, the original ode4j demos have Z UP which is a pain.  During demo migration I either rotated the camera `camera.up.set(Vector.Z)` or reconfiged the simuation (gravity, positions, rotations) to have Y UP.  Both worked but eventaully its best to implement the second option.
+FYI, the original ode4j demos have Z UP which is a pain.  During demo migration I either rotated the camera `camera.up.set(Vector.Z)` or reconfiged the simuation (gravity, positions, rotations) to have Y UP.  Both worked but eventaully its best to implement the second option.  In addition, libGDX primitive 3D shapes are created on the Y-axis orientation, and ode4j is on the z-axis.  You need to be careful that your physics objects and libGDX render objects have the same orientation.
 
 The demos have been tested on GWT, Desktop and Android.
 
