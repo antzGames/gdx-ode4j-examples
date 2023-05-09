@@ -1,9 +1,8 @@
-package com.antz.ode4libGDX.screens;
+package com.antz.ode4libGDX.screens.demo;
 
 import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.controllers.camera.ThirdPersonCameraController;
 import com.antz.ode4libGDX.controllers.character.DynamicCharacterController;
-import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.antz.ode4libGDX.util.OdeEntity;
 import com.antz.ode4libGDX.util.OdePhysicsSystem;
 import com.antz.ode4libGDX.util.Utils3D;
@@ -58,7 +57,7 @@ import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
  * Antz
  * April 27, 2023
  */
-public class DynamicCharacterScreen implements Screen, InputProcessor {
+public class DemoDynamicCharacterScreen implements Screen, InputProcessor {
 
     protected PerspectiveCamera camera;
     protected ThirdPersonCameraController cameraController;
@@ -83,10 +82,6 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
 
     @Override
     public void show() {
-        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode()); // uncomment for full screen desktop/html
-        Gdx.input.setCatchKey(Input.Keys.SPACE, true);
-        Gdx.input.setCatchKey(Input.Keys.F1, true);
-
         camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 1f;
         camera.far = 500;
@@ -386,7 +381,7 @@ public class DynamicCharacterScreen implements Screen, InputProcessor {
             odePhysicsSystem.dispose();
             Ode4libGDX.game.setScreen(new DemoCrashScreen());
         } else if (keycode == Input.Keys.R) {
-            Ode4libGDX.game.setScreen(new DynamicCharacterScreen());
+            Ode4libGDX.game.setScreen(new DemoDynamicCharacterScreen());
         } else if (keycode == Input.Keys.B) {
             showAABB = !showAABB;
         }

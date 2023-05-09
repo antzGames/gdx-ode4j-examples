@@ -1,8 +1,9 @@
-package com.antz.ode4libGDX.screens;
+package com.antz.ode4libGDX.screens.demo;
 
 import static org.ode4j.ode.OdeHelper.*;
 import static org.ode4j.ode.OdeMath.*;
 import com.antz.ode4libGDX.Ode4libGDX;
+import com.antz.ode4libGDX.util.DxDefaultHumanRagdollConfig;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -22,7 +23,6 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;

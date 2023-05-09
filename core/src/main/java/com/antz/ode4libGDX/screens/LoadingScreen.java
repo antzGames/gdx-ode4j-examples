@@ -135,7 +135,7 @@ public class LoadingScreen implements Screen {
             batch.begin();
             font.setColor(Color.BLACK);
             font.getData().setScale(2f);
-            font.draw(batch, "CLICK TO CONTINUE", stage.getWidth()/2f - 150, 270);
+            font.draw(batch, "CLICK TO CONTINUE", stage.getWidth()/2f - 145, 270);
             font.setColor(Color.WHITE);
             batch.end();
         }
@@ -153,7 +153,8 @@ public class LoadingScreen implements Screen {
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
-                Ode4libGDX.game.setScreen(new DynamicCharacterScreen());
+                //Ode4libGDX.game.setScreen(new DynamicCharacterScreen());
+                Ode4libGDX.game.setScreen(new LibGDXScreen());
             }
         }
     }

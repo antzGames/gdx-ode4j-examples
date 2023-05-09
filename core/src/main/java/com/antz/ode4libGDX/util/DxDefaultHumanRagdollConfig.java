@@ -1,4 +1,4 @@
-package com.antz.ode4libGDX.screens;
+package com.antz.ode4libGDX.util;
 
 /*************************************************************************
  *                                                                       *

@@ -1,4 +1,4 @@
-package com.antz.ode4libGDX.screens;
+package com.antz.ode4libGDX.screens.demo;
 
 import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
@@ -24,38 +24,28 @@ import com.badlogic.gdx.math.Vector3;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.runtime.Mundus;
-
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
-import org.ode4j.ode.DBody;
 import org.ode4j.ode.DBox;
+import org.ode4j.ode.DHinge2Joint;
+import org.ode4j.ode.DSapSpace;
+import org.ode4j.ode.DSphere;
+import org.ode4j.ode.OdeHelper;
+import org.ode4j.ode.DBody;
 import org.ode4j.ode.DContact;
 import org.ode4j.ode.DContactBuffer;
 import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DGeom.DNearCallback;
-import org.ode4j.ode.DHinge2Joint;
 import org.ode4j.ode.DJoint;
 import org.ode4j.ode.DJointGroup;
 import org.ode4j.ode.DMass;
-import org.ode4j.ode.DSapSpace;
 import org.ode4j.ode.DSpace;
-import org.ode4j.ode.DSphere;
 import org.ode4j.ode.DWorld;
-import org.ode4j.ode.OdeHelper;
-
+import org.ode4j.ode.DGeom.DNearCallback;
 import java.util.ArrayList;
+import static org.ode4j.ode.OdeMath.*;
 
-import static org.ode4j.ode.OdeMath.dContactApprox1;
-import static org.ode4j.ode.OdeMath.dContactSlip1;
-import static org.ode4j.ode.OdeMath.dContactSlip2;
-import static org.ode4j.ode.OdeMath.dContactSoftCFM;
-import static org.ode4j.ode.OdeMath.dContactSoftERP;
-import static org.ode4j.ode.OdeMath.dInfinity;
-import static org.ode4j.ode.OdeMath.dMultiply0;
-import static org.ode4j.ode.OdeMath.dRFromAxisAndAngle;
-
-public class libGDXCrashScreen implements Screen, InputProcessor {
+public class DemoCrashScreen implements Screen, InputProcessor {
 
     // My stuff
     private Mundus mundus;
@@ -136,9 +126,6 @@ public class libGDXCrashScreen implements Screen, InputProcessor {
 
     @Override
     public void show() {
-        Gdx.input.setCatchKey(Input.Keys.SPACE, true);
-        Gdx.input.setCatchKey(Input.Keys.F1, true);
-
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(this);
         modelBatch = new ModelBatch();

@@ -1,6 +1,7 @@
 package com.antz.ode4libGDX.screens;
 
 import com.antz.ode4libGDX.Ode4libGDX;
+import com.antz.ode4libGDX.screens.demo.DemoDynamicCharacterScreen;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -10,42 +11,56 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
+
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
+import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
 import com.mbrlabs.mundus.runtime.Mundus;
+
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
-import org.ode4j.ode.DBox;
-import org.ode4j.ode.DHinge2Joint;
-import org.ode4j.ode.DSapSpace;
-import org.ode4j.ode.DSphere;
-import org.ode4j.ode.OdeHelper;
 import org.ode4j.ode.DBody;
+import org.ode4j.ode.DBox;
 import org.ode4j.ode.DContact;
 import org.ode4j.ode.DContactBuffer;
 import org.ode4j.ode.DGeom;
+import org.ode4j.ode.DGeom.DNearCallback;
+import org.ode4j.ode.DHinge2Joint;
 import org.ode4j.ode.DJoint;
 import org.ode4j.ode.DJointGroup;
 import org.ode4j.ode.DMass;
+import org.ode4j.ode.DSapSpace;
 import org.ode4j.ode.DSpace;
+import org.ode4j.ode.DSphere;
 import org.ode4j.ode.DWorld;
-import org.ode4j.ode.DGeom.DNearCallback;
-import java.util.ArrayList;
-import static org.ode4j.ode.OdeMath.*;
+import org.ode4j.ode.OdeHelper;
 
-public class DemoCrashScreen implements Screen, InputProcessor {
+import java.util.ArrayList;
+
+import static org.ode4j.ode.OdeMath.dContactApprox1;
+import static org.ode4j.ode.OdeMath.dContactSlip1;
+import static org.ode4j.ode.OdeMath.dContactSlip2;
+import static org.ode4j.ode.OdeMath.dContactSoftCFM;
+import static org.ode4j.ode.OdeMath.dContactSoftERP;
+import static org.ode4j.ode.OdeMath.dMultiply0;
+import static org.ode4j.ode.OdeMath.dRFromAxisAndAngle;
+
+public class LibGDXScreen implements Screen, InputProcessor {
 
     // My stuff
     private Mundus mundus;
@@ -55,11 +70,13 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         RENDER
     }
     private GameState gameState = GameState.LOADING;
-    private SpriteBatch batch;
     private BitmapFont font = new BitmapFont();
-    private String info;
+    private TextureRegion texture;
+    private TextureRegion[] boxTextures;
+    private int boxTextureIndex;
     private ModelBatch modelBatch;
     private ModelBuilder modelBuilder;
+    private MeshPartBuilder meshBuilder;
     private Model model;
     private ModelInstance cannonBallModelInstance;                              // the cannonball model
     private ModelInstance cannonBodyModelInstance;                              // cannon body model
@@ -77,8 +94,8 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     private static final float FMAX = 25;			        // max force
     private static final int   ITERS = 20;		            // number of iterations
     private static final float WBOXSIZE = 1.0f;		        // size of wall boxes
-    private static final float WALLWIDTH = 12;		        // width of wall
-    private static final float WALLHEIGHT = 10;		        // height of wall
+    private static final float WALLWIDTH = 9;		        // width of wall
+    private static final float WALLHEIGHT = 9;		        // height of wall
     private static final float DISABLE_THRESHOLD = 0.008f;	// maximum velocity (squared) a body can have and be disabled
     private static final float DISABLE_STEPS = 10;	        // number of steps a box has to have been disable-able before it will be disabled
     private static final float CANNON_X = 100;		        // x position of cannon
@@ -88,15 +105,6 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
     private static boolean WALL = true;
     private static boolean CANNON = true;
-
-    /**
-     libGDX user note: All the ode4j demos create very large arrays for joints, boxes, bodies etc.
-     And then they have a integer keeping track of how many actual elements in the array are used.
-     The original version had 100,000 elements per array.  I reduced it to 1000.
-     I think this is a relic from the C language malloc to reserve memory?
-     Either way this is a todo to switch to an Array
-     There is also some weird code format and variable names.  I think its due to relics of ported C/C++ code.
-    **/
 
     // dynamics and collision objects
     private static DWorld world;
@@ -126,14 +134,13 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
     @Override
     public void show() {
-        Gdx.input.setCatchKey(Input.Keys.SPACE, true);
-        Gdx.input.setCatchKey(Input.Keys.F1, true);
-
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(this);
         modelBatch = new ModelBatch();
         modelBuilder = new ModelBuilder();
-        batch = new SpriteBatch();
+        meshBuilder = new MeshBuilder();
+        texture = new TextureRegion(new Texture(Gdx.files.internal("graphics/img.png")));
         font.setColor(Color.BLUE);
         doFast = true;
 
@@ -150,19 +157,10 @@ public class DemoCrashScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        info = "DemoCrash\n\n" +
-            "WASD to move camera, click-drag mouse to rotate camera.\n" +
-            "LEFT-CURSOR to turn the cannon left.\n" +
-            "RIGHT-CURSOR to turn the cannon right.\n" +
-            "SPACE to shoot from the cannon.\n" +
-            "R to reset simulation.\n" +
-            "F1 to go to RagDoll Demo\n";
-
-        System.out.println(info);
-
         bodies = 0;
         joints = 0;
         OdeHelper.initODE2(0);
+        initAnimation();
         setupSimulation();
     }
 
@@ -190,28 +188,12 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         modelBatch.begin(scene.cam);
         simLoop(false, modelBatch); // so the original demo did rendering in the simulation loop, I did the same thing, but I think its not a good idea
         modelBatch.end();
-
-        // 2D stuff for info text
-        batch.begin();
-        font.draw(batch, info + "Number of Boxes:" + wb + "\nFPS:" + Gdx.graphics.getFramesPerSecond(), 10, 180);
-        batch.end();
     }
 
     // simulation loop
     private void simLoop (boolean pause, ModelBatch modelBatch)  {
         int i, j;
         if (!pause) {
-            for (j = 0; j < joints; j++)  {
-                DHinge2Joint j2 = joint[j];
-                double curturn = j2.getAngle1 ();
-                //dMessage (0,"curturn %e, turn %e, vel %e", curturn, turn, (turn-curturn)*1.0);
-                j2.setParamVel((turn-curturn)*1.0);
-                j2.setParamFMax(dInfinity);
-                j2.setParamVel2(speed);
-                j2.setParamFMax2(FMAX);
-                j2.getBody(0).enable();
-                j2.getBody(1).enable();
-            }
             if (doFast) {
                 space.collide (null,nearCallback);
                 world.quickStep (0.05);
@@ -246,7 +228,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                 }
 
                 DVector3 ss = new DVector3();
-                wall_boxes[i].getLengths (ss);
+                wall_boxes[i].getLengths(ss);
 
                 wallBoxModelInstances.get(i).transform.set(Ode2GdxMathUtils.getGdxQuaternion(wall_boxes[i].getQuaternion()));
                 wallBoxModelInstances.get(i).transform.setTranslation((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2());
@@ -265,16 +247,6 @@ public class DemoCrashScreen implements Screen, InputProcessor {
             }
         }
 
-        // draw the cannon
-        DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
-        dRFromAxisAndAngle (R2,0,1,0,cannon_angle);
-        dRFromAxisAndAngle (R3,1,0,0,cannon_elevation);
-        dMultiply0 (R4,R2,R3);
-
-        cannonBodyModelInstance.transform.setTranslation(CANNON_X,1,CANNON_Z);
-        modelBatch.render(cannonBodyModelInstance);
-        //dsDrawCylinder (cpos,R4,3f,0.5f); //original draw call
-
         // draw the cannon ball
         cannonBallModelInstance.transform.setTranslation((float)cannon_ball_body.getPosition().get0(),(float)cannon_ball_body.getPosition().get1(),(float)cannon_ball_body.getPosition().get2());
         modelBatch.render(cannonBallModelInstance);
@@ -284,6 +256,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     private void setupSimulation() {
         cannon_angle = 0;
         cannon_elevation = 0;
+        boxTextureIndex = 0;
 
         int i;
         for (i = 0; i < 1000; i++) wb_stepsdis[i] = 0;
@@ -306,11 +279,13 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         if (WALL) {//#ifdef WALL
             boolean offset = false;
-            for (double y = WBOXSIZE/2.0; y <= WALLHEIGHT; y+=WBOXSIZE) {
+            for (double y = WBOXSIZE/2.0; y <= WALLHEIGHT; y += WBOXSIZE) {
                 offset = !offset;
-                for (double x = (-WALLWIDTH+y)/2; x <= (WALLWIDTH-y)/2; x+=WBOXSIZE) {
+                for (double x = (-WALLWIDTH)/2; x <= (WALLWIDTH)/2; x += WBOXSIZE) {
                     wall_bodies[wb] = OdeHelper.createBody(world);
-                    wall_bodies[wb].setPosition (100 + x,y,100 );
+
+                    //if (offset) wall_bodies[wb].setPosition (100 + x - WBOXSIZE/2f , y ,100 );
+                    wall_bodies[wb].setPosition (100 + x , y ,100 );
                     m.setBox (1,WBOXSIZE,WBOXSIZE,WBOXSIZE);
                     m.adjust (WALLMASS);
                     wall_bodies[wb].setMass(m);
@@ -319,10 +294,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                     //dBodyDisable(wall_bodies[wb++]);
 
                     // libGDX model code
-                    model = modelBuilder.createBox(WBOXSIZE, WBOXSIZE, WBOXSIZE, GL20.GL_LINES,
-                        new Material(ColorAttribute.createDiffuse(Color.RED)),
-                        VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-                    wallBoxModelInstances.add(new ModelInstance(model));
+                    wallBoxModelInstances.add(createBox());
                     wb++;
                 }
             }
@@ -359,6 +331,49 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         }//#endif
     }
 
+    private void initAnimation() {
+        TextureRegion[][] tmp = texture.split(
+            texture.getRegionWidth() / 10,
+            texture.getRegionHeight() / 10);
+
+        // Place the regions into a 1D array in the correct order, starting from the top
+        // left, going across first. The Animation constructor requires a 1D array.
+        boxTextures = new TextureRegion[10 * 10];
+        int index = 0;
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                boxTextures[index++] = tmp[i][j];
+            }
+        }
+    }
+
+    private ModelInstance createBox(){
+        float size = WBOXSIZE/2f;
+        modelBuilder.begin();
+        meshBuilder = modelBuilder.part("front",GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates,
+            new Material(ColorAttribute.createDiffuse(Color.WHITE), TextureAttribute.createDiffuse(boxTextures[boxTextureIndex])));
+        boxTextureIndex++;
+        meshBuilder.rect(new Vector3(-size,size,-size), new Vector3(size,size,-size), new Vector3(size,-size,-size), new Vector3(-size,-size,-size), new Vector3(0,0,1));
+
+        meshBuilder = modelBuilder.part("other",GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
+            new Material(ColorAttribute.createDiffuse(Color.WHITE)));
+        // back
+        meshBuilder.rect(new Vector3(-size,-size,size), new Vector3(size,-size,size), new Vector3(size,size,size), new Vector3(-size,size,size), new Vector3(0,0,1));
+
+        //right
+        meshBuilder.rect(new Vector3(-size,size,size), new Vector3(-size,size,-size), new Vector3(-size,-size,-size), new Vector3(-size,-size,size), new Vector3(-1,0,0));
+        //left
+        meshBuilder.rect(new Vector3(size,size,size), new Vector3(size,-size,size), new Vector3(size,-size,-size), new Vector3(size,size,-size), new Vector3(0,0,1));
+
+        // top
+        meshBuilder.rect(new Vector3(-size,size,size), new Vector3(size,size,size), new Vector3(size,size,-size), new Vector3(-size,size,-size), new Vector3(0,1,0));
+        //bottom
+        meshBuilder.rect(new Vector3(-size,-size,-size), new Vector3(size,-size,-size), new Vector3(size,-size,size), new Vector3(-size,-size,size), new Vector3(0,-1,0));
+
+        model = modelBuilder.end();
+        return new ModelInstance(model);
+    }
+
     @Override
     public void resize(int width, int height) {
         // Resize your screen here. The parameters represent the new window size.
@@ -385,7 +400,6 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         mundus.dispose();
         model.dispose();
         modelBatch.dispose();
-        batch.dispose();
         font.dispose();
 
         contactgroup.destroy();
@@ -414,7 +428,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                 break;
             case Input.Keys.F1:
                 shutdownSimulation();
-                Ode4libGDX.game.setScreen(new DemoRagDollScreen());
+                Ode4libGDX.game.setScreen(new DemoDynamicCharacterScreen());
                 break;
         }
         return false;
@@ -474,7 +488,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         if (mundus.continueLoading()) {
             // Loading complete, load a scene.
             scene = mundus.loadScene("Main Scene.mundus");
-            scene.cam.position.set(90, 10, 90);
+            scene.cam.position.set(100, 10, 90);
             scene.cam.lookAt(100,0,100);
             scene.cam.up.set(Vector3.Y);
             scene.cam.update();;
@@ -505,7 +519,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         final int N = 4;
         DContactBuffer contacts = new DContactBuffer(N);
-        n = OdeHelper.collide (o1,o2,N,contacts.getGeomBuffer());//[0].geom,sizeof(dContact));
+        n = OdeHelper.collide(o1,o2,N,contacts.getGeomBuffer());//[0].geom,sizeof(dContact));
         if (n > 0) {
             for (i=0; i<n; i++) {
                 DContact contact = contacts.get(i);
@@ -521,6 +535,12 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                 contact.surface.soft_cfm = 0.01;
                 DJoint c = OdeHelper.createContactJoint(world,contactgroup,contact);
                 c.attach (o1.getBody(), o2.getBody());
+
+                if (o1 instanceof DSphere && o2 instanceof DBox){
+                    o2.getBody().addLinearVel(25,50,0);
+                } else if (o2 instanceof DSphere && o1 instanceof DBox){
+                    o1.getBody().addLinearVel(-25,50,0);
+                }
             }
         }
     }
