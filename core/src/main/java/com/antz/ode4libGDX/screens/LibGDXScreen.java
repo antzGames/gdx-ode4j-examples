@@ -1,9 +1,9 @@
 package com.antz.ode4libGDX.screens;
 
 import com.antz.ode4libGDX.Ode4libGDX;
+import com.antz.ode4libGDX.screens.demo.DemoCrashScreen;
 import com.antz.ode4libGDX.screens.demo.DemoDynamicCharacterScreen;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -13,8 +13,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
-
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -27,10 +25,11 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.mbrlabs.mundus.commons.Scene;
 import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
+import com.mbrlabs.mundus.commons.scene3d.GameObject;
 import com.mbrlabs.mundus.runtime.Mundus;
-
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
@@ -49,9 +48,7 @@ import org.ode4j.ode.DSpace;
 import org.ode4j.ode.DSphere;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.OdeHelper;
-
 import java.util.ArrayList;
-
 import static org.ode4j.ode.OdeMath.dContactApprox1;
 import static org.ode4j.ode.OdeMath.dContactSlip1;
 import static org.ode4j.ode.OdeMath.dContactSlip2;
@@ -69,8 +66,8 @@ public class LibGDXScreen implements Screen, InputProcessor {
         LOADING,
         RENDER
     }
+
     private GameState gameState = GameState.LOADING;
-    private BitmapFont font = new BitmapFont();
     private TextureRegion texture;
     private TextureRegion[] boxTextures;
     private int boxTextureIndex;
@@ -79,23 +76,19 @@ public class LibGDXScreen implements Screen, InputProcessor {
     private MeshPartBuilder meshBuilder;
     private Model model;
     private ModelInstance cannonBallModelInstance;                              // the cannonball model
-    private ModelInstance cannonBodyModelInstance;                              // cannon body model
-    private ArrayList<ModelInstance> sphereModelInstances = new ArrayList<>();  // The models for sphere[] array (not used)
-    private ArrayList<ModelInstance> boxesModelInstances = new ArrayList<>();   // The models for boxes[] array (not used)
+    private ModelInstance ground;                                               // ground model
     private ArrayList<ModelInstance> wallBoxModelInstances = new ArrayList<>(); // The models for wall_boxes[] array
+    private ArrayList<GameObject> wallBoxGameObjects = new ArrayList<>();
     private InputMultiplexer inputMultiplexer;
     private FirstPersonCameraController controller;
-
-    // **** ode4j DemoCrash original stuff below
 
     // some constants
     private static final float RADIUS = 0.5f;	            // canon ball radius
     private static final float WALLMASS = 1	;	            // wall box mass
-    private static final float FMAX = 25;			        // max force
     private static final int   ITERS = 20;		            // number of iterations
     private static final float WBOXSIZE = 1.0f;		        // size of wall boxes
-    private static final float WALLWIDTH = 9;		        // width of wall
-    private static final float WALLHEIGHT = 9;		        // height of wall
+    private static final int   WALLWIDTH = 10;		        // width of wall
+    private static final int   WALLHEIGHT = 10;		        // height of wall
     private static final float DISABLE_THRESHOLD = 0.008f;	// maximum velocity (squared) a body can have and be disabled
     private static final float DISABLE_STEPS = 10;	        // number of steps a box has to have been disable-able before it will be disabled
     private static final float CANNON_X = 100;		        // x position of cannon
@@ -103,15 +96,11 @@ public class LibGDXScreen implements Screen, InputProcessor {
     private static final float CANNON_BALL_MASS = 10;	    // mass of the cannon ball
     private static final float CANNON_BALL_RADIUS = 0.5f;   // cannon ball radius
 
-    private static boolean WALL = true;
-    private static boolean CANNON = true;
-
     // dynamics and collision objects
     private static DWorld world;
     private static DSpace space;
     private static int bodies;
     private static DHinge2Joint[] joint = new DHinge2Joint[1000];
-    private static int joints;
     private static DJointGroup contactgroup;
 
     //private static DGeom ground;
@@ -127,22 +116,12 @@ public class LibGDXScreen implements Screen, InputProcessor {
     private static DBody b;
     private static DMass m;
 
-    // things that the user controls
-    private static float turn = 0, speed = 0;
     private static float cannon_angle = 0;
     private static float cannon_elevation = 0f;
 
     @Override
     public void show() {
         Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-        inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(this);
-        modelBatch = new ModelBatch();
-        modelBuilder = new ModelBuilder();
-        meshBuilder = new MeshBuilder();
-        texture = new TextureRegion(new Texture(Gdx.files.internal("graphics/img.png")));
-        font.setColor(Color.BLUE);
-        doFast = true;
 
         // From Mundus Example Project
         Mundus.Config config = new Mundus.Config();
@@ -156,12 +135,20 @@ public class LibGDXScreen implements Screen, InputProcessor {
         } catch (MetaFileParseException e) {
             e.printStackTrace();
         }
+        modelBatch = new ModelBatch();
+        modelBuilder = new ModelBuilder();
+        meshBuilder = new MeshBuilder();
+        texture = new TextureRegion(new Texture(Gdx.files.internal("graphics/img.png")));
 
+        doFast = true;
         bodies = 0;
-        joints = 0;
         OdeHelper.initODE2(0);
-        initAnimation();
+        initBoxTextures();
         setupSimulation();
+
+        inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(this);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     @Override
@@ -174,83 +161,66 @@ public class LibGDXScreen implements Screen, InputProcessor {
                 continueLoading();
                 break;
             case RENDER:
+                simLoop();
                 draw();
                 break;
         }
     }
 
     private void draw() {
-        controller.update(); // camera controller
+        controller.update();
         scene.sceneGraph.update(); // update Mundus
         scene.render(); // render Mundus scene
 
-        // 3D models drawing
         modelBatch.begin(scene.cam);
-        simLoop(false, modelBatch); // so the original demo did rendering in the simulation loop, I did the same thing, but I think its not a good idea
+        for (int i = 0; i < wb; i++) {
+            modelBatch.render(wallBoxModelInstances.get(i));
+        }
+        modelBatch.render(cannonBallModelInstance);
+        //modelBatch.render(ground);
         modelBatch.end();
     }
 
     // simulation loop
-    private void simLoop (boolean pause, ModelBatch modelBatch)  {
-        int i, j;
-        if (!pause) {
-            if (doFast) {
-                space.collide (null,nearCallback);
-                world.quickStep (0.05);
-                contactgroup.empty ();
-            } else {
-                space.collide (null,nearCallback);
-                world.step (0.05);
-                contactgroup.empty ();
-            }
-
-            for (i = 0; i < wb; i++) {
-                b = wall_boxes[i].getBody();
-                if (b.isEnabled()) {
-                    boolean disable = true;
-                    DVector3C lvel = b.getLinearVel();
-                    double lspeed = lvel.lengthSquared();
-                    if (lspeed > DISABLE_THRESHOLD)
-                        disable = false;
-                    DVector3C avel = b.getAngularVel();
-                    double aspeed = avel.lengthSquared();
-                    if (aspeed > DISABLE_THRESHOLD)
-                        disable = false;
-
-                    if (disable)
-                        wb_stepsdis[i]++;
-                    else
-                        wb_stepsdis[i] = 0;
-
-                    if (wb_stepsdis[i] > DISABLE_STEPS) {
-                        b.disable();
-                    }
-                }
-
-                DVector3 ss = new DVector3();
-                wall_boxes[i].getLengths(ss);
-
-                wallBoxModelInstances.get(i).transform.set(Ode2GdxMathUtils.getGdxQuaternion(wall_boxes[i].getQuaternion()));
-                wallBoxModelInstances.get(i).transform.setTranslation((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2());
-                modelBatch.render(wallBoxModelInstances.get(i));
-                //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);  //original draw call
-            }
+    private void simLoop ()  {
+        if (doFast) {
+            space.collide (null,nearCallback);
+            world.quickStep (0.05);
+            contactgroup.empty ();
         } else {
-            for (i = 0; i < wb; i++) {
-                b = wall_boxes[i].getBody();
-
-                DVector3 ss = new DVector3();
-                wall_boxes[i].getLengths (ss);
-                wallBoxModelInstances.get(i).transform.setTranslation((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2());
-                modelBatch.render(wallBoxModelInstances.get(i));
-                //dsDrawBox(wall_boxes[i].getPosition(), wall_boxes[i].getRotation(), ss);  //original draw call
-            }
+            space.collide (null,nearCallback);
+            world.step (0.05);
+            contactgroup.empty ();
         }
 
-        // draw the cannon ball
+        for (int i = 0; i < wb; i++) {
+            b = wall_boxes[i].getBody();
+            if (b.isEnabled()) {
+                boolean disable = true;
+                DVector3C lvel = b.getLinearVel();
+                double lspeed = lvel.lengthSquared();
+                if (lspeed > DISABLE_THRESHOLD)
+                    disable = false;
+                DVector3C avel = b.getAngularVel();
+                double aspeed = avel.lengthSquared();
+                if (aspeed > DISABLE_THRESHOLD)
+                    disable = false;
+
+                if (disable)
+                    wb_stepsdis[i]++;
+                else
+                    wb_stepsdis[i] = 0;
+
+                if (wb_stepsdis[i] > DISABLE_STEPS) {
+                    b.disable();
+                }
+            }
+            DVector3 ss = new DVector3();
+            wall_boxes[i].getLengths(ss);
+            wallBoxModelInstances.get(i).transform.set(Ode2GdxMathUtils.getGdxQuaternion(wall_boxes[i].getQuaternion()));
+            wallBoxModelInstances.get(i).transform.setTranslation((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2());
+        }
         cannonBallModelInstance.transform.setTranslation((float)cannon_ball_body.getPosition().get0(),(float)cannon_ball_body.getPosition().get1(),(float)cannon_ball_body.getPosition().get2());
-        modelBatch.render(cannonBallModelInstance);
-        //dsDrawSphere (cannon_ball_body.getPosition(),cannon_ball_body.getRotation(), CANNON_BALL_RADIUS); //original draw call
     }
 
     private void setupSimulation() {
@@ -258,8 +228,7 @@ public class LibGDXScreen implements Screen, InputProcessor {
         cannon_elevation = 0;
         boxTextureIndex = 0;
 
-        int i;
-        for (i = 0; i < 1000; i++) wb_stepsdis[i] = 0;
+        for (int i = 0; i < 1000; i++) wb_stepsdis[i] = 0;
 
         // recreate world
         world = OdeHelper.createWorld();
@@ -274,74 +243,58 @@ public class LibGDXScreen implements Screen, InputProcessor {
 
         OdeHelper.createPlane (space,0,1,0,0);
         bodies = 0;
-        joints = 0;
         wb = 0;
 
-        if (WALL) {//#ifdef WALL
-            boolean offset = false;
-            for (double y = WBOXSIZE/2.0; y <= WALLHEIGHT; y += WBOXSIZE) {
-                offset = !offset;
-                for (double x = (-WALLWIDTH)/2; x <= (WALLWIDTH)/2; x += WBOXSIZE) {
-                    wall_bodies[wb] = OdeHelper.createBody(world);
+        // Wall boxes
+        for (float y = WBOXSIZE/2f; y < WALLHEIGHT; y += WBOXSIZE) {
+            for (float x = -WALLWIDTH/2; x < WALLWIDTH/2; x += WBOXSIZE) {
+                wall_bodies[wb] = OdeHelper.createBody(world);
 
-                    //if (offset) wall_bodies[wb].setPosition (100 + x - WBOXSIZE/2f , y ,100 );
-                    wall_bodies[wb].setPosition (100 + x , y ,100 );
-                    m.setBox (1,WBOXSIZE,WBOXSIZE,WBOXSIZE);
-                    m.adjust (WALLMASS);
-                    wall_bodies[wb].setMass(m);
-                    wall_boxes[wb] = OdeHelper.createBox (space,WBOXSIZE,WBOXSIZE,WBOXSIZE);
-                    wall_boxes[wb].setBody (wall_bodies[wb]);
-                    //dBodyDisable(wall_bodies[wb++]);
+                //if (offset) wall_bodies[wb].setPosition (100 + x - WBOXSIZE/2f , y ,100 );
+                wall_bodies[wb].setPosition(100.5f + x , y ,100 );
+                m.setBox(1,WBOXSIZE,WBOXSIZE,WBOXSIZE);
+                m.adjust(WALLMASS);
+                wall_bodies[wb].setMass(m);
+                wall_boxes[wb] = OdeHelper.createBox (space,WBOXSIZE,WBOXSIZE,WBOXSIZE);
+                wall_boxes[wb].setBody (wall_bodies[wb]);
 
-                    // libGDX model code
-                    wallBoxModelInstances.add(createBox());
-                    wb++;
-                }
+                // libGDX model code
+                wallBoxModelInstances.add(createBox());
+                wb++;
             }
-            System.out.println("wall boxes: " + wb);
-        }//#endif
-        if (CANNON) {//#ifdef CANNON
-            cannon_ball_body = OdeHelper.createBody (world);
-            cannon_ball_geom = OdeHelper.createSphere (space,CANNON_BALL_RADIUS);
-            m.setSphereTotal (CANNON_BALL_MASS,CANNON_BALL_RADIUS);
+        }
 
-            // libGDX model code
-            model = modelBuilder.createSphere(CANNON_BALL_RADIUS*2, CANNON_BALL_RADIUS*2, CANNON_BALL_RADIUS*2, 10, 10,
-                new Material(ColorAttribute.createDiffuse(Color.ORANGE)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-            sphereModelInstances.add(new ModelInstance(model));
+        // Cannon ball
+        cannon_ball_body = OdeHelper.createBody (world);
+        cannon_ball_geom = OdeHelper.createSphere (space,CANNON_BALL_RADIUS);
+        m.setSphereTotal(CANNON_BALL_MASS,CANNON_BALL_RADIUS);
+        cannon_ball_body.setMass(m);
+        cannon_ball_geom.setBody(cannon_ball_body);
+        cannon_ball_body.setPosition(CANNON_X, CANNON_BALL_RADIUS, CANNON_Z);
 
-            cannon_ball_body.setMass (m);
-            cannon_ball_geom.setBody (cannon_ball_body);
-            cannon_ball_body.setPosition (CANNON_X, CANNON_BALL_RADIUS, CANNON_Z);
+        // libGDX model code
+        model = modelBuilder.createSphere(RADIUS, RADIUS, RADIUS, 10, 10,
+            new Material(ColorAttribute.createDiffuse(Color.BLACK)),
+            VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+        cannonBallModelInstance = new ModelInstance(model);
 
-            // libGDX model code
-            model = modelBuilder.createSphere(RADIUS, RADIUS, RADIUS, 10, 10,
-                new Material(ColorAttribute.createDiffuse(Color.ORANGE)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-            cannonBallModelInstance = new ModelInstance(model);
-
-            // libGDX model code
-            model = modelBuilder.createCylinder(0.5f,3f,0.5f, 10,
-                new Material(ColorAttribute.createDiffuse(Color.PINK)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-            cannonBodyModelInstance = new ModelInstance(model);
-            cannonBodyModelInstance.transform.translate(CANNON_X,1,CANNON_Z);
-            cannonBodyModelInstance.transform.setToRotation(Vector3.X, 90);
-        }//#endif
+        // ground
+        model = modelBuilder.createBox(200, 1,200,
+            new Material(ColorAttribute.createDiffuse(Color.WHITE)),
+            VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+        ground = new ModelInstance(model);
+        ground.transform.setTranslation(0,-0.5f,0);
     }
 
-    private void initAnimation() {
+    private void initBoxTextures() {
         TextureRegion[][] tmp = texture.split(
-            texture.getRegionWidth() / 10,
-            texture.getRegionHeight() / 10);
+            texture.getRegionWidth() / WALLWIDTH,
+            texture.getRegionHeight() / WALLHEIGHT);
 
-        // Place the regions into a 1D array in the correct order, starting from the top
-        // left, going across first. The Animation constructor requires a 1D array.
-        boxTextures = new TextureRegion[10 * 10];
+        boxTextures = new TextureRegion[WALLWIDTH * WALLHEIGHT];
         int index = 0;
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
+        for (int i = 0; i < WALLWIDTH; i++) {
+            for (int j = 0; j < WALLHEIGHT; j++) {
                 boxTextures[index++] = tmp[i][j];
             }
         }
@@ -397,10 +350,8 @@ public class LibGDXScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         // Destroy screen's assets here.
-        mundus.dispose();
         model.dispose();
         modelBatch.dispose();
-        font.dispose();
 
         contactgroup.destroy();
         space.destroy();
@@ -416,11 +367,9 @@ public class LibGDXScreen implements Screen, InputProcessor {
                 setupSimulation();
                 break;
             case Input.Keys.LEFT:
-                cannonBodyModelInstance.transform.rotateRad(Vector3.Z, -0.1f);
                 cannon_angle += 0.1;
                 break;
             case Input.Keys.RIGHT:
-                cannonBodyModelInstance.transform.rotateRad(Vector3.Z, 0.1f);
                 cannon_angle -= 0.1;
                 break;
             case Input.Keys.SPACE:
@@ -440,7 +389,9 @@ public class LibGDXScreen implements Screen, InputProcessor {
         dRFromAxisAndAngle (R3,1,0,0,cannon_elevation);
         dMultiply0 (R4,R2,R3);
         double[] cpos = {CANNON_X,1, CANNON_Z};
-        for (int i=0; i<3; i++) cpos[i] += 3*R4.get(i, 2);//[i*4+2];
+        for (int i=0; i<3; i++)
+            cpos[i] += 3*R4.get(i, 2);//[i*4+2];
+
         cannon_ball_body.setPosition (cpos[0],cpos[1],cpos[2]);
         double force = 10;
         cannon_ball_body.setLinearVel (force*R4.get(0, 2),force*R4.get(1,2),force*R4.get(2,2));
@@ -459,7 +410,6 @@ public class LibGDXScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (Gdx.app.getType().equals(Application.ApplicationType.Android)) fireCannon();
         return false;
     }
 
@@ -483,31 +433,7 @@ public class LibGDXScreen implements Screen, InputProcessor {
         return false;
     }
 
-
-    private void continueLoading() {
-        if (mundus.continueLoading()) {
-            // Loading complete, load a scene.
-            scene = mundus.loadScene("Main Scene.mundus");
-            scene.cam.position.set(100, 10, 90);
-            scene.cam.lookAt(100,0,100);
-            scene.cam.up.set(Vector3.Y);
-            scene.cam.update();;
-            // setup input
-            controller = new FirstPersonCameraController(scene.cam);
-            controller.setVelocity(20f);
-            inputMultiplexer.addProcessor(controller);
-            Gdx.input.setInputProcessor(inputMultiplexer);
-            // Update our game state
-            gameState = GameState.RENDER;
-        }
-    }
-
-    private DNearCallback nearCallback = new DNearCallback() {
-        @Override
-        public void call(Object data, DGeom o1, DGeom o2) {
-            nearCallback(data, o1, o2);
-        }
-    };
+    private DNearCallback nearCallback = (data, o1, o2) -> nearCallback(data, o1, o2);
 
     private void nearCallback (Object data, DGeom o1, DGeom o2) {
         int i,n;
@@ -552,6 +478,24 @@ public class LibGDXScreen implements Screen, InputProcessor {
             space.destroy();
             world.destroy();
             bodies = 0;
+        }
+    }
+
+    private void continueLoading() {
+        if (mundus.continueLoading()) {
+            // Loading complete, load a scene.
+            scene = mundus.loadScene("Main Scene.mundus");
+            scene.cam.position.set(100, 3, 90);
+            scene.cam.lookAt(100,5,100);
+            scene.cam.up.set(Vector3.Y);
+            scene.cam.update();;
+            // setup input
+            controller = new FirstPersonCameraController(scene.cam);
+            controller.setVelocity(20f);
+            inputMultiplexer.addProcessor(controller);
+            Gdx.input.setInputProcessor(inputMultiplexer);
+            // Update our game state
+            gameState = GameState.RENDER;
         }
     }
 }
