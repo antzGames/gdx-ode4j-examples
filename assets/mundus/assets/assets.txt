@@ -4,10 +4,14 @@ default.sky
 default.sky.meta
 dudv.png
 dudv.png.meta
+libDGXTerrain.terra
+libDGXTerrain.terra.meta
 Metal_Tile_Diff_512.jpg
 Metal_Tile_Diff_512.jpg.meta
 Metal_Tile_Normal_512.jpg
 Metal_Tile_Normal_512.jpg.meta
+ode.terra
+ode.terra.meta
 skybox_default.png
 skybox_default.png.meta
 Terrain.terra
@@ -16,5 +20,5 @@ waterFoam.png
 waterFoam.png.meta
 waterNormal.png
 waterNormal.png.meta
-ode.terra
-ode.terra.meta
+white.png
+white.png.meta

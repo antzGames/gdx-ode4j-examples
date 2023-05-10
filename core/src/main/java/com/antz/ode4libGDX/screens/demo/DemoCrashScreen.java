@@ -380,6 +380,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     public void dispose() {
         // Destroy screen's assets here.
         mundus.dispose();
+        scene.dispose();
         model.dispose();
         modelBatch.dispose();
         batch.dispose();
