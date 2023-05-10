@@ -77,7 +77,6 @@ public class LibGDXScreen implements Screen, InputProcessor {
     private MeshPartBuilder meshBuilder;
     private Model model;
     private ModelInstance cannonBallModelInstance;                              // the cannonball model
-    private ModelInstance ground;                                               // ground model
     private ArrayList<GameObject> wallBoxGameObjects = new ArrayList<>();
     private InputMultiplexer inputMultiplexer;
     private FirstPersonCameraController controller;
@@ -171,11 +170,7 @@ public class LibGDXScreen implements Screen, InputProcessor {
         scene.render(); // render Mundus scene
 
         modelBatch.begin(scene.cam);
-        for (int i = 0; i < wb; i++) {
-            //modelBatch.render(wallBoxModelInstances.get(i));
-        }
         modelBatch.render(cannonBallModelInstance);
-        //modelBatch.render(ground);
         modelBatch.end();
     }
 
@@ -219,7 +214,7 @@ public class LibGDXScreen implements Screen, InputProcessor {
             wallBoxGameObjects.get(i).setLocalPosition((float)wall_boxes[i].getPosition().get0(), (float)wall_boxes[i].getPosition().get1(), (float)wall_boxes[i].getPosition().get2());
 
         }
-        cannonBallModelInstance.transform.setTranslation((float)cannon_ball_body.getPosition().get0(),(float)cannon_ball_body.getPosition().get1(),(float)cannon_ball_body.getPosition().get2());
+        scene.sceneGraph.getGameObjects().get(scene.sceneGraph.getGameObjects().size-1).setLocalPosition((float)cannon_ball_body.getPosition().get0(),(float)cannon_ball_body.getPosition().get1(),(float)cannon_ball_body.getPosition().get2());
     }
 
     private void setupSimulation() {
@@ -277,13 +272,7 @@ public class LibGDXScreen implements Screen, InputProcessor {
             new Material(ColorAttribute.createDiffuse(Color.BLACK)),
             VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
         cannonBallModelInstance = new ModelInstance(model);
-
-        // ground
-        model = modelBuilder.createBox(200, 1,200,
-            new Material(ColorAttribute.createDiffuse(Color.WHITE)),
-            VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        ground = new ModelInstance(model);
-        ground.transform.setTranslation(0,-0.5f,0);
+        scene.sceneGraph.addGameObject(cannonBallModelInstance, new Vector3(0,0,0));
     }
 
     private void initBoxTextures() {
@@ -309,7 +298,7 @@ public class LibGDXScreen implements Screen, InputProcessor {
         VertexAttributes attributes = new VertexAttributes(
             VertexAttribute.Position(),
             VertexAttribute.Normal(),
-            new VertexAttribute(VertexAttributes.Usage.Tangent, 4, ShaderProgram.TANGENT_ATTRIBUTE),
+            //new VertexAttribute(VertexAttributes.Usage.Tangent, 4, ShaderProgram.TANGENT_ATTRIBUTE),
             VertexAttribute.TexCoords(0)
         );
 
@@ -494,6 +483,7 @@ public class LibGDXScreen implements Screen, InputProcessor {
             world.destroy();
             bodies = 0;
         }
+        scene.sceneGraph.getGameObjects().get(scene.sceneGraph.getGameObjects().size-1).remove();
         for (GameObject go: wallBoxGameObjects) go.remove();
         wallBoxGameObjects = new ArrayList<>();
     }
