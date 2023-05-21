@@ -194,7 +194,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
             "WASD to move camera, click-drag mouse to rotate camera.\n" +
             "SPACE to drop sphere.\n" +
             "M to show/hide Mesh.\n" +
-            "F1 to run Demo Crash.\n";
+            "F1 to run Dynamic Character Demo.\n";
         System.out.println(info);
 
         initODE();

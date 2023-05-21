@@ -266,7 +266,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         DMatrix3 R2 = new DMatrix3(), R3 = new DMatrix3(), R4 = new DMatrix3();
         dRFromAxisAndAngle (R2,0,1,0,cannon_angle);
         dRFromAxisAndAngle (R3,1,0,0,cannon_elevation);
-        dMultiply0 (R4,R2,R3);
+        dMultiply0(R4,R2,R3);
 
         cannonBodyModelInstance.transform.setTranslation(CANNON_X,1,CANNON_Z);
         modelBatch.render(cannonBodyModelInstance);
