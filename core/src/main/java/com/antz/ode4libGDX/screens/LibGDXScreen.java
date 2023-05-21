@@ -4,8 +4,8 @@ import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.screens.demo.DemoDynamicCharacterScreen;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -75,7 +75,7 @@ public class LibGDXScreen implements Screen {
     private MeshPartBuilder meshBuilder;
     private Model model;
     private ArrayList<GameObject> wallBoxGameObjects = new ArrayList<>();
-    private InputMultiplexer inputMultiplexer;
+    private Music zebraMusic, zebraTalk, libGDXMusic, antzMusic;
 
     // some constants
     private static final float RADIUS = 0.5f;	            // canon ball radius
@@ -132,6 +132,12 @@ public class LibGDXScreen implements Screen {
         } catch (MetaFileParseException e) {
             e.printStackTrace();
         }
+
+        mundus.getAssetManager().getGdxAssetManager().load("sounds/base3.mp3", Music.class);
+        mundus.getAssetManager().getGdxAssetManager().load("sounds/base5.mp3", Music.class);
+        mundus.getAssetManager().getGdxAssetManager().load("sounds/antz.mp3", Music.class);
+        mundus.getAssetManager().getGdxAssetManager().load("sounds/zebraTalk.mp3", Music.class);
+
         modelBatch = new ModelBatch();
         modelBuilder = new ModelBuilder();
         meshBuilder = new MeshBuilder();
@@ -173,10 +179,16 @@ public class LibGDXScreen implements Screen {
 
         switch (logicIndex){
             case 0: // fire cannon after 3s
-                if (logicTimer > 3){
+                if (!zebraTalk.isPlaying()){
+                    zebraTalk.setVolume(1);
+                    zebraTalk.play();
+                }
+                if (logicTimer > 3.75f){
                     logicIndex = 1;
                     logicTimer = 0;
                     fireCannon();
+                    zebraMusic.setVolume(1);
+                    zebraMusic.play();
                 }
                 break;
             case 1: // wait 6 sec and then switch to libGDX wall scene
@@ -192,14 +204,21 @@ public class LibGDXScreen implements Screen {
                     scene.cam.update();
                 }
                 break;
-            case 2: // wait 3s and then fire cannon
-                if (logicTimer > 3){
+            case 2: // wait 2.5s and then fire cannon
+                if (logicTimer > 2.5f){
                     logicIndex = 3;
                     logicTimer = 0;
                     fireCannon();
+                    libGDXMusic.setVolume(1);
+                    libGDXMusic.play();
+
                 }
                 break;
             case 3: // slide Antz across
+                if (logicTimer > 3 && !antzMusic.isPlaying()){
+                    antzMusic.setVolume(1);
+                    antzMusic.play();
+                }
                 if (logicTimer > 7){
                     logicIndex = 4;
                     logicTimer = 0;
@@ -269,8 +288,6 @@ public class LibGDXScreen implements Screen {
         }
         scene.sceneGraph.getGameObjects().get(scene.sceneGraph.getGameObjects().size-2).setLocalPosition((float)cannon_ball_body.getPosition().get0(),(float)cannon_ball_body.getPosition().get1(),(float)cannon_ball_body.getPosition().get2());
         scene.sceneGraph.getGameObjects().get(scene.sceneGraph.getGameObjects().size-1).setLocalPosition((float)antzBody.getPosition().get0(),(float)antzBody.getPosition().get1(),(float)antzBody.getPosition().get2());
-
-        System.out.println(antzBody.getPosition());
     }
 
     private void setupSimulation() {
@@ -542,6 +559,11 @@ public class LibGDXScreen implements Screen {
     private void continueLoading() {
         if (mundus.continueLoading()) {
             // Loading complete, load a scene.
+            zebraMusic = mundus.getAssetManager().getGdxAssetManager().get("sounds/base5.mp3");
+            zebraTalk = mundus.getAssetManager().getGdxAssetManager().get("sounds/zebraTalk.mp3");
+            libGDXMusic = mundus.getAssetManager().getGdxAssetManager().get("sounds/base3.mp3");
+            antzMusic = mundus.getAssetManager().getGdxAssetManager().get("sounds/antz.mp3");
+
             scene = mundus.loadScene("libGDX.mundus");
             scene.cam.position.set(91.60605f,5.2253003f,90.154625f);
             scene.cam.lookAt(100,5,100);
