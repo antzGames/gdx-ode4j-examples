@@ -37,7 +37,6 @@ import org.ode4j.ode.DContact;
 import org.ode4j.ode.DContactBuffer;
 import org.ode4j.ode.DGeom;
 import org.ode4j.ode.DGeom.DNearCallback;
-import org.ode4j.ode.DHinge2Joint;
 import org.ode4j.ode.DJoint;
 import org.ode4j.ode.DJointGroup;
 import org.ode4j.ode.DMass;
@@ -66,7 +65,7 @@ public class LibGDXScreen implements Screen {
     }
 
     private GameState gameState = GameState.LOADING;
-    private TextureRegion texture, texture2;
+    private TextureRegion texture;
     private TextureRegion[] boxTextures;
     private int boxTextureIndex, logicIndex;
     private float logicTimer;
@@ -95,23 +94,18 @@ public class LibGDXScreen implements Screen {
     private static DWorld world;
     private static DSpace space;
     private static int bodies;
-    private static DHinge2Joint[] joint = new DHinge2Joint[1000];
-    private static DJointGroup contactgroup;
+    private static DJointGroup contactGroup;
 
-    private static DBox[] wall_boxes = new DBox[1000];
-    private static DBody[] wall_bodies = new DBody[1000];
-    private static int[] wb_stepsdis = new int[1000];
+    private static final DBox[] wall_boxes = new DBox[1000];
+    private static final DBody[] wall_bodies = new DBody[1000];
+    private static final int[] wb_stepsdis = new int[1000];
 
-    private static DSphere cannon_ball_geom;
     private static DBody cannon_ball_body;
 
-    private static DBox antzGeom;
     private static DBody antzBody;
 
     private static int wb;
     private static boolean doFast;
-    private static DBody b;
-    private static DMass m;
 
     private static float cannon_angle = 0;
     private static float cannon_elevation = 0f;
@@ -168,9 +162,8 @@ public class LibGDXScreen implements Screen {
     }
 
     private void draw() {
-        scene.sceneGraph.update(); // update Mundus
-        scene.render(); // render Mundus scene
-        //System.out.println(scene.cam.position);
+        scene.sceneGraph.update();  // update Mundus
+        scene.render();             // render Mundus scene
     }
 
     // libGDX screen logic
@@ -251,15 +244,15 @@ public class LibGDXScreen implements Screen {
         if (doFast) {
             space.collide (null,nearCallback);
             world.quickStep (0.05);
-            contactgroup.empty ();
+            contactGroup.empty ();
         } else {
             space.collide (null,nearCallback);
             world.step (0.05);
-            contactgroup.empty ();
+            contactGroup.empty ();
         }
 
         for (int i = 0; i < wb; i++) {
-            b = wall_boxes[i].getBody();
+            DBody b = wall_boxes[i].getBody();
             if (b.isEnabled()) {
                 boolean disable = true;
                 DVector3C lvel = b.getLinearVel();
@@ -300,9 +293,9 @@ public class LibGDXScreen implements Screen {
         // recreate world
         world = OdeHelper.createWorld();
         space = OdeHelper.createSapSpace(null, DSapSpace.AXES.XZY );
-        m = OdeHelper.createMass();
+        DMass m = OdeHelper.createMass();
 
-        contactgroup = OdeHelper.createJointGroup();
+        contactGroup = OdeHelper.createJointGroup();
         world.setGravity(0,-1.5,0);
         world.setCFM(1e-5);
         world.setERP(0.8);
@@ -316,10 +309,9 @@ public class LibGDXScreen implements Screen {
 
         // Wall boxes
         for (float y = WBOXSIZE/2f; y < WALLHEIGHT; y += WBOXSIZE) {
-            for (float x = -WALLWIDTH/2; x < WALLWIDTH/2; x += WBOXSIZE) {
+            for (float x = -WALLWIDTH/2f; x < WALLWIDTH/2f; x += WBOXSIZE) {
                 wall_bodies[wb] = OdeHelper.createBody(world);
 
-                //if (offset) wall_bodies[wb].setPosition (100 + x - WBOXSIZE/2f , y ,100 );
                 wall_bodies[wb].setPosition(100.5f + x , y ,100 );
                 m.setBox(1,WBOXSIZE,WBOXSIZE,WBOXSIZE);
                 m.adjust(WALLMASS);
@@ -335,7 +327,7 @@ public class LibGDXScreen implements Screen {
 
         // Cannon ball
         cannon_ball_body = OdeHelper.createBody(world);
-        cannon_ball_geom = OdeHelper.createSphere(space,CANNON_BALL_RADIUS);
+        DSphere cannon_ball_geom = OdeHelper.createSphere(space, CANNON_BALL_RADIUS);
         m.setSphereTotal(CANNON_BALL_MASS,CANNON_BALL_RADIUS);
         cannon_ball_body.setMass(m);
         cannon_ball_geom.setBody(cannon_ball_body);
@@ -349,7 +341,7 @@ public class LibGDXScreen implements Screen {
 
         // antz box
         antzBody = OdeHelper.createBody(world);
-        antzGeom = OdeHelper.createBox(space,11,11,11);
+        DBox antzGeom = OdeHelper.createBox(space, 11, 11, 11);
         m.setBoxTotal(CANNON_BALL_MASS*100, 10,10, 10);
         antzBody.setMass(m);
         antzGeom.setBody(antzBody);
@@ -483,7 +475,7 @@ public class LibGDXScreen implements Screen {
         mundus.dispose();
         scene.dispose();
 
-        contactgroup.destroy();
+        contactGroup.destroy();
         space.destroy();
         world.destroy();
         OdeHelper.closeODE();
@@ -496,7 +488,7 @@ public class LibGDXScreen implements Screen {
         dMultiply0 (R4,R2,R3);
         double[] cpos = {CANNON_X,1, CANNON_Z};
         for (int i=0; i<3; i++)
-            cpos[i] += 3*R4.get(i, 2);//[i*4+2];
+            cpos[i] += 3*R4.get(i, 2);
 
         cannon_ball_body.setPosition(cpos[0],cpos[1],cpos[2]);
         double force = 10;
@@ -504,9 +496,9 @@ public class LibGDXScreen implements Screen {
         cannon_ball_body.setAngularVel(0,0,0);
     }
 
-    private DNearCallback nearCallback = (data, o1, o2) -> nearCallback(data, o1, o2);
+    private final DNearCallback nearCallback = (data, o1, o2) -> nearCallback(o1, o2);
 
-    private void nearCallback (Object data, DGeom o1, DGeom o2) {
+    private void nearCallback (DGeom o1, DGeom o2) {
         int i,n;
 
         DBody b1 = o1.getBody();
@@ -530,7 +522,7 @@ public class LibGDXScreen implements Screen {
                 contact.surface.slip2 = 0.0;
                 contact.surface.soft_erp = 0.8;
                 contact.surface.soft_cfm = 0.01;
-                DJoint c = OdeHelper.createContactJoint(world,contactgroup,contact);
+                DJoint c = OdeHelper.createContactJoint(world, contactGroup,contact);
                 c.attach (o1.getBody(), o2.getBody());
 
                 if (o1 instanceof DSphere && o2 instanceof DBox){
@@ -545,7 +537,7 @@ public class LibGDXScreen implements Screen {
     private void shutdownSimulation() {
         // destroy world if it exists
         if (bodies!=0)  {
-            contactgroup.destroy();
+            contactGroup.destroy();
             space.destroy();
             world.destroy();
             bodies = 0;
@@ -558,12 +550,12 @@ public class LibGDXScreen implements Screen {
 
     private void continueLoading() {
         if (mundus.continueLoading()) {
-            // Loading complete, load a scene.
             zebraMusic = mundus.getAssetManager().getGdxAssetManager().get("sounds/base5.mp3");
             zebraTalk = mundus.getAssetManager().getGdxAssetManager().get("sounds/zebraTalk.mp3");
             libGDXMusic = mundus.getAssetManager().getGdxAssetManager().get("sounds/base3.mp3");
             antzMusic = mundus.getAssetManager().getGdxAssetManager().get("sounds/antz.mp3");
 
+            // Loading complete, load a scene.
             scene = mundus.loadScene("libGDX.mundus");
             scene.cam.position.set(91.60605f,5.2253003f,90.154625f);
             scene.cam.lookAt(100,5,100);
