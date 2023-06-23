@@ -1,6 +1,7 @@
 package com.antz.ode4libGDX.screens;
 
 import com.antz.ode4libGDX.Ode4libGDX;
+import com.antz.ode4libGDX.screens.demo.DemoDynamicCharacterScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -153,8 +154,7 @@ public class LoadingScreen implements Screen {
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
-                //Ode4libGDX.game.setScreen(new DynamicCharacterScreen());
-                Ode4libGDX.game.setScreen(new LibGDXScreen());
+                Ode4libGDX.game.setScreen(new DemoDynamicCharacterScreen());
             }
         }
     }

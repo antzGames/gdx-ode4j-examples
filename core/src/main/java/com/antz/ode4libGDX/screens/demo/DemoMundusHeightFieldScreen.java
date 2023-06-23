@@ -190,11 +190,11 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
-        info = "MUNDUS terrain height field inetegration\n\n" +
+        info = "MUNDUS terrain height field integration\n\n" +
             "WASD to move camera, click-drag mouse to rotate camera.\n" +
             "SPACE to drop sphere.\n" +
             "M to show/hide Mesh.\n" +
-            "F1 to run Dynamic Character Demo.\n";
+            "F1 to run gdx Bullet Test.\n";
         System.out.println(info);
 
         initODE();
@@ -483,7 +483,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.F1) {
             odeDispose();
-            Ode4libGDX.game.setScreen(new DemoDynamicCharacterScreen());
+            Ode4libGDX.game.setScreen(new OdeTest());
         } else if (keycode == Input.Keys.M) showTerrainMesh = !showTerrainMesh;
         else if (keycode == Input.Keys.SPACE) doDropSphere();
         return false;
