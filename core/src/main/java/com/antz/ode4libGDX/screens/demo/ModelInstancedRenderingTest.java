@@ -168,11 +168,11 @@ public class ModelInstancedRenderingTest implements Screen {
             // update float buffer and update the mesh instance data
             offsets.position(targetIndex);
             offsets.put(mat4.getValues());
-            // This next method only works on desktop
+            // This next method only works on desktop - comment out for GWT
             renderable.meshPart.mesh.updateInstanceData(targetIndex, mat4.getValues());
 
         }
-        // This is the only method that works in GWT and is expensive
+        // This is the only method that works in GWT and is expensive - uncomment if GWT
         //renderable.meshPart.mesh.updateInstanceData(0, offsets);
     }
 
@@ -251,6 +251,17 @@ public class ModelInstancedRenderingTest implements Screen {
         renderable.shader.init();
     }
 
+    /** See assets/shaders/instanced.vert file to see how:
+
+        a_position
+        i_worldTrans
+        i_color
+
+        vertex attributes are used to update each instance.
+
+        u_projViewTrans uniform needs to be set with camera.combined
+        so shader can calculate the updated position and rotation
+     */
     private BaseShader createShader() {
         return new BaseShader() {
 
@@ -314,7 +325,7 @@ public class ModelInstancedRenderingTest implements Screen {
         font.setColor(Color.WHITE);
         font.getData().setScale(2);
 
-        // set instance limits for all other platforms
+        // set low instance limits for all other platforms not desktop
         if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
             INSTANCE_COUNT_SIDE = 100;
             CULLING_FACTOR = camera.far * 0.25f; // cull very small cubes that we cant detect rotating
@@ -323,7 +334,7 @@ public class ModelInstancedRenderingTest implements Screen {
             CULLING_FACTOR = camera.far; // no culling as all objects can be seen rotating
         }
 
-        // 100 * 100 * 100 = 1 million
+        // 100 * 100 * 100 = 1 million for desktop
         INSTANCE_COUNT = INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE;
 
         // create & enable the profiler
