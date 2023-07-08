@@ -8,5 +8,5 @@ dependencies {
   api "com.github.tommyettinger:textratypist:$textratypistVersion"
   api "space.earlygrey:shapedrawer:$shapeDrawerVersion"
   api "com.github.jamestkhan.mundus:gdx-runtime:master-SNAPSHOT"
-  api 'org.json:json:20211205'
+  //api 'org.json:json:20211205'
 }

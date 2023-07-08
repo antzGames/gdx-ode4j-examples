@@ -22,6 +22,7 @@ public class GwtLauncher extends GwtApplication {
         cfg.padVertical = 0;
         cfg.padHorizontal = 0;
         cfg.antialiasing = true;
+        cfg.useGL30 = true;
         Window.enableScrolling(false);
         Window.setMargin("0");
         Window.addResizeHandler(new ResizeListener());

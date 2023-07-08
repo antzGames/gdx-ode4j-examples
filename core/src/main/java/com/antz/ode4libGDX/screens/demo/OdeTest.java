@@ -1,6 +1,5 @@
 package com.antz.ode4libGDX.screens.demo;
 
-import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -28,7 +27,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
 import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DVector3C;
 import org.ode4j.ode.DBody;
@@ -45,6 +43,7 @@ import org.ode4j.ode.DWorld;
 import org.ode4j.ode.OdeHelper;
 
 import static org.ode4j.ode.OdeConstants.dContactApprox1;
+import static org.ode4j.ode.OdeConstants.dContactBounce;
 import static org.ode4j.ode.OdeConstants.dContactSlip1;
 import static org.ode4j.ode.OdeConstants.dContactSlip2;
 import static org.ode4j.ode.OdeConstants.dContactSoftCFM;
@@ -53,9 +52,9 @@ import static org.ode4j.ode.OdeConstants.dContactSoftERP;
 public class OdeTest implements Screen {
 
     // some constants
-    private static final int   ITERS = 20;		            // number of iterations
+    private static final int   ITERS = 5;		            // number of iterations
     private static final float DISABLE_THRESHOLD = 0.008f;	// maximum velocity (squared) a body can have and be disabled
-    private static final float DISABLE_STEPS = 10;	        // number of steps a box has to have been disable-able before it will be disabled
+    private static final float DISABLE_STEPS = 5;	        // number of steps a box has to have been disable-able before it will be disabled
 
     // dynamics and collision objects
     DWorld world;
@@ -63,12 +62,12 @@ public class OdeTest implements Screen {
     DJointGroup contactGroup;
     int wb;
 
-    int totalBoxes = 250;
+    int totalBoxes = 500;
 
     ModelInstance[] boxes = new ModelInstance[totalBoxes];
     DBox[] wall_boxes = new DBox[totalBoxes];
     DBody[] wall_bodies = new DBody[totalBoxes];
-    int[] wb_stepsdis = new int[1000];
+    int[] wb_stepsdis = new int[totalBoxes];
     Quaternion q = new Quaternion();
 
     DMass m;
@@ -121,7 +120,7 @@ public class OdeTest implements Screen {
         final Texture texture = new Texture(Gdx.files.internal("graphics/badlogic.jpg"));
         texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         final Material material = new Material(TextureAttribute.createDiffuse(texture),
-                FloatAttribute.createShininess(4f));
+            FloatAttribute.createShininess(4f));
 
         boxModel = builder.createBox(1, 1, 1, material, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
 
@@ -168,7 +167,7 @@ public class OdeTest implements Screen {
     public void resetSimulation() {
         // recreate world
         world = OdeHelper.createWorld();
-        space = OdeHelper.createSapSpace(null, DSapSpace.AXES.XZY );
+        space = OdeHelper.createSapSpace2(DSapSpace.AXES.XZY,0 );
         m = OdeHelper.createMass();
 
         contactGroup = OdeHelper.createJointGroup();
@@ -193,12 +192,13 @@ public class OdeTest implements Screen {
         int count = 0;
         wb = 0;
 
-        int offsetY = 20;
+        int offsetY = 15;
 
         for(int i = 0; i < totalBoxes; i++) {
-            float x = MathUtils.random(-10.0f, 10.0f);
-            float y = MathUtils.random(offsetY + 5f, offsetY + 12f);
-            float z = MathUtils.random(-10.0f, 10.0f);
+            ModelInstance createBox = null;
+            float x = MathUtils.random(-5.0f, 5.0f);
+            float y = MathUtils.random(offsetY + 4f, offsetY + 9f);
+            float z = MathUtils.random(-5.0f, 5.0f);
             float axisX = MathUtils.random(0, 360);
             float axisY = MathUtils.random(0, 360);
             float axisZ = MathUtils.random(0, 360);
@@ -236,10 +236,9 @@ public class OdeTest implements Screen {
 
         batch.begin();
         font.draw(batch, "\nFPS: " + Gdx.graphics.getFramesPerSecond() +
-                "\nTotal Boxes: " + totalBoxes +
-                "\nInputs: Enter for fullscreen, Space to un/freeze simulation" +
-                "\nInputs: R key to run Dynamic Character Screen Demo" +
-                "\nHold Left/Right mouse to manipulate camera", 30, Gdx.graphics.getHeight() - 14);
+            "\nTotal Boxes: " + totalBoxes +
+            "\nInputs: Enter for fullscreen, Space to un/freeze simulation\nHold Left/Right mouse to manipulate camera", 30, Gdx.graphics.getHeight() - 14);
+        font.draw(batch, "Libgdx teaVM Backend + ODE4J", 20, 30);
         batch.end();
     }
 
@@ -248,7 +247,7 @@ public class OdeTest implements Screen {
     private void simLoop ()  {
 
         space.collide(null,nearCallback);
-        world.quickStep(0.01667);
+        world.quickStep(0.05);
         contactGroup.empty();
 
         for (int i = 0; i < wb; i++) {
@@ -322,17 +321,14 @@ public class OdeTest implements Screen {
     }
 
     public void doInput() {
-         if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
+        if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
             if(Gdx.graphics.isFullscreen()) {
                 Gdx.graphics.setWindowedMode(0, 0);
-            } else {
+            }
+            else {
                 Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
             }
-        } else if(Gdx.input.isKeyJustPressed(Keys.R)) {
-             shutdownSimulation();
-             OdeHelper.closeODE();
-             Ode4libGDX.game.setScreen(new DemoDynamicCharacterScreen());
-         }
+        }
     }
 
     private final DGeom.DNearCallback nearCallback = (data, o1, o2) -> nearCallback(o1, o2);
@@ -347,19 +343,22 @@ public class OdeTest implements Screen {
 
         final int N = 4;
         DContactBuffer contacts = new DContactBuffer(N);
-        n = OdeHelper.collide(o1,o2,N,contacts.getGeomBuffer());//[0].geom,sizeof(dContact));
+        n = OdeHelper.collide(o1,o2,N,contacts.getGeomBuffer());
         if (n > 0) {
             for (i=0; i<n; i++) {
                 DContact contact = contacts.get(i);
-                contact.surface.mode = dContactSlip1 | dContactSlip2 | dContactSoftERP | dContactSoftCFM | dContactApprox1;
-                contact.surface.mu = 0.5;
-                contact.surface.slip1 = 0.0;
-                contact.surface.slip2 = 0.0;
+                contact.surface.mode = dContactSlip1 | dContactBounce |dContactSlip2 | dContactSoftERP | dContactSoftCFM | dContactApprox1;
+                contact.surface.mu = 0.9;
+                contact.surface.slip1 = 0.1;
+                contact.surface.bounce = 1;
+                contact.surface.bounce_vel = 0.01;
+                contact.surface.slip2 = 0.1;
                 contact.surface.soft_erp = 0.8;
-                contact.surface.soft_cfm = 0.01;
+                contact.surface.soft_cfm = 0.1;
                 DJoint c = OdeHelper.createContactJoint(world,contactGroup,contact);
                 c.attach (o1.getBody(), o2.getBody());
             }
         }
     }
+
 }

@@ -34,7 +34,7 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
   implementation "com.github.tommyettinger:formic:$formicVersion:sources"
   implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
-  implementation "com.github.tommyettinger:textratypist:$textratypistVersion:sources"
+  //implementation "com.github.tommyettinger:textratypist:$textratypistVersion:sources"
   api "com.github.jamestkhan.mundus:gdx-runtime:master-SNAPSHOT:sources"
   api "com.github.jamestkhan.mundus:commons:master-SNAPSHOT:sources"
   api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
@@ -54,6 +54,7 @@ gretty.httpPort = 8080
 gretty.resourceBase = project.buildDir.path + "/gwt/draftOut"
 gretty.contextPath = "/"
 gretty.portPropertiesFileName = "TEMP_PORTS.properties"
+gwt.compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
 
 task startHttpServer (dependsOn: [draftCompileGwt]) {
   doFirst {
