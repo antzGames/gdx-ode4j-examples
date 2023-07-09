@@ -1,8 +1,9 @@
 precision mediump float;
 
-in vec4 v_color;
 out vec4 FragColor;
+uniform sampler2D u_texture;
+in vec2 TexCoords;
 
 void main () {
-    FragColor = v_color;
+    FragColor = texture(u_texture, TexCoords);
 }

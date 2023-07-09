@@ -10,22 +10,34 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.BaseShader;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
+import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.Frustum;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -39,7 +51,14 @@ import java.nio.FloatBuffer;
 
 public class ModelInstancedRenderingTest implements Screen {
 
+    private Environment environment;
     private Mesh mesh;
+
+    private ModelBuilder modelBuilder;
+    private MeshPartBuilder meshBuilder;
+    private Model model;
+    TextureRegion texture = new TextureRegion(new Texture(Gdx.files.internal("graphics/badlogic.jpg")));
+
     private ModelBatch batch;
     private GLProfiler profiler;
     private SpriteBatch batch2D;
@@ -101,16 +120,16 @@ public class ModelInstancedRenderingTest implements Screen {
     }
 
     private void drawStats() {
-        font.draw(batch2D,"FPS: " + Gdx.graphics.getFramesPerSecond() +
-            "  Draw Calls: " + profiler.getDrawCalls() +
-                "  Vert Count: " + profiler.getVertexCount().latest +
-                "  Shader Switches: " + profiler.getShaderSwitches() +
-                "  Texture Bindings: " + profiler.getTextureBindings(),
-            10, 40);
+        font.draw(batch2D,"WASD + mouse drag: camera, F1: Toggle stats, SPACE: Toggle rotation. rotation=" + rotateOn, 10, 40);
         font.draw(batch2D,"3D Cubes: " + INSTANCE_COUNT + "  Updated: " + instanceUpdated + "   Skipped: " + (INSTANCE_COUNT - instanceUpdated), 10, 80);
         font.draw(batch2D,"Update Time: " + TimeUtils.nanosToMillis(updateTime) + "ms", 10, 120);
         font.draw(batch2D,"Render Time: " + TimeUtils.nanosToMillis(renderTime) + "ms", 10, 160);
-        font.draw(batch2D,"F1: Toggle Stats, SPACE: Toggle rotation. Rotation=" + rotateOn, 10, 200);
+        font.draw(batch2D,"FPS: " + Gdx.graphics.getFramesPerSecond() +
+                "  Draw Calls: " + profiler.getDrawCalls() +
+                "  Vert Count: " + profiler.getVertexCount().latest +
+                "  Shader Switches: " + profiler.getShaderSwitches() +
+                "  Texture Bindings: " + profiler.getTextureBindings(),
+            10, 200);
     }
 
     private void update(float delta) {
@@ -128,7 +147,7 @@ public class ModelInstancedRenderingTest implements Screen {
 
         // Everything you do in this loop will impact performance with high INSTANCE_COUNT
         for (int x = 0; x < INSTANCE_COUNT; x++) {
-            targetIndex = x * 20; // each instance uses 20 floats
+            targetIndex = x * 16; // each instance uses 20 floats
 
             // get position of instance (x, y, z)
             vec3Temp.set(offsets.get(targetIndex + 12), offsets.get(targetIndex + 13), offsets.get(targetIndex + 14));
@@ -177,29 +196,44 @@ public class ModelInstancedRenderingTest implements Screen {
     }
 
     private void setupInstancedMesh() {
+
         // Create a 3D cube mesh
         mesh = new Mesh(true, 24, 36,
-            new VertexAttribute(Usage.Position, 3, "a_position"));
+            new VertexAttribute(Usage.Position, 3, "a_position"),
+            new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoords0")
+        );
         size = 1f / (float)Math.sqrt(INSTANCE_COUNT) * 0.5f;
 
         float[] vertices = new float[] {
-            -size, -size, -size,    // 0
-            size, -size, -size,     // 1
-            size, size, -size,      // 2
-            -size, size, -size,     // 3
-            -size, -size, size,     // 4
-            size, -size, size,      // 5
-            size, size, size,       // 6
-            -size, size, size       // 7
+            -size, size, -size, 0.0f, 1.0f,
+            size, size, -size, 1.0f, 1.0f,
+            size, -size, -size, 1.0f, 0.0f,
+            -size, -size, -size, 0.0f, 0.0f,
+            size, size, size, 1.0f, 1.0f,
+            -size, size, size, 0.0f, 1.0f,
+            -size, -size, size, 0.0f, 0.0f,
+            size, -size, size, 1.0f, 0.0f,
+            -size, size, size, 1.0f, 1.0f,
+            -size, size, -size, 0.0f, 1.0f,
+            -size, -size, -size, 0.0f, 0.0f,
+            -size, -size, size, 1.0f, 0.0f,
+            size, size, -size, 1.0f, 1.0f,
+            size, size, size, 0.0f, 1.0f,
+            size, -size, size, 0.0f, 0.0f,
+            size, -size, -size, 1.0f, 0.0f,
+            -size, size, size, 1.0f, 1.0f,
+            size, size, size, 0.0f, 1.0f,
+            size, size, -size, 0.0f, 0.0f,
+            -size, size, -size, 1.0f, 0.0f,
+            -size, -size, -size, 1.0f, 1.0f,
+            size, -size, -size, 0.0f, 1.0f,
+            size, -size, size, 0.0f, 0.0f,
+            -size, -size, size, 1.0f, 0.0f
         };
 
         short[] indices = new short[]
-               {0, 1, 2, 2, 3, 0,
-                5, 4, 7, 7, 6, 5,
-                0, 3, 7, 7, 4, 0,
-                5, 6, 2, 2, 1, 5,
-                5, 1, 0, 0, 4, 5,
-                2, 6, 7, 7, 3, 2};
+               {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 8, 9, 10, 10, 11, 8, 12, 13,
+                14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20 };
 
         mesh.setVertices(vertices);
         mesh.setIndices(indices);
@@ -209,11 +243,11 @@ public class ModelInstancedRenderingTest implements Screen {
             new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 0),
             new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 1),
             new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 2),
-            new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 3),
-            new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 4, "i_color"));
+            new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 3));
+
 
         // Create offset FloatBuffer that will hold matrix4 and color for each instance to pass to shader
-        offsets = BufferUtils.newFloatBuffer(INSTANCE_COUNT * 20); // 16 mat4 + 4 color = 20 floats
+        offsets = BufferUtils.newFloatBuffer(INSTANCE_COUNT * 16); // 16 mat4 + 4 color = 20 floats
         for (int x = 1; x <= INSTANCE_COUNT_SIDE; x++) {
             for (int y = 1; y <= INSTANCE_COUNT_SIDE; y++) {
                 for (int z = 1; z <= INSTANCE_COUNT_SIDE; z++) {
@@ -225,18 +259,13 @@ public class ModelInstancedRenderingTest implements Screen {
                         z / (INSTANCE_COUNT_SIDE * 0.5f) - 1f);
 
                     // set random rotation
-                    q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
+                    //q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
 
                     // create matrix transform
                     mat4.set(vec3Temp, q);
 
                     // put the 20 floats in the float buffer
                     offsets.put(mat4.getValues());  // put matrix4 = 16
-                    offsets.put(new float[] {       // add color rgba = 4
-                        x / (float) INSTANCE_COUNT_SIDE,
-                        y / (float) INSTANCE_COUNT_SIDE,
-                        z / (float) INSTANCE_COUNT_SIDE,
-                        1f});
                 }
             }
         }
@@ -244,8 +273,8 @@ public class ModelInstancedRenderingTest implements Screen {
         mesh.setInstanceData(offsets);
 
         renderable = new Renderable();
-        renderable.material = new Material();
         renderable.meshPart.set("Cube", mesh, 0, 36, GL20.GL_TRIANGLES); // 36 indices
+        renderable.environment = environment;
         renderable.worldTransform.idt();
         renderable.shader = createShader(); // see method for more details
         renderable.shader.init();
@@ -264,11 +293,14 @@ public class ModelInstancedRenderingTest implements Screen {
      */
     private BaseShader createShader() {
         return new BaseShader() {
+            Texture texture = new Texture(Gdx.files.internal("graphics/badlogic.jpg"));
 
             @Override
             public void begin(Camera camera, RenderContext context) {
                 program.bind();
+                texture.bind();
                 program.setUniformMatrix("u_projViewTrans", camera.combined);
+                program.setUniformi("u_texture", 0);
                 context.setDepthTest(GL30.GL_LEQUAL);
             }
 
@@ -302,6 +334,12 @@ public class ModelInstancedRenderingTest implements Screen {
         q = new Quaternion();
         vec3Temp = new Vector3();
         floatTemp = new float[16];
+
+        environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.9f, 0.9f, 0.9f, 1f));
+                environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        modelBuilder = new ModelBuilder();
+        meshBuilder = new MeshBuilder();
 
         // setup camera, controller, and batches
         camera = new PerspectiveCamera(45, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
