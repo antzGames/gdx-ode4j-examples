@@ -16,28 +16,18 @@ import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.BaseShader;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.Frustum;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -54,10 +44,8 @@ public class ModelInstancedRenderingTest implements Screen {
     private Environment environment;
     private Mesh mesh;
 
-    private ModelBuilder modelBuilder;
-    private MeshPartBuilder meshBuilder;
-    private Model model;
-    TextureRegion texture = new TextureRegion(new Texture(Gdx.files.internal("graphics/badlogic.jpg")));
+    //Texture texture = new Texture(Gdx.files.internal("graphics/badlogic.jpg"));
+    private Texture texture = new Texture(Gdx.files.internal("graphics/zebra.png"));
 
     private ModelBatch batch;
     private GLProfiler profiler;
@@ -106,6 +94,7 @@ public class ModelInstancedRenderingTest implements Screen {
 
         // draw all instances
         startTime = TimeUtils.nanoTime();
+        texture.bind();
         batch.begin(camera);
         batch.render(renderable);
         batch.end();
@@ -191,12 +180,11 @@ public class ModelInstancedRenderingTest implements Screen {
             renderable.meshPart.mesh.updateInstanceData(targetIndex, mat4.getValues());
 
         }
-        // This is the only method that works in GWT and is expensive - uncomment if GWT
+        // This is the only method that works in GWT and is expensive - UNCOMMENT if GWT
         //renderable.meshPart.mesh.updateInstanceData(0, offsets);
     }
 
     private void setupInstancedMesh() {
-
         // Create a 3D cube mesh
         mesh = new Mesh(true, 24, 36,
             new VertexAttribute(Usage.Position, 3, "a_position"),
@@ -204,6 +192,7 @@ public class ModelInstancedRenderingTest implements Screen {
         );
         size = 1f / (float)Math.sqrt(INSTANCE_COUNT) * 0.5f;
 
+        // 24 vertices
         float[] vertices = new float[] {
             -size, size, -size, 0.0f, 1.0f,
             size, size, -size, 1.0f, 1.0f,
@@ -231,6 +220,7 @@ public class ModelInstancedRenderingTest implements Screen {
             -size, -size, size, 1.0f, 0.0f
         };
 
+        // 36 indices
         short[] indices = new short[]
                {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 8, 9, 10, 10, 11, 8, 12, 13,
                 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20 };
@@ -246,12 +236,12 @@ public class ModelInstancedRenderingTest implements Screen {
             new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 3));
 
 
-        // Create offset FloatBuffer that will hold matrix4 and color for each instance to pass to shader
-        offsets = BufferUtils.newFloatBuffer(INSTANCE_COUNT * 16); // 16 mat4 + 4 color = 20 floats
+        // Create offset FloatBuffer that will hold matrix4 for each instance to pass to shader
+        offsets = BufferUtils.newFloatBuffer(INSTANCE_COUNT * 16); // 16 floats for mat4
+
         for (int x = 1; x <= INSTANCE_COUNT_SIDE; x++) {
             for (int y = 1; y <= INSTANCE_COUNT_SIDE; y++) {
                 for (int z = 1; z <= INSTANCE_COUNT_SIDE; z++) {
-
                     // set instance position
                     vec3Temp.set(
                         x / (INSTANCE_COUNT_SIDE * 0.5f) - 1f,
@@ -259,13 +249,13 @@ public class ModelInstancedRenderingTest implements Screen {
                         z / (INSTANCE_COUNT_SIDE * 0.5f) - 1f);
 
                     // set random rotation
-                    //q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
+                    q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
 
                     // create matrix transform
                     mat4.set(vec3Temp, q);
 
-                    // put the 20 floats in the float buffer
-                    offsets.put(mat4.getValues());  // put matrix4 = 16
+                    // put the 16 floats for mat4 in the float buffer
+                    offsets.put(mat4.getValues());
                 }
             }
         }
@@ -283,8 +273,8 @@ public class ModelInstancedRenderingTest implements Screen {
     /** See assets/shaders/instanced.vert file to see how:
 
         a_position
+        a_texCoords0
         i_worldTrans
-        i_color
 
         vertex attributes are used to update each instance.
 
@@ -293,12 +283,10 @@ public class ModelInstancedRenderingTest implements Screen {
      */
     private BaseShader createShader() {
         return new BaseShader() {
-            Texture texture = new Texture(Gdx.files.internal("graphics/badlogic.jpg"));
 
             @Override
             public void begin(Camera camera, RenderContext context) {
                 program.bind();
-                texture.bind();
                 program.setUniformMatrix("u_projViewTrans", camera.combined);
                 program.setUniformi("u_texture", 0);
                 context.setDepthTest(GL30.GL_LEQUAL);
@@ -337,9 +325,7 @@ public class ModelInstancedRenderingTest implements Screen {
 
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.9f, 0.9f, 0.9f, 1f));
-                environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
-        modelBuilder = new ModelBuilder();
-        meshBuilder = new MeshBuilder();
+//        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
         // setup camera, controller, and batches
         camera = new PerspectiveCamera(45, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -358,6 +344,7 @@ public class ModelInstancedRenderingTest implements Screen {
 
         batch = new ModelBatch();
         batch2D = new SpriteBatch();
+
         // until they fix the default font, load the fixed version locally
         font = new BitmapFont(Gdx.files.internal("fonts/lsans-15.fnt"));
         font.setColor(Color.WHITE);
@@ -402,6 +389,7 @@ public class ModelInstancedRenderingTest implements Screen {
 
     @Override
     public void dispose () {
+        texture.dispose();
         mesh.dispose();
         batch.dispose();
         batch2D.dispose();
