@@ -45,7 +45,7 @@ public class ModelInstancedRenderingTest implements Screen {
     private Mesh mesh;
 
     //Texture texture = new Texture(Gdx.files.internal("graphics/badlogic.jpg"));
-    private Texture texture = new Texture(Gdx.files.internal("graphics/zebra.png"));
+    private Texture texture = new Texture(Gdx.files.internal("graphics/zebra.png")); // our mascot!
 
     private ModelBatch batch;
     private GLProfiler profiler;
@@ -125,7 +125,7 @@ public class ModelInstancedRenderingTest implements Screen {
         instanceUpdated = 0;
 
         // toggle rotation if space key pressed
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.isTouched()))
             rotateOn = !rotateOn;
 
         // toggle show stats if F1 key pressed
@@ -190,7 +190,7 @@ public class ModelInstancedRenderingTest implements Screen {
             new VertexAttribute(Usage.Position, 3, "a_position"),
             new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoords0")
         );
-        size = 1f / (float)Math.sqrt(INSTANCE_COUNT) * 0.5f;
+        size = 1f / (float)Math.sqrt(INSTANCE_COUNT) * 1f;
 
         // 24 vertices
         float[] vertices = new float[] {
@@ -351,8 +351,9 @@ public class ModelInstancedRenderingTest implements Screen {
         font.getData().setScale(2);
 
         // set low instance limits for all other platforms not desktop
+        // >>> always use an odd number so camera is not inside a cube
         if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
-            INSTANCE_COUNT_SIDE = 100;
+            INSTANCE_COUNT_SIDE = 101;
             CULLING_FACTOR = camera.far * 0.25f; // cull very small cubes that we cant detect rotating
         } else {
             INSTANCE_COUNT_SIDE = 25;
