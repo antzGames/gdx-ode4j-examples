@@ -1,3 +1,28 @@
+/*******************************************************************************
+ * Copyright 2011 See AUTHORS file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Based on: ModelInstancedRenderingTest.java
+ * https://github.com/libgdx/libgdx/blob/master/tests/gdx-tests/src/com/badlogic/gdx/tests/gles3/ModelInstancedRenderingTest.java
+ *
+ * Author: Antz
+ * https://antzgames.itch.io/
+ *
+ * July 2023
+ *
+ ******************************************************************************/
+
 package com.antz.ode4libGDX.screens.demo;
 
 import com.badlogic.gdx.Application;
@@ -39,7 +64,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 
-public class ModelInstancedRenderingTest implements Screen {
+public class ModelInstancedRendering implements Screen {
 
     private Environment environment;
     private Mesh mesh;
@@ -100,7 +125,7 @@ public class ModelInstancedRenderingTest implements Screen {
         batch.end();
         renderTime = TimeUtils.timeSinceNanos(startTime);
 
-        // 2D stuff for info text
+        // 2D stuff for stats text
         if (showStats) {
             batch2D.begin();
             drawStats();
@@ -110,15 +135,14 @@ public class ModelInstancedRenderingTest implements Screen {
 
     private void drawStats() {
         font.draw(batch2D,"WASD + mouse drag: camera, F1: Toggle stats, SPACE: Toggle rotation. rotation=" + rotateOn, 10, 40);
-        font.draw(batch2D,"3D Cubes: " + INSTANCE_COUNT + "  Updated: " + instanceUpdated + "   Skipped: " + (INSTANCE_COUNT - instanceUpdated), 10, 80);
-        font.draw(batch2D,"Update Time: " + TimeUtils.nanosToMillis(updateTime) + "ms", 10, 120);
-        font.draw(batch2D,"Render Time: " + TimeUtils.nanosToMillis(renderTime) + "ms", 10, 160);
+        font.draw(batch2D,"3D Cubes: " + INSTANCE_COUNT + "  Matrix4 Updated: " + instanceUpdated + "   Matrix4 Skipped: " + (INSTANCE_COUNT - instanceUpdated), 10, 80);
+        font.draw(batch2D,"Update Time: " + TimeUtils.nanosToMillis(updateTime) + "ms   Render Time: " + TimeUtils.nanosToMillis(renderTime) + "ms", 10, 120);
         font.draw(batch2D,"FPS: " + Gdx.graphics.getFramesPerSecond() +
                 "  Draw Calls: " + profiler.getDrawCalls() +
                 "  Vert Count: " + profiler.getVertexCount().latest +
                 "  Shader Switches: " + profiler.getShaderSwitches() +
                 "  Texture Bindings: " + profiler.getTextureBindings(),
-            10, 200);
+            10, 160);
     }
 
     private void update(float delta) {
@@ -132,11 +156,11 @@ public class ModelInstancedRenderingTest implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F1))
             showStats = !showStats;
 
-        if (!rotateOn) return;
+        if (!rotateOn) return; // no need to update matrix transform, so return
 
-        // Everything you do in this loop will impact performance with high INSTANCE_COUNT
+        // Everything you do in this loop will impact performance at high INSTANCE_COUNT
         for (int x = 0; x < INSTANCE_COUNT; x++) {
-            targetIndex = x * 16; // each instance uses 20 floats
+            targetIndex = x * 16; // each instance uses 16 floats
 
             // get position of instance (x, y, z)
             vec3Temp.set(offsets.get(targetIndex + 12), offsets.get(targetIndex + 13), offsets.get(targetIndex + 14));
@@ -180,7 +204,7 @@ public class ModelInstancedRenderingTest implements Screen {
             renderable.meshPart.mesh.updateInstanceData(targetIndex, mat4.getValues());
 
         }
-        // This is the only method that works in GWT and is expensive - UNCOMMENT if GWT
+        // This is the only method that works in GWT and is expensive - UNCOMMENT for GWT
         //renderable.meshPart.mesh.updateInstanceData(0, offsets);
     }
 
@@ -190,9 +214,11 @@ public class ModelInstancedRenderingTest implements Screen {
             new VertexAttribute(Usage.Position, 3, "a_position"),
             new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoords0")
         );
-        size = 1f / (float)Math.sqrt(INSTANCE_COUNT) * 1f;
 
-        // 24 vertices
+        // size of box, update last float (0.95f) to change size: 0.5f to 2.0f range is good
+        size = 1f / (float)Math.sqrt(INSTANCE_COUNT) * 0.95f;
+
+        // 24 vertices - one of the texture coordinates is flipped, but no big deal
         float[] vertices = new float[] {
             -size, size, -size, 0.0f, 1.0f,
             size, size, -size, 1.0f, 1.0f,
@@ -259,6 +285,7 @@ public class ModelInstancedRenderingTest implements Screen {
                 }
             }
         }
+
         ((Buffer)offsets).position(0);
         mesh.setInstanceData(offsets);
 
@@ -270,7 +297,7 @@ public class ModelInstancedRenderingTest implements Screen {
         renderable.shader.init();
     }
 
-    /** See assets/shaders/instanced.vert file to see how:
+    /** See assets/shaders/instanced.vert + assets/shaders/instanced.frag files to see how:
 
         a_position
         a_texCoords0
@@ -360,7 +387,7 @@ public class ModelInstancedRenderingTest implements Screen {
             CULLING_FACTOR = camera.far; // no culling as all objects can be seen rotating
         }
 
-        // 100 * 100 * 100 = 1 million for desktop
+        // 101 * 101 * 101 = 1.03 million for desktop
         INSTANCE_COUNT = INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE;
 
         // create & enable the profiler
