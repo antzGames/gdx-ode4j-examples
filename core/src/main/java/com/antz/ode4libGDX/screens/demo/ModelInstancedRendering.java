@@ -21,6 +21,8 @@
  *
  * July 2023
  *
+ * Learn OpenGL Instancing: https://learnopengl.com/Advanced-OpenGL/Instancing
+ *
  ******************************************************************************/
 
 package com.antz.ode4libGDX.screens.demo;
@@ -148,7 +150,7 @@ public class ModelInstancedRendering implements Screen {
     private void update(float delta) {
         instanceUpdated = 0;
 
-        // toggle rotation if space key pressed
+        // toggle rotation if space key pressed (or screen touched on Android)
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.isTouched()))
             rotateOn = !rotateOn;
 
@@ -160,7 +162,7 @@ public class ModelInstancedRendering implements Screen {
 
         // Everything you do in this loop will impact performance at high INSTANCE_COUNT
         for (int x = 0; x < INSTANCE_COUNT; x++) {
-            targetIndex = x * 16; // each instance uses 16 floats
+            targetIndex = x * 16; // each instance uses 16 floats for matrix4
 
             // get position of instance (x, y, z)
             vec3Temp.set(offsets.get(targetIndex + 12), offsets.get(targetIndex + 13), offsets.get(targetIndex + 14));
@@ -200,12 +202,8 @@ public class ModelInstancedRendering implements Screen {
             // update float buffer and update the mesh instance data
             offsets.position(targetIndex);
             offsets.put(mat4.getValues());
-            // This next method only works on desktop - comment out for GWT
             renderable.meshPart.mesh.updateInstanceData(targetIndex, mat4.getValues());
-
         }
-        // This is the only method that works in GWT and is expensive - UNCOMMENT for GWT
-        //renderable.meshPart.mesh.updateInstanceData(0, offsets);
     }
 
     private void setupInstancedMesh() {
