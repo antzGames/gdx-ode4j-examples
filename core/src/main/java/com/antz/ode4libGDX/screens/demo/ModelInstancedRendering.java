@@ -111,6 +111,7 @@ public class ModelInstancedRendering implements Screen {
         profiler.reset();
         controller.update();
         ScreenUtils.clear(Color.BLACK, true);
+        checkUserInput();
 
         // rotate all instances that are close and in view
         startTime = TimeUtils.nanoTime();
@@ -147,8 +148,6 @@ public class ModelInstancedRendering implements Screen {
 
     private void update(float delta) {
         instanceUpdated = 0;
-
-        checkUserInput();
 
         if (!rotateOn) return; // no need to update matrix transform, so return
 
@@ -411,6 +410,7 @@ public class ModelInstancedRendering implements Screen {
         camera.update();
         camFrustum = camera.frustum;
 
+        // batches
         batch = new ModelBatch();
         batch2D = new SpriteBatch();
 
