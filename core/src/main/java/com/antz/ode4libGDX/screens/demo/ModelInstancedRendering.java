@@ -48,6 +48,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.BaseShader;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
@@ -70,10 +71,7 @@ public class ModelInstancedRendering implements Screen {
 
     private Environment environment;
     private Mesh mesh;
-
-    //Texture texture = new Texture(Gdx.files.internal("graphics/badlogic.jpg"));
-    private Texture texture = new Texture(Gdx.files.internal("graphics/zebra.png")); // our mascot!
-
+    private Texture texture;
     private ModelBatch batch;
     private GLProfiler profiler;
     private SpriteBatch batch2D;
@@ -150,13 +148,7 @@ public class ModelInstancedRendering implements Screen {
     private void update(float delta) {
         instanceUpdated = 0;
 
-        // toggle rotation if space key pressed (or screen touched on Android)
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.isTouched()))
-            rotateOn = !rotateOn;
-
-        // toggle show stats if F1 key pressed
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F1))
-            showStats = !showStats;
+        checkUserInput();
 
         if (!rotateOn) return; // no need to update matrix transform, so return
 
@@ -206,15 +198,22 @@ public class ModelInstancedRendering implements Screen {
         }
     }
 
+    private void checkUserInput() {
+        // toggle rotation if space key pressed (or screen touched on Android)
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || (Gdx.app.getType().equals(Application.ApplicationType.Android) && Gdx.input.isTouched()))
+            rotateOn = !rotateOn;
+
+        // toggle show stats if F1 key pressed
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1))
+            showStats = !showStats;
+    }
+
     private void setupInstancedMesh() {
         // Create a 3D cube mesh
         mesh = new Mesh(true, 24, 36,
             new VertexAttribute(Usage.Position, 3, "a_position"),
             new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoords0")
         );
-
-        // size of box, update last float (0.95f) to change size: 0.5f to 2.0f range is good
-        size = 1f / (float)Math.sqrt(INSTANCE_COUNT) * 0.95f;
 
         // 24 vertices - one of the texture coordinates is flipped, but no big deal
         float[] vertices = new float[] {
@@ -259,30 +258,11 @@ public class ModelInstancedRendering implements Screen {
             new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 2),
             new VertexAttribute(VertexAttributes.Usage.Generic, 4, "i_worldTrans", 3));
 
-
         // Create offset FloatBuffer that will hold matrix4 for each instance to pass to shader
         offsets = BufferUtils.newFloatBuffer(INSTANCE_COUNT * 16); // 16 floats for mat4
 
-        for (int x = 1; x <= INSTANCE_COUNT_SIDE; x++) {
-            for (int y = 1; y <= INSTANCE_COUNT_SIDE; y++) {
-                for (int z = 1; z <= INSTANCE_COUNT_SIDE; z++) {
-                    // set instance position
-                    vec3Temp.set(
-                        x / (INSTANCE_COUNT_SIDE * 0.5f) - 1f,
-                        y / (INSTANCE_COUNT_SIDE * 0.5f) - 1f,
-                        z / (INSTANCE_COUNT_SIDE * 0.5f) - 1f);
-
-                    // set random rotation
-                    q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
-
-                    // create matrix transform
-                    mat4.set(vec3Temp, q);
-
-                    // put the 16 floats for mat4 in the float buffer
-                    offsets.put(mat4.getValues());
-                }
-            }
-        }
+        createBoxField(); // regular box field
+        //createVoxelTerrain(); // simple minecraft terrain
 
         ((Buffer)offsets).position(0);
         mesh.setInstanceData(offsets);
@@ -341,6 +321,75 @@ public class ModelInstancedRendering implements Screen {
         };
     }
 
+    private void createBoxField(){
+        texture = new Texture(Gdx.files.internal("graphics/zebra.png")); // our mascot!
+
+        for (int x = 1; x <= INSTANCE_COUNT_SIDE; x++) {
+            for (int y = 1; y <= INSTANCE_COUNT_SIDE; y++) {
+                for (int z = 1; z <= INSTANCE_COUNT_SIDE; z++) {
+                    // set instance position
+                    vec3Temp.set(
+                        x / (INSTANCE_COUNT_SIDE * 0.5f) - 1f,
+                        y / (INSTANCE_COUNT_SIDE * 0.5f) - 1f,
+                        z / (INSTANCE_COUNT_SIDE * 0.5f) - 1f);
+
+                    // set random rotation
+                    q.setEulerAngles(MathUtils.random(-90, 90), MathUtils.random(-90, 90), MathUtils.random(-90, 90));
+
+                    // create matrix transform
+                    mat4.set(vec3Temp, q);
+
+                    // put the 16 floats for mat4 in the float buffer
+                    offsets.put(mat4.getValues());
+                }
+            }
+        }
+    }
+
+    private void createVoxelTerrain() {
+        texture = new Texture(Gdx.files.internal("graphics/tile.png"));
+        rotateOn = false;
+
+        // very simple random terrain
+        float y, total = 0;
+        for (int x = 1; x <= Math.sqrt(INSTANCE_COUNT); x++) {
+            for (int z = 1; z <= Math.sqrt(INSTANCE_COUNT); z++) {
+
+                if (MathUtils.random(3) == 3)
+                    y = size * 2;
+                else
+                    y = 0;
+
+                vec3Temp.set(
+                    x * size * 2,
+                    y - size * 4, // so terrain below initial camera y position
+                    z * size * 2);
+
+                // create matrix transform
+                mat4.set(vec3Temp, q);
+                rotateOn = false;
+
+                // put the 16 floats for mat4 in the float buffer
+                offsets.put(mat4.getValues());
+                total++;
+            }
+        }
+
+        // build a tower in middle
+        for (int i = 0; i < (INSTANCE_COUNT - total); i++ ) {
+            vec3Temp.set(
+                (float)Math.sqrt(INSTANCE_COUNT)/2f * size * 2,
+                i * size * 2 - size * 4,
+                (float)Math.sqrt(INSTANCE_COUNT)/2f * size * 2);
+
+            // create matrix transform
+            mat4.set(vec3Temp, q);
+
+            // put the 16 floats for mat4 in the float buffer
+            offsets.put(mat4.getValues());
+        }
+    }
+
     private void init() {
         // reusable variables
         mat4 = new Matrix4();
@@ -350,7 +399,7 @@ public class ModelInstancedRendering implements Screen {
 
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.9f, 0.9f, 0.9f, 1f));
-//        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        //environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
         // setup camera, controller, and batches
         camera = new PerspectiveCamera(45, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -361,11 +410,6 @@ public class ModelInstancedRendering implements Screen {
         camera.up.set(Vector3.Y);
         camera.update();
         camFrustum = camera.frustum;
-
-        controller = new FirstPersonCameraController(camera);
-        controller.setVelocity(0.025f);
-        controller.setDegreesPerPixel(0.2f);
-        Gdx.input.setInputProcessor(controller);
 
         batch = new ModelBatch();
         batch2D = new SpriteBatch();
@@ -381,12 +425,20 @@ public class ModelInstancedRendering implements Screen {
             INSTANCE_COUNT_SIDE = 101;
             CULLING_FACTOR = camera.far * 0.25f; // cull very small cubes that we cant detect rotating
         } else {
-            INSTANCE_COUNT_SIDE = 25;
+            INSTANCE_COUNT_SIDE = 29;
             CULLING_FACTOR = camera.far; // no culling as all objects can be seen rotating
         }
 
         // 101 * 101 * 101 = 1.03 million for desktop
         INSTANCE_COUNT = INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE * INSTANCE_COUNT_SIDE;
+
+        // size of box, update last float (0.95f) to change size: 0.5f to 2.0f range is good
+        size = 1f / (float)Math.sqrt(INSTANCE_COUNT) * 0.95f;
+
+        controller = new FirstPersonCameraController(camera);
+        controller.setVelocity(size*16);
+        controller.setDegreesPerPixel(0.2f);
+        Gdx.input.setInputProcessor(controller);
 
         // create & enable the profiler
         profiler = new GLProfiler(Gdx.graphics);
