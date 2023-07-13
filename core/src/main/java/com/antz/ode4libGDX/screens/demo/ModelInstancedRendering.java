@@ -1,31 +1,5 @@
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Based on: ModelInstancedRenderingTest.java
- * https://github.com/libgdx/libgdx/blob/master/tests/gdx-tests/src/com/badlogic/gdx/tests/gles3/ModelInstancedRenderingTest.java
- *
- * Author: Antz
- * https://antzgames.itch.io/
- *
- * July 2023
- *
- * Learn OpenGL Instancing: https://learnopengl.com/Advanced-OpenGL/Instancing
- *
- ******************************************************************************/
-
 package com.antz.ode4libGDX.screens.demo;
+
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -48,7 +22,6 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.BaseShader;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
@@ -158,7 +131,9 @@ public class ModelInstancedRendering implements Screen {
             // get position of instance (x, y, z)
             vec3Temp.set(offsets.get(targetIndex + 12), offsets.get(targetIndex + 13), offsets.get(targetIndex + 14));
 
-            // attempt culling if not within camera's frustum, or too far away to be noticed rotating
+            // Attempt culling if not within camera's frustum, or too far away to be noticed rotating
+            // Note: only uses center of box position to test.  Correct way is to use the bounding box
+            //       of mesh but that is very expensive at high INSTANCE_COUNT.
             if (!(camFrustum.pointInFrustum(vec3Temp)) || vec3Temp.dst(camera.position) > CULLING_FACTOR) continue;
 
             instanceUpdated++;
@@ -244,7 +219,7 @@ public class ModelInstancedRendering implements Screen {
 
         // 36 indices
         short[] indices = new short[]
-               {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 8, 9, 10, 10, 11, 8, 12, 13,
+            {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 8, 9, 10, 10, 11, 8, 12, 13,
                 14, 14, 15, 12, 16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20 };
 
         mesh.setVertices(vertices);
@@ -276,14 +251,14 @@ public class ModelInstancedRendering implements Screen {
 
     /** See assets/shaders/instanced.vert + assets/shaders/instanced.frag files to see how:
 
-        a_position
-        a_texCoords0
-        i_worldTrans
+     a_position
+     a_texCoords0
+     i_worldTrans
 
-        vertex attributes are used to update each instance.
+     vertex attributes are used to update each instance.
 
-        u_projViewTrans uniform needs to be set with camera.combined
-        so shader can calculate the updated position and rotation
+     u_projViewTrans uniform needs to be set with camera.combined
+     so shader can calculate the updated position and rotation
      */
     private BaseShader createShader() {
         return new BaseShader() {
@@ -390,6 +365,10 @@ public class ModelInstancedRendering implements Screen {
     }
 
     private void init() {
+        // Catch Browser keys
+        Gdx.input.setCatchKey(Input.Keys.SPACE, true);
+        Gdx.input.setCatchKey(Input.Keys.F1, true);
+
         // reusable variables
         mat4 = new Matrix4();
         q = new Quaternion();
