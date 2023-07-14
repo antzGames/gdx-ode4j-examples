@@ -483,7 +483,7 @@ public class DemoMundusHeightFieldScreen implements Screen, InputProcessor {
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.F1) {
             odeDispose();
-            Ode4libGDX.game.setScreen(new OdeTest());
+            Ode4libGDX.game.setScreen(new OdeBulletTest());
         } else if (keycode == Input.Keys.M) showTerrainMesh = !showTerrainMesh;
         else if (keycode == Input.Keys.SPACE) doDropSphere();
         return false;

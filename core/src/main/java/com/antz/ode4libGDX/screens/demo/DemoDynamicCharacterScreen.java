@@ -75,7 +75,7 @@ public class DemoDynamicCharacterScreen implements Screen, InputProcessor {
     protected OdePhysicsSystem odePhysicsSystem;
 
     private Array<Color> colors;
-    protected BitmapFont font = new BitmapFont();
+    protected BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/lsans-15.fnt"));
     protected String info;
     private DynamicCharacterController controller;
     protected boolean showAABB;

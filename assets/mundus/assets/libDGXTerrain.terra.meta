@@ -1,1 +1,1 @@
-{"v":1,"mod":1683730686033,"t":"TERRAIN","id":"b49d9c7cf45442ac9ebe032142b05f13","ter":{"size":200,"mapRes":512,"uv":60,"triplanar":false,"base64":null,"material":"terrain_default","base":"34cbc4d4d03f41a491bbb72e0102e6ca"}}
+{"v":1,"mod":1683730686033,"t":"TERRAIN","id":"b49d9c7cf45442ac9ebe032142b05f13","ter":{"size":200,"mapRes":512,"uv":60,"triplanar":true,"base64":null,"material":"terrain_default","base":"chessboard"}}

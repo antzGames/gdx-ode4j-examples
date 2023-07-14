@@ -58,7 +58,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
     }
     private GameState gameState = GameState.LOADING;
     private SpriteBatch batch;
-    private BitmapFont font = new BitmapFont();
+    private BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/lsans-15.fnt"));
     private String info;
     private ModelBatch modelBatch;
     private ModelBuilder modelBuilder;

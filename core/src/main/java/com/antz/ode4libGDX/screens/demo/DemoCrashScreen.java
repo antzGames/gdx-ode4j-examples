@@ -56,7 +56,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     }
     private GameState gameState = GameState.LOADING;
     private SpriteBatch batch;
-    private BitmapFont font = new BitmapFont();
+    private BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/lsans-15.fnt"));
     private String info;
     private ModelBatch modelBatch;
     private ModelBuilder modelBuilder;
@@ -311,7 +311,7 @@ public class DemoCrashScreen implements Screen, InputProcessor {
                     m.setBox (1,WBOXSIZE,WBOXSIZE,WBOXSIZE);
                     m.adjust (WALLMASS);
                     wall_bodies[wb].setMass(m);
-                    wall_boxes[wb] = OdeHelper.createBox (space,WBOXSIZE,WBOXSIZE,WBOXSIZE);
+                    wall_boxes[wb] = OdeHelper.createBox(space,WBOXSIZE,WBOXSIZE,WBOXSIZE);
                     wall_boxes[wb].setBody (wall_bodies[wb]);
                     //dBodyDisable(wall_bodies[wb++]);
 

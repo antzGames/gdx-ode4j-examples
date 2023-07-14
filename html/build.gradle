@@ -35,8 +35,12 @@ dependencies {
   implementation "com.github.tommyettinger:formic:$formicVersion:sources"
   implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
   //implementation "com.github.tommyettinger:textratypist:$textratypistVersion:sources"
-  api "com.github.jamestkhan.mundus:gdx-runtime:master-SNAPSHOT:sources"
-  api "com.github.jamestkhan.mundus:commons:master-SNAPSHOT:sources"
+
+  api "com.github.antzGames.mundus:gdx-runtime:gdxteavm_issue_103_bypass-SNAPSHOT:sources"
+  api "com.github.antzGames.mundus:commons:gdxteavm_issue_103_bypass-SNAPSHOT:sources"
+
+//  api "com.github.jamestkhan.mundus:gdx-runtime:master-SNAPSHOT:sources"
+//  api "com.github.jamestkhan.mundus:commons:master-SNAPSHOT:sources"
   api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
 
 //// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.

@@ -16,6 +16,8 @@ skybox_default.png
 skybox_default.png.meta
 Terrain.terra
 Terrain.terra.meta
+TerrainTest.terra
+TerrainTest.terra.meta
 terrain_default.mat
 terrain_default.mat.meta
 waterFoam.png

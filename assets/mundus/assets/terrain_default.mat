@@ -1,4 +1,4 @@
-#Thu Jun 08 23:17:48 EDT 2023
+#Fri Jul 14 01:23:27 EDT 2023
 diffuse.color=ffffffff
 cullFace=0
 diffuse.rotationUV=0.0
@@ -12,7 +12,7 @@ occlusionTexture.offsetV=0.0
 occlusionTexture.scaleV=1.0
 occlusionTexture.offsetU=0.0
 metallicRoughTexture.scaleU=1.0
-roughness=1.0
+roughness=0.34
 diffuse.uvIndex=0
 metallicRoughTexture.scaleV=1.0
 occlusionTexture.scaleU=1.0
@@ -26,7 +26,7 @@ emissive.offsetV=0.0
 emissive.rotationUV=0.0
 emissive.offsetU=0.0
 map.scaleV=1.0
-metallic=0.0
+metallic=0.17999999
 map.scaleU=1.0
 diffuse.scaleV=1.0
 metallicRoughTexture.offsetU=0.0

@@ -49,7 +49,7 @@ import static org.ode4j.ode.OdeConstants.dContactSlip2;
 import static org.ode4j.ode.OdeConstants.dContactSoftCFM;
 import static org.ode4j.ode.OdeConstants.dContactSoftERP;
 
-public class OdeTest implements Screen {
+public class OdeBulletTest implements Screen {
 
     // some constants
     private static final int   ITERS = 5;		            // number of iterations
@@ -126,7 +126,7 @@ public class OdeTest implements Screen {
 
         resetSimulation();
 
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("fonts/lsans-15.fnt"));
         font.setColor(1, 0, 0, 1);
         time = System.currentTimeMillis();
 
