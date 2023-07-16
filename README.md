@@ -1,10 +1,8 @@
 # gdx-ode4j Examples
 
-Some examples and demos using my [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) library. 
+Some examples and demos using my [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) library.  **gdx-ode4j** library is compatible with all libGDX backends, including GWT.
 
 You can test these demos on your browser on [itch.io](https://antzgames.itch.io/physics-in-a-browser).
-
-This ODE4J library is compatible with all libGDX backends, including GWT.  
 
 It is based on version 0.4.2 of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j).
 
