@@ -6,7 +6,7 @@ Some examples and demos using my [gdx-ode4j](https://github.com/antzGames/gdx-od
 
 You can test these demos on your browser on [itch.io](https://antzgames.itch.io/physics-in-a-browser).
 
-It is based on version 0.4.2 of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j).
+`gdx-ode4j` is based on version 0.4.2 of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j).
 
 https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/assets/10563814/b0db87e1-d548-43d6-bb89-02aa4ae2b21d
 
