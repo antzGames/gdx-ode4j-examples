@@ -2,7 +2,7 @@
 
 Some examples and demos using my [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) library.
 
-**gdx-ode4j** library is compatible with all libGDX backends, including GWT.
+`gdx-ode4j` library is compatible with all libGDX backends, including GWT.
 
 You can test these demos on your browser on [itch.io](https://antzgames.itch.io/physics-in-a-browser).
 
