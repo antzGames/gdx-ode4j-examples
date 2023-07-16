@@ -1,9 +1,8 @@
 package com.antz.ode4libGDX.util;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-
-import org.ode4j.ode.DBody;
-import org.ode4j.ode.DGeom;
+import com.github.antzGames.gdx.ode4j.ode.DBody;
+import com.github.antzGames.gdx.ode4j.ode.DGeom;
 
 /**
  * Original code from: https://github.com/JamesTKhan/libgdx-bullet-tutorials

@@ -1,7 +1,6 @@
 package com.antz.ode4libGDX.screens.demo;
 
 import com.antz.ode4libGDX.Ode4libGDX;
-import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -22,7 +21,6 @@ import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.shaders.BaseShader;
-import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Frustum;
@@ -34,20 +32,21 @@ import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import org.ode4j.math.DQuaternion;
-import org.ode4j.ode.DBody;
-import org.ode4j.ode.DBox;
-import org.ode4j.ode.DContact;
-import org.ode4j.ode.DContactBuffer;
-import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DGeom.DNearCallback;
-import org.ode4j.ode.DJoint;
-import org.ode4j.ode.DJointGroup;
-import org.ode4j.ode.DMass;
-import org.ode4j.ode.DSapSpace;
-import org.ode4j.ode.DSpace;
-import org.ode4j.ode.DWorld;
-import org.ode4j.ode.OdeHelper;
+import com.github.antzGames.gdx.ode4j.Ode2GdxMathUtils;
+import com.github.antzGames.gdx.ode4j.math.DQuaternion;
+import com.github.antzGames.gdx.ode4j.ode.DBody;
+import com.github.antzGames.gdx.ode4j.ode.DBox;
+import com.github.antzGames.gdx.ode4j.ode.DContact;
+import com.github.antzGames.gdx.ode4j.ode.DContactBuffer;
+import com.github.antzGames.gdx.ode4j.ode.DGeom;
+import com.github.antzGames.gdx.ode4j.ode.DJoint;
+import com.github.antzGames.gdx.ode4j.ode.DJointGroup;
+import com.github.antzGames.gdx.ode4j.ode.DMass;
+import com.github.antzGames.gdx.ode4j.ode.DSapSpace;
+import com.github.antzGames.gdx.ode4j.ode.DSpace;
+import com.github.antzGames.gdx.ode4j.ode.DWorld;
+import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
+
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 
@@ -114,7 +113,11 @@ public class DemoCollisionTest implements Screen {
         // GWT issue.  You need to draw before updating the instanced data
         if (logicTimer < 0.5f) {
             draw();
-        } else {
+        } else if (logicTimer > 15) { // switch to next demo after 15s
+            ShaderProgram.prependVertexCode = "";
+            ShaderProgram.prependFragmentCode = "";
+            Ode4libGDX.game.setScreen(new DemoDynamicCharacterScreen());
+        } else { // main loop
             checkInput();
             simLoop();
             draw();
@@ -202,6 +205,7 @@ public class DemoCollisionTest implements Screen {
         font.draw(batch2D,"Total Physics Time: " + TimeUtils.nanosToMillis(physicsTime) + "ms", 10, 100);
         font.draw(batch2D,"Render Time: " + TimeUtils.nanosToMillis(renderTime) + "ms", 10, 120);
         font.draw(batch2D,"Press F1 for Dynamic Character Screen Demo.", 10, 140);
+        font.draw(batch2D,"Standard Collision Test", 10, 180);
         batch2D.end();
         nearCallBackTotal = 0;
     }
@@ -420,7 +424,7 @@ public class DemoCollisionTest implements Screen {
         OdeHelper.closeODE();
     }
 
-    private final DNearCallback nearCallback = (data, o1, o2) -> nearCallback(o1, o2);
+    private final DGeom.DNearCallback nearCallback = (data, o1, o2) -> nearCallback(o1, o2);
 
     private void nearCallback (DGeom o1, DGeom o2) {
         nearCallbackStart = TimeUtils.nanoTime();
@@ -494,6 +498,5 @@ public class DemoCollisionTest implements Screen {
         // until they fix the default font, load the fixed version locally
         font = new BitmapFont(Gdx.files.internal("fonts/lsans-15.fnt"));
         font.setColor(Color.RED);
-        //font.getData().setScale(2);
     }
 }

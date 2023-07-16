@@ -36,17 +36,19 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import org.ode4j.math.DMatrix3;
-import org.ode4j.math.DQuaternion;
-import org.ode4j.math.DVector3;
-import org.ode4j.ode.DAABBC;
-import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DMass;
-import org.ode4j.ode.DRay;
-import org.ode4j.ode.DTriMeshData;
-import org.ode4j.ode.OdeHelper;
-import static org.ode4j.ode.internal.Common.M_PI;
-import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
+import com.github.antzGames.gdx.ode4j.math.DMatrix3;
+import com.github.antzGames.gdx.ode4j.math.DQuaternion;
+import com.github.antzGames.gdx.ode4j.math.DVector3;
+import com.github.antzGames.gdx.ode4j.ode.DAABBC;
+import com.github.antzGames.gdx.ode4j.ode.DMass;
+import com.github.antzGames.gdx.ode4j.ode.DRay;
+import com.github.antzGames.gdx.ode4j.ode.DTriMesh;
+import com.github.antzGames.gdx.ode4j.ode.DTriMeshData;
+import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
+
+import static com.github.antzGames.gdx.ode4j.ode.internal.Common.M_PI;
+import static com.github.antzGames.gdx.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
+
 
 /**
  * Original code from: https://github.com/JamesTKhan/libgdx-bullet-tutorials
@@ -193,7 +195,7 @@ public class DemoDynamicCharacterScreen implements Screen, InputProcessor {
 
     private OdeEntity createScene(){
         OdeEntity scene = new OdeEntity();
-        DGeom sceneTriMesh;
+        DTriMesh sceneTriMesh;
         DTriMeshData sceneTriMeshData;
 
         // Load a walkable area, set tri mesh for ODE
@@ -218,7 +220,7 @@ public class DemoDynamicCharacterScreen implements Screen, InputProcessor {
         for (int x = 0; x < indexOut.size ; x++) indices[x] = indexOut.get(x).intValue();
 
         sceneTriMeshData = OdeHelper.createTriMeshData();
-        sceneTriMeshData.build(vertices, indices);
+        ((DTriMeshData) sceneTriMeshData).build(vertices, indices);
         sceneTriMeshData.preprocess();
 
         // create the geom

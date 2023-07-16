@@ -1,7 +1,6 @@
 package com.antz.ode4libGDX.screens.demo;
 
 import com.antz.ode4libGDX.Ode4libGDX;
-import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -21,40 +21,39 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.mbrlabs.mundus.commons.Scene;
-import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
-import com.mbrlabs.mundus.runtime.Mundus;
-import org.ode4j.math.DMatrix3;
-import org.ode4j.math.DVector3;
-import org.ode4j.math.DVector3C;
-import org.ode4j.ode.DBox;
-import org.ode4j.ode.DHinge2Joint;
-import org.ode4j.ode.DSapSpace;
-import org.ode4j.ode.DSphere;
-import org.ode4j.ode.OdeHelper;
-import org.ode4j.ode.DBody;
-import org.ode4j.ode.DContact;
-import org.ode4j.ode.DContactBuffer;
-import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DJoint;
-import org.ode4j.ode.DJointGroup;
-import org.ode4j.ode.DMass;
-import org.ode4j.ode.DSpace;
-import org.ode4j.ode.DWorld;
-import org.ode4j.ode.DGeom.DNearCallback;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.github.antzGames.gdx.ode4j.Ode2GdxMathUtils;
+import com.github.antzGames.gdx.ode4j.math.DMatrix3;
+import com.github.antzGames.gdx.ode4j.math.DVector3;
+import com.github.antzGames.gdx.ode4j.math.DVector3C;
+import com.github.antzGames.gdx.ode4j.ode.DBody;
+import com.github.antzGames.gdx.ode4j.ode.DBox;
+import com.github.antzGames.gdx.ode4j.ode.DContact;
+import com.github.antzGames.gdx.ode4j.ode.DContactBuffer;
+import com.github.antzGames.gdx.ode4j.ode.DGeom;
+import com.github.antzGames.gdx.ode4j.ode.DHinge2Joint;
+import com.github.antzGames.gdx.ode4j.ode.DJoint;
+import com.github.antzGames.gdx.ode4j.ode.DJointGroup;
+import com.github.antzGames.gdx.ode4j.ode.DMass;
+import com.github.antzGames.gdx.ode4j.ode.DSapSpace;
+import com.github.antzGames.gdx.ode4j.ode.DSpace;
+import com.github.antzGames.gdx.ode4j.ode.DSphere;
+import com.github.antzGames.gdx.ode4j.ode.DWorld;
+import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
 import java.util.ArrayList;
-import static org.ode4j.ode.OdeMath.*;
+import static com.github.antzGames.gdx.ode4j.ode.DRotation.dRFromAxisAndAngle;
+import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactApprox1;
+import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactSlip1;
+import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactSlip2;
+import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactSoftCFM;
+import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactSoftERP;
+import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dInfinity;
+import static com.github.antzGames.gdx.ode4j.ode.internal.Matrix.dMultiply0;
+
 
 public class DemoCrashScreen implements Screen, InputProcessor {
 
-    // My stuff
-    private Mundus mundus;
-    private Scene scene;
-    enum GameState {
-        LOADING,
-        RENDER
-    }
-    private GameState gameState = GameState.LOADING;
+    private PerspectiveCamera camera;
     private SpriteBatch batch;
     private BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/lsans-15.fnt"));
     private String info;
@@ -90,12 +89,8 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     private static boolean CANNON = true;
 
     /**
-     libGDX user note: All the ode4j demos create very large arrays for joints, boxes, bodies etc.
-     And then they have a integer keeping track of how many actual elements in the array are used.
-     The original version had 100,000 elements per array.  I reduced it to 1000.
-     I think this is a relic from the C language malloc to reserve memory?
-     Either way this is a todo to switch to an Array
-     There is also some weird code format and variable names.  I think its due to relics of ported C/C++ code.
+     libGDX user note: All the ode4j demos are translated from old C/C++ code
+     so they are a bit outdate
     **/
 
     // dynamics and collision objects
@@ -134,19 +129,6 @@ public class DemoCrashScreen implements Screen, InputProcessor {
         font.setColor(Color.BLUE);
         doFast = true;
 
-        // From Mundus Example Project
-        Mundus.Config config = new Mundus.Config();
-        config.autoLoad = false; // Do not autoload, we want to queue custom assets
-        config.asyncLoad = true; // Do asynchronous loading
-
-        // Start asynchronous loading
-        mundus = new Mundus(Gdx.files.internal("mundus"), config);
-        try {
-            mundus.getAssetManager().queueAssetsForLoading(true);
-        } catch (MetaFileParseException e) {
-            e.printStackTrace();
-        }
-
         info = "DemoCrash\n\n" +
             "WASD to move camera, click-drag mouse to rotate camera.\n" +
             "LEFT-CURSOR to turn the cannon left.\n" +
@@ -157,34 +139,23 @@ public class DemoCrashScreen implements Screen, InputProcessor {
 
         System.out.println(info);
 
-        bodies = 0;
-        joints = 0;
+        init();
         OdeHelper.initODE2(0);
         setupSimulation();
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        ScreenUtils.clear(Color.WHITE, true);
+        draw();
 
-        switch (gameState) {
-            case LOADING:
-                continueLoading();
-                break;
-            case RENDER:
-                draw();
-                break;
-        }
     }
 
     private void draw() {
         controller.update(); // camera controller
-        scene.sceneGraph.update(); // update Mundus
-        scene.render(); // render Mundus scene
 
         // 3D models drawing
-        modelBatch.begin(scene.cam);
+        modelBatch.begin(camera);
         simLoop(false, modelBatch); // so the original demo did rendering in the simulation loop, I did the same thing, but I think its not a good idea
         modelBatch.end();
 
@@ -379,8 +350,6 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         // Destroy screen's assets here.
-        mundus.dispose();
-        scene.dispose();
         model.dispose();
         modelBatch.dispose();
         batch.dispose();
@@ -473,25 +442,22 @@ public class DemoCrashScreen implements Screen, InputProcessor {
     }
 
 
-    private void continueLoading() {
-        if (mundus.continueLoading()) {
-            // Loading complete, load a scene.
-            scene = mundus.loadScene("Main Scene.mundus");
-            scene.cam.position.set(90, 10, 90);
-            scene.cam.lookAt(100,0,100);
-            scene.cam.up.set(Vector3.Y);
-            scene.cam.update();;
-            // setup input
-            controller = new FirstPersonCameraController(scene.cam);
-            controller.setVelocity(20f);
-            inputMultiplexer.addProcessor(controller);
-            Gdx.input.setInputProcessor(inputMultiplexer);
-            // Update our game state
-            gameState = GameState.RENDER;
-        }
+    private void init() {
+        bodies = 0;
+        joints = 0;
+        camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.position.set(90, 10, 90);
+        camera.lookAt(100,0,100);
+        camera.up.set(Vector3.Y);
+        camera.update();;
+        // setup input
+        controller = new FirstPersonCameraController(camera);
+        controller.setVelocity(20f);
+        inputMultiplexer.addProcessor(controller);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
-    private DNearCallback nearCallback = new DNearCallback() {
+    private DGeom.DNearCallback nearCallback = new DGeom.DNearCallback() {
         @Override
         public void call(Object data, DGeom o1, DGeom o2) {
             nearCallback(data, o1, o2);

@@ -20,7 +20,6 @@ allprojects {
   apply plugin: 'idea'
 
   ext{
-    mundusGdxRuntime = 'master-SNAPSHOT';
     gltfVersion = '2.1.0'
   }
 
@@ -39,7 +38,7 @@ configure(subprojects - project(':android')) {
 
 subprojects {
   version = '1.0.0'
-  ext.appName = 'ode4libGDX'
+  ext.appName = 'gdx-ode4j-samples'
   repositories {
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org' }
@@ -51,4 +50,4 @@ subprojects {
   }
 }
 
-eclipse.project.name = 'ode4libGDX' + '-parent'
+eclipse.project.name = 'gdx-ode4j-samples' + '-parent'

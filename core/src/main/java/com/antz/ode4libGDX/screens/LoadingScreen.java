@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.mbrlabs.mundus.runtime.Mundus;
 
 public class LoadingScreen implements Screen {
 
@@ -46,11 +45,6 @@ public class LoadingScreen implements Screen {
         Gdx.input.setCatchKey(Input.Keys.DOWN, true);
         Gdx.input.setCatchKey(Input.Keys.LEFT, true);
         Gdx.input.setCatchKey(Input.Keys.RIGHT, true);
-
-        // Load Mundus Project
-        Mundus.Config config = new Mundus.Config();
-        config.autoLoad = true;
-        config.asyncLoad = true;
 
         //assetManager = Constants.mundus.getAssetManager().getGdxAssetManager();
         assetManager = new AssetManager();

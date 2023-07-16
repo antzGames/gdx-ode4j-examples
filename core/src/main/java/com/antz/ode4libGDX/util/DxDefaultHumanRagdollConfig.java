@@ -24,13 +24,13 @@ package com.antz.ode4libGDX.util;
  * details.                                                              *
  *                                                                       *
  *************************************************************************/
-import org.ode4j.math.DVector3;
-import org.ode4j.ode.internal.ragdoll.DxRagdollBoneConfig;
-import org.ode4j.ode.internal.ragdoll.DxRagdollJointConfig;
-import org.ode4j.ode.ragdoll.DRagdollBoneConfig;
-import org.ode4j.ode.ragdoll.DRagdollConfig;
-import org.ode4j.ode.ragdoll.DRagdollJointConfig;
-import org.ode4j.ode.ragdoll.DRagdollJointConfig.JointType;
+
+import com.github.antzGames.gdx.ode4j.math.DVector3;
+import com.github.antzGames.gdx.ode4j.ode.internal.ragdoll.DxRagdollBoneConfig;
+import com.github.antzGames.gdx.ode4j.ode.internal.ragdoll.DxRagdollJointConfig;
+import com.github.antzGames.gdx.ode4j.ode.ragdoll.DRagdollBoneConfig;
+import com.github.antzGames.gdx.ode4j.ode.ragdoll.DRagdollConfig;
+import com.github.antzGames.gdx.ode4j.ode.ragdoll.DRagdollJointConfig;
 
 /**
  * Human rag doll configuration based on http://www.monsterden.net/software/ragdoll-pyode-tutorial with tiny fixes.
@@ -154,38 +154,38 @@ public class DxDefaultHumanRagdollConfig implements DRagdollConfig {
     @Override
     public DRagdollJointConfig[] getJoints() {
         DRagdollJointConfig[] joints = new DRagdollJointConfig[LEFT_WRIST + 1];
-        joints[MID_SPINE] = new DxRagdollJointConfig(JointType.FIXED, CHEST, BELLY, null, null, null, 0, 0, 0, 0);
-        joints[LOW_SPINE] = new DxRagdollJointConfig(JointType.FIXED, BELLY, PELVIS, null, null, null, 0, 0, 0, 0);
-        joints[NECK] = new DxRagdollJointConfig(JointType.CONSTRAINED_BALL, CHEST, HEAD, getNeckPos(), upAxis, upAxis, -Math.PI * 0.25,
+        joints[MID_SPINE] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.FIXED, CHEST, BELLY, null, null, null, 0, 0, 0, 0);
+        joints[LOW_SPINE] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.FIXED, BELLY, PELVIS, null, null, null, 0, 0, 0, 0);
+        joints[NECK] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.CONSTRAINED_BALL, CHEST, HEAD, getNeckPos(), upAxis, upAxis, -Math.PI * 0.25,
             Math.PI * 0.25, -Math.PI * 0.3, Math.PI * 0.3);
-        joints[RIGHT_HIP] = new DxRagdollJointConfig(JointType.UNIVERSAL, PELVIS, RIGHT_UPPER_LEG, getRightHipPos(), bkwdAxis, rightAxis,
+        joints[RIGHT_HIP] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.UNIVERSAL, PELVIS, RIGHT_UPPER_LEG, getRightHipPos(), bkwdAxis, rightAxis,
             -Math.PI * 0.1, Math.PI * 0.3, -Math.PI * 0.15, Math.PI * 0.5);
-        joints[RIGHT_KNEE] = new DxRagdollJointConfig(JointType.HINGE, RIGHT_UPPER_LEG, RIGHT_LOWER_LEG, getRightKneePos(), leftAxis, null,
+        joints[RIGHT_KNEE] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.HINGE, RIGHT_UPPER_LEG, RIGHT_LOWER_LEG, getRightKneePos(), leftAxis, null,
             0.0, Math.PI * 0.75, 0.0, 0.0);
-        joints[RIGHT_ANKLE] = new DxRagdollJointConfig(JointType.HINGE, RIGHT_LOWER_LEG, RIGHT_FOOT, getRightAnklePos(), rightAxis, null,
+        joints[RIGHT_ANKLE] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.HINGE, RIGHT_LOWER_LEG, RIGHT_FOOT, getRightAnklePos(), rightAxis, null,
             -Math.PI * 0.1, Math.PI * 0.05, 0.0, 0.0);
-        joints[LEFT_HIP] = new DxRagdollJointConfig(JointType.UNIVERSAL, PELVIS, LEFT_UPPER_LEG, getLeftHipPos(), fwdAxis, rightAxis,
+        joints[LEFT_HIP] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.UNIVERSAL, PELVIS, LEFT_UPPER_LEG, getLeftHipPos(), fwdAxis, rightAxis,
             -Math.PI * 0.1, Math.PI * 0.3, -Math.PI * 0.15, Math.PI * 0.5);
-        joints[LEFT_KNEE] = new DxRagdollJointConfig(JointType.HINGE, LEFT_UPPER_LEG, LEFT_LOWER_LEG, getLeftKneePos(), leftAxis, null, 0.0,
+        joints[LEFT_KNEE] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.HINGE, LEFT_UPPER_LEG, LEFT_LOWER_LEG, getLeftKneePos(), leftAxis, null, 0.0,
             Math.PI * 0.75, 0.0, 0.0);
-        joints[LEFT_ANKLE] = new DxRagdollJointConfig(JointType.HINGE, LEFT_LOWER_LEG, LEFT_FOOT, getLeftAnklePos(), rightAxis, null,
+        joints[LEFT_ANKLE] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.HINGE, LEFT_LOWER_LEG, LEFT_FOOT, getLeftAnklePos(), rightAxis, null,
             -Math.PI * 0.1, Math.PI * 0.05, 0.0, 0.0);
 
         DVector3 axis = new DVector3(-1.0, -1.0, 4.0);
         axis.normalize();
-        joints[RIGHT_SHOULDER] = new DxRagdollJointConfig(JointType.CONSTRAINED_BALL, CHEST, RIGHT_UPPER_ARM, getRightShoulderPos(), axis,
+        joints[RIGHT_SHOULDER] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.CONSTRAINED_BALL, CHEST, RIGHT_UPPER_ARM, getRightShoulderPos(), axis,
             leftAxis, -Math.PI * 0.45, Math.PI * 0.45, -Math.PI * 0.25, Math.PI * 0.25);
-        joints[RIGHT_ELBOW] = new DxRagdollJointConfig(JointType.HINGE, RIGHT_UPPER_ARM, RIGHT_FORE_ARM, getRightElbowPos(), downAxis, null,
+        joints[RIGHT_ELBOW] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.HINGE, RIGHT_UPPER_ARM, RIGHT_FORE_ARM, getRightElbowPos(), downAxis, null,
             0.0, Math.PI * 0.6, 0.0, 0.0);
-        joints[RIGHT_WRIST] = new DxRagdollJointConfig(JointType.HINGE, RIGHT_FORE_ARM, RIGHT_HAND, getRightWristPos(), fwdAxis, null,
+        joints[RIGHT_WRIST] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.HINGE, RIGHT_FORE_ARM, RIGHT_HAND, getRightWristPos(), fwdAxis, null,
             -Math.PI * 0.1, Math.PI * 0.2, 0.0, 0.0);
         axis = new DVector3(1.0, -1.0, 4.0);
         axis.normalize();
-        joints[LEFT_SHOULDER] = new DxRagdollJointConfig(JointType.CONSTRAINED_BALL, CHEST, LEFT_UPPER_ARM, getLeftShoulderPos(), axis,
+        joints[LEFT_SHOULDER] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.CONSTRAINED_BALL, CHEST, LEFT_UPPER_ARM, getLeftShoulderPos(), axis,
             rightAxis, -Math.PI * 0.45, Math.PI * 0.45, -Math.PI * 0.25, Math.PI * 0.25);
-        joints[LEFT_ELBOW] = new DxRagdollJointConfig(JointType.HINGE, LEFT_UPPER_ARM, LEFT_FORE_ARM, getLeftElbowPos(), upAxis, null, 0.0,
+        joints[LEFT_ELBOW] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.HINGE, LEFT_UPPER_ARM, LEFT_FORE_ARM, getLeftElbowPos(), upAxis, null, 0.0,
             Math.PI * 0.6, 0.0, 0.0);
-        joints[LEFT_WRIST] = new DxRagdollJointConfig(JointType.HINGE, LEFT_FORE_ARM, LEFT_HAND, getLeftWristPos(), bkwdAxis, null,
+        joints[LEFT_WRIST] = new DxRagdollJointConfig(DRagdollJointConfig.JointType.HINGE, LEFT_FORE_ARM, LEFT_HAND, getLeftWristPos(), bkwdAxis, null,
             -Math.PI * 0.1, Math.PI * 0.2, 0.0, 0.0);
         return joints;
     }

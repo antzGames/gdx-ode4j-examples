@@ -1,10 +1,8 @@
 package com.antz.ode4libGDX.screens.demo;
 
-import static org.ode4j.ode.OdeHelper.*;
-import static org.ode4j.ode.OdeMath.*;
+
 import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.util.DxDefaultHumanRagdollConfig;
-import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -13,6 +11,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,39 +23,35 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.mbrlabs.mundus.commons.Scene;
-import com.mbrlabs.mundus.commons.assets.meta.MetaFileParseException;
-import com.mbrlabs.mundus.runtime.Mundus;
-import org.ode4j.math.DMatrix3;
-import org.ode4j.math.DMatrix3C;
-import org.ode4j.math.DQuaternion;
-import org.ode4j.math.DVector3;
-import org.ode4j.math.DVector3C;
-import org.ode4j.ode.DBody;
-import org.ode4j.ode.DCapsule;
-import org.ode4j.ode.DContact;
-import org.ode4j.ode.DContactBuffer;
-import org.ode4j.ode.DContactJoint;
-import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DJoint;
-import org.ode4j.ode.DJointGroup;
-import org.ode4j.ode.DSpace;
-import org.ode4j.ode.DWorld;
-import org.ode4j.ode.OdeHelper;
-import org.ode4j.ode.OdeMath;
-import org.ode4j.ode.internal.Rotation;
-import org.ode4j.ode.internal.ragdoll.DxRagdoll;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.github.antzGames.gdx.ode4j.Ode2GdxMathUtils;
+import com.github.antzGames.gdx.ode4j.math.DMatrix3;
+import com.github.antzGames.gdx.ode4j.math.DMatrix3C;
+import com.github.antzGames.gdx.ode4j.math.DQuaternion;
+import com.github.antzGames.gdx.ode4j.math.DVector3;
+import com.github.antzGames.gdx.ode4j.math.DVector3C;
+import com.github.antzGames.gdx.ode4j.ode.DBody;
+import com.github.antzGames.gdx.ode4j.ode.DCapsule;
+import com.github.antzGames.gdx.ode4j.ode.DContact;
+import com.github.antzGames.gdx.ode4j.ode.DContactBuffer;
+import com.github.antzGames.gdx.ode4j.ode.DContactJoint;
+import com.github.antzGames.gdx.ode4j.ode.DGeom;
+import com.github.antzGames.gdx.ode4j.ode.DJoint;
+import com.github.antzGames.gdx.ode4j.ode.DJointGroup;
+import com.github.antzGames.gdx.ode4j.ode.DSpace;
+import com.github.antzGames.gdx.ode4j.ode.DWorld;
+import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
+import com.github.antzGames.gdx.ode4j.ode.OdeMath;
+import com.github.antzGames.gdx.ode4j.ode.internal.Rotation;
+import com.github.antzGames.gdx.ode4j.ode.internal.ragdoll.DxRagdoll;
+import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactBounce;
+import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactSoftCFM;
+import static com.github.antzGames.gdx.ode4j.ode.OdeHelper.areConnectedExcluding;
+
 
 public class DemoRagDollScreen implements Screen, InputProcessor {
 
-    // My stuff
-    private Mundus mundus;
-    private Scene scene;
-    enum GameState {
-        LOADING,
-        RENDER
-    }
-    private GameState gameState = GameState.LOADING;
+    private PerspectiveCamera camera;
     private SpriteBatch batch;
     private BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/lsans-15.fnt"));
     private String info;
@@ -64,7 +59,6 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
     private ModelBuilder modelBuilder;
     private Model model;
     private InputMultiplexer inputMultiplexer;
-    private FirstPersonCameraController controller;
     private ModelInstance[] m = new ModelInstance[32];
 
     // **** ode4j Ragdoll Stuff
@@ -78,30 +72,11 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
 
     @Override
     public void show() {
-        inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(this);
-        modelBatch = new ModelBatch();
-        modelBuilder = new ModelBuilder();
-        batch = new SpriteBatch();
-        font.setColor(Color.BLUE);
+        init();
 
-        // From Mundus Example Project
-        Mundus.Config config = new Mundus.Config();
-        config.autoLoad = false; // Do not autoload, we want to queue custom assets
-        config.asyncLoad = true; // Do asynchronous loading
-
-        // Start asynchronous loading
-        mundus = new Mundus(Gdx.files.internal("mundus"), config);
-        try {
-            mundus.getAssetManager().queueAssetsForLoading(true);
-        } catch (MetaFileParseException e) {
-            e.printStackTrace();
-        }
-
-        info = "DemoRagDoll\n\n" +
-            "WASD to move camera, click-drag mouse to rotate camera.\n" +
-            "SPACE to apply some force to the ragdoll.\n" +
-            "F1 for Trimesh Heightfield Demo\n";
+       info = "DemoRagDoll\n\n" +
+        "SPACE to apply some force to the ragdoll.\n" +
+        "F1 for ODEvsBullet Demo\n";
 
         System.out.println(info);
 
@@ -139,26 +114,13 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-        switch (gameState) {
-            case LOADING:
-                continueLoading();
-                break;
-            case RENDER:
-                draw();
-                break;
-        }
+        ScreenUtils.clear(Color.WHITE, true);
+        draw();
     }
 
     private void draw() {
-        controller.update();        // camera controller
-        scene.sceneGraph.update();  // update Mundus
-        scene.render();             // render Mundus scene
-
         // 3D models drawing
-        modelBatch.begin(scene.cam);
+        modelBatch.begin(camera);
         doStep(false, modelBatch); // so the original demo did rendering in the simulation loop, I did the same thing, but I think its not a good idea
         modelBatch.end();
 
@@ -287,8 +249,6 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         // Destroy screen's assets here.
-        mundus.dispose();
-        scene.dispose();
         model.dispose();
         modelBatch.dispose();
         batch.dispose();
@@ -314,7 +274,7 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
                 break;
             case Input.Keys.F1:
                 odeDispose();
-                Ode4libGDX.game.setScreen(new DemoTriMeshHeightFieldScreen());
+                Ode4libGDX.game.setScreen(new OdeBulletTest());
                 break;
         }
         return false;
@@ -364,21 +324,19 @@ public class DemoRagDollScreen implements Screen, InputProcessor {
     }
 
 
-    private void continueLoading() {
-        if (mundus.continueLoading()) {
-            // Loading complete, load a scene.
-            scene = mundus.loadScene("Main Scene.mundus");
-            scene.cam.position.set(-5, 5, -5);
-            scene.cam.lookAt(0,5,0);
-            scene.cam.up.set(Vector3.Y);
-            scene.cam.update();;
-            // setup input
-            controller = new FirstPersonCameraController(scene.cam);
-            controller.setVelocity(20f);
-            inputMultiplexer.addProcessor(controller);
-            Gdx.input.setInputProcessor(inputMultiplexer);
-            // Update our game state
-            gameState = GameState.RENDER;
-        }
+    private void init() {
+        inputMultiplexer = new InputMultiplexer();
+        modelBatch = new ModelBatch();
+        modelBuilder = new ModelBuilder();
+        batch = new SpriteBatch();
+        font.setColor(Color.BLUE);
+
+        camera = new PerspectiveCamera(45, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.position.set(-10, 5, -10);
+        camera.lookAt(0,1,0);
+        camera.up.set(Vector3.Y);
+        camera.update();;
+        inputMultiplexer.addProcessor(this);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 }

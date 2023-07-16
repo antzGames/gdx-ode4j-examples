@@ -33,22 +33,8 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
   implementation "com.github.tommyettinger:formic:$formicVersion:sources"
-  implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
-  //implementation "com.github.tommyettinger:textratypist:$textratypistVersion:sources"
-
-//  api "com.github.antzGames.mundus:gdx-runtime:gdxteavm_issue_103_bypass-SNAPSHOT:sources"
-//  api "com.github.antzGames.mundus:commons:gdxteavm_issue_103_bypass-SNAPSHOT:sources"
-
-  api "com.github.jamestkhan.mundus:gdx-runtime:master-SNAPSHOT:sources"
-  api "com.github.jamestkhan.mundus:commons:master-SNAPSHOT:sources"
+  implementation "com.github.antzGames:gdx-ode4j:master-SNAPSHOT:sources"
   api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
-
-//// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
-//// If you do, follow the steps at https://github.com/tommyettinger/gdx-backends#gwt-2902100-support
-//// and you can use GWT 2.10.0, which gives you access to Java 11 language features.
-//// These releases use libGDX 1.11.0, and are not compatible with other versions.
-//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1100.0"
-//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1100.0:sources"
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask

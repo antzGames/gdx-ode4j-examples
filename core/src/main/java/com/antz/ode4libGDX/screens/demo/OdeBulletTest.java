@@ -1,6 +1,6 @@
 package com.antz.ode4libGDX.screens.demo;
 
-import com.antz.ode4libGDX.util.Ode2GdxMathUtils;
+import com.antz.ode4libGDX.Ode4libGDX;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
@@ -27,27 +27,24 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import org.ode4j.math.DQuaternion;
-import org.ode4j.math.DVector3C;
-import org.ode4j.ode.DBody;
-import org.ode4j.ode.DBox;
-import org.ode4j.ode.DContact;
-import org.ode4j.ode.DContactBuffer;
-import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DJoint;
-import org.ode4j.ode.DJointGroup;
-import org.ode4j.ode.DMass;
-import org.ode4j.ode.DSapSpace;
-import org.ode4j.ode.DSpace;
-import org.ode4j.ode.DWorld;
-import org.ode4j.ode.OdeHelper;
+import com.github.antzGames.gdx.ode4j.Ode2GdxMathUtils;
+import com.github.antzGames.gdx.ode4j.math.DQuaternion;
+import com.github.antzGames.gdx.ode4j.math.DVector3C;
+import com.github.antzGames.gdx.ode4j.ode.DBody;
+import com.github.antzGames.gdx.ode4j.ode.DBox;
+import com.github.antzGames.gdx.ode4j.ode.DContact;
+import com.github.antzGames.gdx.ode4j.ode.DContactBuffer;
+import com.github.antzGames.gdx.ode4j.ode.DGeom;
+import com.github.antzGames.gdx.ode4j.ode.DJoint;
+import com.github.antzGames.gdx.ode4j.ode.DJointGroup;
+import com.github.antzGames.gdx.ode4j.ode.DMass;
+import com.github.antzGames.gdx.ode4j.ode.DSapSpace;
+import com.github.antzGames.gdx.ode4j.ode.DSpace;
+import com.github.antzGames.gdx.ode4j.ode.DWorld;
+import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
 
-import static org.ode4j.ode.OdeConstants.dContactApprox1;
-import static org.ode4j.ode.OdeConstants.dContactBounce;
-import static org.ode4j.ode.OdeConstants.dContactSlip1;
-import static org.ode4j.ode.OdeConstants.dContactSlip2;
-import static org.ode4j.ode.OdeConstants.dContactSoftCFM;
-import static org.ode4j.ode.OdeConstants.dContactSoftERP;
+import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.*;
+
 
 public class OdeBulletTest implements Screen {
 
@@ -235,10 +232,11 @@ public class OdeBulletTest implements Screen {
         modelBatch.end();
 
         batch.begin();
-        font.draw(batch, "\nFPS: " + Gdx.graphics.getFramesPerSecond() +
+        font.draw(batch, "Bullet test on ODE4J" +
+            "\n\nFPS: " + Gdx.graphics.getFramesPerSecond() +
             "\nTotal Boxes: " + totalBoxes +
-            "\nInputs: Enter for fullscreen, Space to un/freeze simulation\nHold Left/Right mouse to manipulate camera", 30, Gdx.graphics.getHeight() - 14);
-        font.draw(batch, "Libgdx teaVM Backend + ODE4J", 20, 30);
+            "\nInputs: F2 for next demo" +
+            "\nHold Left/Right mouse to manipulate camera", 30, 120);
         batch.end();
     }
 
@@ -321,13 +319,9 @@ public class OdeBulletTest implements Screen {
     }
 
     public void doInput() {
-        if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
-            if(Gdx.graphics.isFullscreen()) {
-                Gdx.graphics.setWindowedMode(0, 0);
-            }
-            else {
-                Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-            }
+        if(Gdx.input.isKeyJustPressed(Keys.F2)) {
+            shutdownSimulation();
+            Ode4libGDX.game.setScreen(new DemoCollisionTest());
         }
     }
 
