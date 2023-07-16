@@ -1,17 +1,20 @@
 # gdx-ode4j Examples
 
-These are some examples and demos of using my [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) library.  
-This ODE4J library is compatible with all libGDX backends, including GWT.  It is based on
-version 0.4.2 of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j).
+Some examples and demos of using my [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) library. 
+
+This ODE4J library is compatible with all libGDX backends, including GWT.  
+
+It is based on version 0.4.2 of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j).
 
 https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/assets/10563814/b0db87e1-d548-43d6-bb89-02aa4ae2b21d
 
 You can test these demos on your browser on [itch.io](https://antzgames.itch.io/physics-in-a-browser).
 
 If you want to use ode4j only on libGDX Desktop/Android/iOS backends then I recommend you use [odej4](https://github.com/tzaeschke/ode4j) directly.  
-However if you want cross platform support (i.e include GWT support) then you need to this library.
+However if you want cross platform support (i.e include GWT support) then you need to use my [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) library.
 
 Currently this is the only 3D physics engine option for GWT on libGDX.  
+
 Fully tested on libGDX v1.12.0 and tested using WebGL2 support for GWT.
 
 I created this repository to play with a 3D physics engine that works on libGDX's GWT backend for game JAMS and other fun stuff.  I do not recommend to use in important projects.
@@ -38,24 +41,12 @@ The demos have been tested on GWT, Desktop and Android.
 ## Gotchas while porting ODE4J demos
 
 FYI, the original ode4j demos have Z UP which is a pain.  
+
 During demo migration I either rotated the camera `camera.up.set(Vector.Z)` or
-reconfigured the simulation (gravity, positions, rotations) to have Y UP.  
-Both worked but eventually its best to implement the second option.  
+reconfigured the simulation (gravity, positions, rotations) to have Y UP.  Both worked but eventually its best to implement the second option.
+
 In addition, libGDX primitive 3D shapes are created on the Y-axis orientation, and ode4j is on the z-axis.  
 You need to be careful that your physics objects and libGDX render objects have the same orientation.
-
-## GWT Performance
-
-To test performance for yourself, modify the [DemoCrashScreen](https://github.com/antzGames/gdx-ode4j-examples/blob/master/core/src/main/java/com/antz/ode4libGDX/screens/DemoCrashScreen.java).
-
-It currently creates 75 boxes and I get 60 frame per second (fps) on a Chrome based browser.  You can increase the size of the wall, resulting in more boxes by modifying these two constants:
-
-```java
-    private static final float WALLWIDTH = 12;		// width of wall
-    private static final float WALLHEIGHT = 10;		// height of wall
-```
-
-For me if when I generate over 200 boxes my fps on Chrome goes down significantly.
 
 ## Where to get ODE/ode4j documentation and help
 
