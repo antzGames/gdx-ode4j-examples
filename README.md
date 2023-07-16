@@ -23,7 +23,7 @@ You can test the demos on your browser [here](https://antzgames.itch.io/physics-
 
 ```F1``` key will cycle to the next demo.  On the last demo will need you to press F2 to return you to first demo.
 
-The following modified od4j demos are included:
+Description of included demos:
 
 * `Demo Collision` - the standard physics collision test with 1000 boxes.
 * `Dynamic Character` - [JamesTKhan's libGDX jBullet tutorial example](https://www.youtube.com/watch?v=O0Deshj2-KU), but using odej4 library. (Picture below)
