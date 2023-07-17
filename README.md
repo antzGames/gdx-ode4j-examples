@@ -8,7 +8,7 @@ You can test these demos on your browser on [itch.io](https://antzgames.itch.io/
 
 `gdx-ode4j` is based on version 0.4.2 of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j).
 
-https://github.com/antzGames/ode4j-GWT-Compatible-libGDX/assets/10563814/b0db87e1-d548-43d6-bb89-02aa4ae2b21d
+https://github.com/antzGames/gdx-ode4j/assets/10563814/bc46a9a9-f2e8-414b-bfde-8be6ea54e46b
 
 If you want to use ode4j only on libGDX Desktop/Android/iOS backends then I recommend you use [odej4](https://github.com/tzaeschke/ode4j) directly.  
 However if you want cross platform support (i.e include GWT support) then you need to use my [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) library.
