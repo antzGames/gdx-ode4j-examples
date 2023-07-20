@@ -46,10 +46,8 @@ import com.github.antzGames.gdx.ode4j.ode.DSapSpace;
 import com.github.antzGames.gdx.ode4j.ode.DSpace;
 import com.github.antzGames.gdx.ode4j.ode.DWorld;
 import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
-
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
-
 
 public class DemoCollisionTest implements Screen {
 
@@ -147,15 +145,8 @@ public class DemoCollisionTest implements Screen {
             if (b.isEnabled()) {
                 disable = true;
 
-                //DVector3C lvel = b.getLinearVel();
-                //double lspeed = b.getLinearVel().lengthSquared();
-                if (b.getLinearVel().lengthSquared() > DISABLE_THRESHOLD)
-                    disable = false;
-
-                //DVector3C avel = b.getAngularVel();
-                //double aspeed = b.getAngularVel().lengthSquared();
-                if (b.getAngularVel().lengthSquared() > DISABLE_THRESHOLD)
-                    disable = false;
+                if (b.getLinearVel().lengthSquared() > DISABLE_THRESHOLD) disable = false;
+                if (b.getAngularVel().lengthSquared() > DISABLE_THRESHOLD) disable = false;
 
                 if (disable)
                     wb_stepsdis[i]++;
@@ -180,10 +171,9 @@ public class DemoCollisionTest implements Screen {
             offsets.position(targetIndex);
             offsets.put(mat4.getValues());
 
-            renderable.meshPart.mesh.updateInstanceData(targetIndex, mat4.getValues());
-
+            renderable.meshPart.mesh.updateInstanceData(targetIndex, mat4.getValues()); // use this if you use culling
         }
-        //renderable.meshPart.mesh.updateInstanceData(0, offsets);
+        //renderable.meshPart.mesh.updateInstanceData(0, offsets); // if no culling done then you can use this, but comment out above
         physicsTime = TimeUtils.timeSinceNanos(startTime);
     }
 
@@ -443,10 +433,7 @@ public class DemoCollisionTest implements Screen {
         if (n > 0) {
             for (i=0; i<n; i++) {
                 DContact contact = contacts.get(i);
-//                contact.surface.mode = dContactSoftERP | dContactSoftCFM;
                 contact.surface.mu = 0.5;
-//                contact.surface.soft_erp = 0.8;
-//                contact.surface.soft_cfm = 0.01;
 
                 DJoint c = OdeHelper.createContactJoint(world, contactGroup, contact);
                 c.attach(o1.getBody(), o2.getBody());
@@ -489,7 +476,6 @@ public class DemoCollisionTest implements Screen {
 
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.9f, 0.9f, 0.9f, 1f));
-        //environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
         // batches
         batch = new ModelBatch();
