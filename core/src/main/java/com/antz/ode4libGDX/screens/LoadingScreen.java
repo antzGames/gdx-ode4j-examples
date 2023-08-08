@@ -2,7 +2,6 @@ package com.antz.ode4libGDX.screens;
 
 import com.antz.ode4libGDX.Ode4libGDX;
 import com.antz.ode4libGDX.screens.demo.DemoCollisionTest;
-import com.antz.ode4libGDX.screens.demo.DemoDynamicCharacterScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -46,7 +45,6 @@ public class LoadingScreen implements Screen {
         Gdx.input.setCatchKey(Input.Keys.LEFT, true);
         Gdx.input.setCatchKey(Input.Keys.RIGHT, true);
 
-        //assetManager = Constants.mundus.getAssetManager().getGdxAssetManager();
         assetManager = new AssetManager();
         assetManagerForLoadingBar = new AssetManager();
 
@@ -134,22 +132,22 @@ public class LoadingScreen implements Screen {
             font.draw(batch, "CLICK TO CONTINUE", stage.getWidth()/2f - 145, 270);
             font.setColor(Color.WHITE);
             batch.end();
-        }
-
-        if (assetManager.update()) { // Load some, will return true if done loading
-            //Textures
-
-            // Next Screen
-            if (!isReady){
-                loadingBar.remove();
-                loadingBarHidden.remove();
-                loadingFrame.remove();
-                isReady = true;
-
-            }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
                 Ode4libGDX.game.setScreen(new DemoCollisionTest());
+            }
+        } else {
+            if (assetManager.update()) { // Load some, will return true if done loading
+                //Textures
+
+                // Next Screen
+                if (!isReady) {
+                    loadingBar.remove();
+                    loadingBarHidden.remove();
+                    loadingFrame.remove();
+                    isReady = true;
+
+                }
             }
         }
     }
