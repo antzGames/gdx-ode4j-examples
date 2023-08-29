@@ -136,7 +136,7 @@ public class DemoCollisionTest implements Screen {
 
         startTime = TimeUtils.nanoTime();
         space.collide(null, nearCallback);
-        world.quickStep(Gdx.graphics.getDeltaTime());
+        world.quickStep(0.02);
         contactGroup.empty();
         boolean disable;
 
