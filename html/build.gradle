@@ -33,7 +33,7 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
   implementation "com.github.tommyettinger:formic:$formicVersion:sources"
-  implementation "com.github.antzGames:gdx-ode4j:master-SNAPSHOT:sources"
+  implementation "com.github.antzGames:ode4j:0.5.1:sources"
   api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion:sources"
 }
 

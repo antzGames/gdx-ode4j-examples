@@ -32,20 +32,20 @@ import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.github.antzGames.gdx.ode4j.Ode2GdxMathUtils;
-import com.github.antzGames.gdx.ode4j.math.DQuaternion;
-import com.github.antzGames.gdx.ode4j.ode.DBody;
-import com.github.antzGames.gdx.ode4j.ode.DBox;
-import com.github.antzGames.gdx.ode4j.ode.DContact;
-import com.github.antzGames.gdx.ode4j.ode.DContactBuffer;
-import com.github.antzGames.gdx.ode4j.ode.DGeom;
-import com.github.antzGames.gdx.ode4j.ode.DJoint;
-import com.github.antzGames.gdx.ode4j.ode.DJointGroup;
-import com.github.antzGames.gdx.ode4j.ode.DMass;
-import com.github.antzGames.gdx.ode4j.ode.DSapSpace;
-import com.github.antzGames.gdx.ode4j.ode.DSpace;
-import com.github.antzGames.gdx.ode4j.ode.DWorld;
-import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
+import org.ode4j.Ode2GdxMathUtils;
+import org.ode4j.math.DQuaternion;
+import org.ode4j.ode.DBody;
+import org.ode4j.ode.DBox;
+import org.ode4j.ode.DContact;
+import org.ode4j.ode.DContactBuffer;
+import org.ode4j.ode.DGeom;
+import org.ode4j.ode.DJoint;
+import org.ode4j.ode.DJointGroup;
+import org.ode4j.ode.DMass;
+import org.ode4j.ode.DSapSpace;
+import org.ode4j.ode.DSpace;
+import org.ode4j.ode.DWorld;
+import org.ode4j.ode.OdeHelper;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 
@@ -87,8 +87,8 @@ public class DemoCollisionTest implements Screen {
     private static int bodies;
     private static DJointGroup contactGroup;
     private DMass m;
-    private final int N = 1;
-    private DContactBuffer contacts;
+    private static final int MAX_CONTACTS = 1;
+    private static final DContactBuffer contacts = new DContactBuffer(MAX_CONTACTS);
 
     private static DBox[] wall_boxes;
     private static DBody[] wall_bodies;
@@ -427,9 +427,10 @@ public class DemoCollisionTest implements Screen {
         }
 
         int i,n;
-        contacts = new DContactBuffer(N);
+        //contacts = new DContactBuffer(N);
+        contacts.nullify(); // less GC
 
-        n = OdeHelper.collide(o1,o2,N,contacts.getGeomBuffer());
+        n = OdeHelper.collide(o1,o2, MAX_CONTACTS,contacts.getGeomBuffer());
         if (n > 0) {
             for (i=0; i<n; i++) {
                 DContact contact = contacts.get(i);

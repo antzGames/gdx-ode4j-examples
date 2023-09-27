@@ -25,12 +25,12 @@ package com.antz.ode4libGDX.util;
  *                                                                       *
  *************************************************************************/
 
-import com.github.antzGames.gdx.ode4j.math.DVector3;
-import com.github.antzGames.gdx.ode4j.ode.internal.ragdoll.DxRagdollBoneConfig;
-import com.github.antzGames.gdx.ode4j.ode.internal.ragdoll.DxRagdollJointConfig;
-import com.github.antzGames.gdx.ode4j.ode.ragdoll.DRagdollBoneConfig;
-import com.github.antzGames.gdx.ode4j.ode.ragdoll.DRagdollConfig;
-import com.github.antzGames.gdx.ode4j.ode.ragdoll.DRagdollJointConfig;
+import org.ode4j.math.DVector3;
+import org.ode4j.ode.internal.ragdoll.DxRagdollBoneConfig;
+import org.ode4j.ode.internal.ragdoll.DxRagdollJointConfig;
+import org.ode4j.ode.ragdoll.DRagdollBoneConfig;
+import org.ode4j.ode.ragdoll.DRagdollConfig;
+import org.ode4j.ode.ragdoll.DRagdollJointConfig;
 
 /**
  * Human rag doll configuration based on http://www.monsterden.net/software/ragdoll-pyode-tutorial with tiny fixes.

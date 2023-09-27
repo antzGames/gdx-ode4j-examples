@@ -6,9 +6,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.github.antzGames.gdx.ode4j.ode.DContactGeomBuffer;
-import com.github.antzGames.gdx.ode4j.ode.DRay;
-import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
+import org.ode4j.ode.DContactGeomBuffer;
+import org.ode4j.ode.DRay;
+import org.ode4j.ode.OdeHelper;
 
 
 /**

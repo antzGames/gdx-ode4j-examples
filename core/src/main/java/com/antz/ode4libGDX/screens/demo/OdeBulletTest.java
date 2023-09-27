@@ -27,23 +27,23 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.github.antzGames.gdx.ode4j.Ode2GdxMathUtils;
-import com.github.antzGames.gdx.ode4j.math.DQuaternion;
-import com.github.antzGames.gdx.ode4j.math.DVector3C;
-import com.github.antzGames.gdx.ode4j.ode.DBody;
-import com.github.antzGames.gdx.ode4j.ode.DBox;
-import com.github.antzGames.gdx.ode4j.ode.DContact;
-import com.github.antzGames.gdx.ode4j.ode.DContactBuffer;
-import com.github.antzGames.gdx.ode4j.ode.DGeom;
-import com.github.antzGames.gdx.ode4j.ode.DJoint;
-import com.github.antzGames.gdx.ode4j.ode.DJointGroup;
-import com.github.antzGames.gdx.ode4j.ode.DMass;
-import com.github.antzGames.gdx.ode4j.ode.DSapSpace;
-import com.github.antzGames.gdx.ode4j.ode.DSpace;
-import com.github.antzGames.gdx.ode4j.ode.DWorld;
-import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
+import org.ode4j.Ode2GdxMathUtils;
+import org.ode4j.math.DQuaternion;
+import org.ode4j.math.DVector3C;
+import org.ode4j.ode.DBody;
+import org.ode4j.ode.DBox;
+import org.ode4j.ode.DContact;
+import org.ode4j.ode.DContactBuffer;
+import org.ode4j.ode.DGeom;
+import org.ode4j.ode.DJoint;
+import org.ode4j.ode.DJointGroup;
+import org.ode4j.ode.DMass;
+import org.ode4j.ode.DSapSpace;
+import org.ode4j.ode.DSpace;
+import org.ode4j.ode.DWorld;
+import org.ode4j.ode.OdeHelper;
 
-import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.*;
+import static org.ode4j.ode.OdeConstants.*;
 
 
 public class OdeBulletTest implements Screen {

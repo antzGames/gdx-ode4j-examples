@@ -4,5 +4,5 @@ eclipse.project.name = appName + '-core'
 dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   api "com.github.tommyettinger:formic:$formicVersion"
-  api "com.github.antzGames:gdx-ode4j:master-SNAPSHOT"
+  api "com.github.antzGames:ode4j:0.5.1"
 }

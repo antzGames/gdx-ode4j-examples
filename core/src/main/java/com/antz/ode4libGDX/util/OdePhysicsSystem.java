@@ -3,26 +3,26 @@ package com.antz.ode4libGDX.util;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.github.antzGames.gdx.ode4j.Ode2GdxMathUtils;
-import com.github.antzGames.gdx.ode4j.math.DMatrix3;
-import com.github.antzGames.gdx.ode4j.ode.DBody;
-import com.github.antzGames.gdx.ode4j.ode.DContact;
-import com.github.antzGames.gdx.ode4j.ode.DContactBuffer;
-import com.github.antzGames.gdx.ode4j.ode.DContactJoint;
-import com.github.antzGames.gdx.ode4j.ode.DGeom;
-import com.github.antzGames.gdx.ode4j.ode.DJoint;
-import com.github.antzGames.gdx.ode4j.ode.DJointGroup;
-import com.github.antzGames.gdx.ode4j.ode.DSpace;
-import com.github.antzGames.gdx.ode4j.ode.DWorld;
-import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
+import org.ode4j.Ode2GdxMathUtils;
+import org.ode4j.math.DMatrix3;
+import org.ode4j.ode.DBody;
+import org.ode4j.ode.DContact;
+import org.ode4j.ode.DContactBuffer;
+import org.ode4j.ode.DContactJoint;
+import org.ode4j.ode.DGeom;
+import org.ode4j.ode.DJoint;
+import org.ode4j.ode.DJointGroup;
+import org.ode4j.ode.DSpace;
+import org.ode4j.ode.DWorld;
+import org.ode4j.ode.OdeHelper;
 
-import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactApprox1;
-import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactBounce;
-import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactSlip1;
-import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactSlip2;
-import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactSoftCFM;
-import static com.github.antzGames.gdx.ode4j.ode.OdeConstants.dContactSoftERP;
-import static com.github.antzGames.gdx.ode4j.ode.OdeHelper.areConnectedExcluding;
+import static org.ode4j.ode.OdeConstants.dContactApprox1;
+import static org.ode4j.ode.OdeConstants.dContactBounce;
+import static org.ode4j.ode.OdeConstants.dContactSlip1;
+import static org.ode4j.ode.OdeConstants.dContactSlip2;
+import static org.ode4j.ode.OdeConstants.dContactSoftCFM;
+import static org.ode4j.ode.OdeConstants.dContactSoftERP;
+import static org.ode4j.ode.OdeHelper.areConnectedExcluding;
 
 /**
  * Original code from: https://github.com/JamesTKhan/libgdx-bullet-tutorials

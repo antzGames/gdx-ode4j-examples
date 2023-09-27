@@ -36,18 +36,18 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.github.antzGames.gdx.ode4j.math.DMatrix3;
-import com.github.antzGames.gdx.ode4j.math.DQuaternion;
-import com.github.antzGames.gdx.ode4j.math.DVector3;
-import com.github.antzGames.gdx.ode4j.ode.DAABBC;
-import com.github.antzGames.gdx.ode4j.ode.DMass;
-import com.github.antzGames.gdx.ode4j.ode.DRay;
-import com.github.antzGames.gdx.ode4j.ode.DTriMesh;
-import com.github.antzGames.gdx.ode4j.ode.DTriMeshData;
-import com.github.antzGames.gdx.ode4j.ode.OdeHelper;
+import org.ode4j.math.DMatrix3;
+import org.ode4j.math.DQuaternion;
+import org.ode4j.math.DVector3;
+import org.ode4j.ode.DAABBC;
+import org.ode4j.ode.DMass;
+import org.ode4j.ode.DRay;
+import org.ode4j.ode.DTriMesh;
+import org.ode4j.ode.DTriMeshData;
+import org.ode4j.ode.OdeHelper;
 
-import static com.github.antzGames.gdx.ode4j.ode.internal.Common.M_PI;
-import static com.github.antzGames.gdx.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
+import static org.ode4j.ode.internal.Common.M_PI;
+import static org.ode4j.ode.internal.Rotation.dRFromAxisAndAngle;
 
 
 /**
