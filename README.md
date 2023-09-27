@@ -1,17 +1,17 @@
 # gdx-ode4j Examples
 
-Some examples and demos using my [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) library.
+Some examples and demos using my ODE4J fork [ode4j](https://github.com/antzGames/ode4j) library.
 
 `gdx-ode4j` library is compatible with all libGDX backends, including GWT.
 
 You can test these demos on your browser on [itch.io](https://antzgames.itch.io/physics-in-a-browser).
 
-`gdx-ode4j` is based on version 0.4.2 of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j).
+`gdx-ode4j` is based on version 0.5.1 of [Open Dynamics Engine for Java](https://github.com/tzaeschke/ode4j).
 
 https://github.com/antzGames/gdx-ode4j/assets/10563814/bc46a9a9-f2e8-414b-bfde-8be6ea54e46b
 
 If you want to use ode4j only on libGDX Desktop/Android/iOS backends then I recommend you use [odej4](https://github.com/tzaeschke/ode4j) directly.  
-However if you want cross platform support (i.e include GWT support) then you need to use my [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) library.
+However if you want cross platform support (i.e include GWT support) then you need to use [my fork of ode4j](https://github.com/antzGames/ode4j) library.
 
 Currently this is the only 3D physics engine option for GWT on libGDX.  
 
